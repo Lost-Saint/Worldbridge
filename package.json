@@ -10,6 +10,8 @@
     "build": "gulp",
     "build:local-sourcemaps": "gulp --local-sourcemaps",
     "build:sign": "gulp --sign",
+    "format": "dprint fmt",
+    "format:check": "dprint check",
     "polyfill": "webpack --entry=./polyfill.js --output-path=./src/lib --output-filename=polyfill.js -d inline-source-map"
   },
   "dependencies": {

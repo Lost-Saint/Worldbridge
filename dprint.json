@@ -1,0 +1,24 @@
+{
+  "lineWidth": 100,
+  "indentWidth": 2,
+  "useTabs": false,
+  "includes": [
+    "**/*.{css,html,js,json,md,svg,xml,yaml,yml}"
+  ],
+  "excludes": [
+    "**/build",
+    "**/dist",
+    "**/node_modules",
+    "extra/out",
+    "src/lib/polyfill.js",
+    "src/w3css"
+  ],
+  "plugins": [
+    "https://plugins.dprint.dev/typescript-0.96.1.wasm",
+    "https://plugins.dprint.dev/json-0.22.0.wasm",
+    "https://plugins.dprint.dev/markdown-0.22.1.wasm",
+    "https://plugins.dprint.dev/g-plane/malva-v0.16.0.wasm",
+    "https://plugins.dprint.dev/g-plane/markup_fmt-v0.27.3.wasm",
+    "https://plugins.dprint.dev/g-plane/pretty_yaml-v0.6.0.wasm"
+  ]
+}
