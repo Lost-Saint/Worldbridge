@@ -10,6 +10,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "./polyfill.js", "./*.d.ts"],
   "exclude": ["node_modules", "dist", "src/lib/polyfill.js"]
 }
