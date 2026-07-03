@@ -18,7 +18,8 @@ Translate pages in place with Google, Bing, or Yandex without opening a separate
 
 ### Firefox
 
-- Desktop: install from [Mozilla Add-ons](https://addons.mozilla.org/firefox/addon/traduzir-paginas-web/).
+- Desktop: install from
+  [Mozilla Add-ons](https://addons.mozilla.org/firefox/addon/traduzir-paginas-web/).
 - Android:
   1. Install Firefox 120 or newer.
   2. Open the extension manager.
@@ -47,7 +48,8 @@ pnpm install
 ### Load the extension for local debugging
 
 - Firefox: load the `src/` directory as a temporary add-on.
-- Chromium browsers: load `src/` as an unpacked extension if you want to test without the legacy compatibility build step.
+- Chromium browsers: load `src/` as an unpacked extension if you want to test without the legacy
+  compatibility build step.
 
 The `src/` directory is the editable extension source. It already contains the generated
 `src/lib/polyfill.js` bundle checked into the repository.
@@ -117,8 +119,10 @@ pnpm format:check
 
 ## Contributing
 
-- UI translation contributions are handled through [Crowdin](https://crowdin.com/project/translate-web-pages).
-- Code contributions should preserve the checked-in polyfill flow and browser-specific manifest setup.
+- UI translation contributions are handled through
+  [Crowdin](https://crowdin.com/project/translate-web-pages).
+- Code contributions should preserve the checked-in polyfill flow and browser-specific manifest
+  setup.
 
 ## Privacy
 

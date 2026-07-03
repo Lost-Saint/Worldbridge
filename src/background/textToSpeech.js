@@ -441,12 +441,12 @@ const textToSpeech = (function() {
         const audioKey = [targetLanguage, requestText].join(', ');
         if (!this.audios.get(audioKey)) {
           promises.push(
-                this.makeRequest(requestText, targetLanguage)
-                  .then(
-                    /** @type {string} */ (response) => {
-                      this.audios.set(audioKey, response);
-                      return response;
-                    },
+            this.makeRequest(requestText, targetLanguage)
+              .then(
+                /** @type {string} */ (response) => {
+                  this.audios.set(audioKey, response);
+                  return response;
+                },
               )
               .catch((e) => {
                 console.error(e);
@@ -591,7 +591,10 @@ const textToSpeech = (function() {
     },
     function getRequestBody(text, targetLanguage) {
       const languageData = BingHelper.getLanguageData(targetLanguage);
-      const ssml = `<speak version='1.0' xml:lang='${languageData.locale}'><voice xml:lang='${languageData.locale}' xml:gender='${languageData.gender}' name='${languageData.voice}'><prosody rate='-20.00%'>${FetchUtils.escapeXML(text)}</prosody></voice></speak>`;
+      const ssml =
+        `<speak version='1.0' xml:lang='${languageData.locale}'><voice xml:lang='${languageData.locale}' xml:gender='${languageData.gender}' name='${languageData.voice}'><prosody rate='-20.00%'>${
+          FetchUtils.escapeXML(text)
+        }</prosody></voice></speak>`;
 
       const params = new URLSearchParams();
       params.append('ssml', ssml);
