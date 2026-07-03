@@ -2,7 +2,9 @@
   "compilerOptions": {
     "target": "ES2023",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "checkJs": true,
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
     "strict": true,
     "types": ["chrome", "firefox-webext-browser"],
     "skipLibCheck": true,

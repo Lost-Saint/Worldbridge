@@ -1,7 +1,5 @@
 'use strict';
 
-let $ = document.querySelector.bind(document);
-
 twpConfig
   .onReady()
   .then(() => twpI18n.updateUiMessages())
@@ -143,7 +141,6 @@ twpConfig
     }
 
     const eOrigText = document.getElementById('eOrigText');
-    const eOrigTextDiv = document.getElementById('eOrigTextDiv');
     const eTextTranslated = document.getElementById('eTextTranslated');
 
     const sGoogle = document.getElementById('sGoogle');

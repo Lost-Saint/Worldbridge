@@ -818,14 +818,6 @@ twpConfig
     );
 
     // hotkeys options
-    function escapeHtml(unsafe) {
-      return unsafe
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
     $('[data-i18n="lblTranslateSelectedWhenPressTwice"]').innerHTML = $(
       '[data-i18n="lblTranslateSelectedWhenPressTwice"]',
     ).innerHTML.replace('[Ctrl]', '<kbd>Ctrl</kbd>');

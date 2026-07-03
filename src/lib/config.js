@@ -1,13 +1,22 @@
+// @ts-check
+
 'use strict';
 
+/** @typedef {import('../types/config').ArrayConfigName} ArrayConfigName */
+/** @typedef {import('../types/config').ConfigName} ConfigName */
+/** @typedef {import('../types/config').ConfigObserver} ConfigObserver */
+/** @typedef {import('../types/config').ConfigStore} ConfigStore */
+/** @typedef {import('../types/config').MapConfigName} MapConfigName */
+/** @typedef {import('../types/config').PageTranslatorServiceName} PageTranslatorServiceName */
+/** @typedef {import('../types/config').PersistedConfigStore} PersistedConfigStore */
+/** @typedef {import('../types/config').TwpConfigApi} TwpConfigApi */
+
 const twpConfig = (function() {
-  /** @type {function[]} */
+  /** @type {ConfigObserver[]} */
   const observers = [];
   const defaultTargetLanguages = ['en', 'es', 'de'];
-  /**
-   * all configName available
-   * @typedef {"uiLanguage" | "pageTranslatorService" | "textTranslatorService" | "textToSpeechService" | "enabledServices" | "ttsSpeed" | "ttsVolume" | "targetLanguage" | "targetLanguageTextTranslation" | "targetLanguages" | "alwaysTranslateSites" | "neverTranslateSites" | "sitesToTranslateWhenHovering" | "langsToTranslateWhenHovering" | "alwaysTranslateLangs" | "neverTranslateLangs" | "customDictionary" | "showTranslatePageContextMenu" | "showTranslateSelectedContextMenu" | "showButtonInTheAddressBar" | "showOriginalTextWhenHovering" | "showTranslateSelectedButton" | "whenShowMobilePopup" | "useOldPopup" | "darkMode" | "popupBlueWhenSiteIsTranslated" | "popupPanelSection" | "showReleaseNotes" | "dontShowIfIsNotValidText" | "dontShowIfPageLangIsTargetLang" | "dontShowIfPageLangIsUnknown" | "dontShowIfSelectedTextIsTargetLang" | "dontShowIfSelectedTextIsUnknown" | "hotkeys" | "expandPanelTranslateSelectedText" | "translateTag_pre" | "enableIframePageTranslation" | "dontSortResults" | "translateDynamicallyCreatedContent" | "autoTranslateWhenClickingALink" | "translateSelectedWhenPressTwice" | "translateTextOverMouseWhenPressTwice" | "translateClickingOnce" | "enableDiskCache" | "useAlternativeService" | "customServices" | "showMobilePopupOnDesktop" | "popupMobileKeepOnScren" | "popupMobilePosition" | "addPaddingToPage" | "proxyServers"} DefaultConfigNames
-   */
+
+  /** @type {ConfigStore} */
   const defaultConfig = {
     uiLanguage: 'default',
     pageTranslatorService: 'google', // google yandex bing
@@ -60,32 +69,51 @@ const twpConfig = (function() {
     popupMobilePosition: 'top', // top bottom
     addPaddingToPage: 'no',
     proxyServers: {},
+    lastTimeShowingReleaseNotes: null,
+    installDateTime: null,
+    originalUserAgent: null,
+    deepl_confirmed: 'no',
+    authorizationToOpenOptions: null,
   };
+
+  /** @type {ConfigName[]} */
+  const configNames = /** @type {ConfigName[]} */ (Object.keys(defaultConfig));
+
+  /** @type {ConfigStore} */
   const config = structuredClone(defaultConfig);
 
+  /** @type {Array<() => void>} */
   let onReadyObservers = [];
   let configIsReady = false;
-  let onReadyResolvePromise;
-  const onReadyPromise = new Promise(
-    (resolve) => (onReadyResolvePromise = resolve),
-  );
+  /** @type {(() => void) | null} */
+  let onReadyResolvePromise = null;
+  /** @type {Promise<void>} */
+  const onReadyPromise = new Promise((resolve) => {
+    onReadyResolvePromise = resolve;
+  });
 
-  /**
-   * this function is executed when de config is ready
-   */
   function readyConfig() {
     configIsReady = true;
     onReadyObservers.forEach((callback) => callback());
     onReadyObservers = [];
-    onReadyResolvePromise();
+    onReadyResolvePromise?.();
   }
 
-  const twpConfig = {};
+  /**
+   * @template {ConfigName} K
+   * @param {K} key
+   * @param {ConfigStore[K]} value
+   */
+  function assignConfigValue(key, value) {
+    config[key] = value;
+  }
+
+  /** @type {TwpConfigApi} */
+  const twpConfig = /** @type {TwpConfigApi} */ ({});
 
   /**
-   * create a listener to run when the settings are ready
-   * @param {function} callback
-   * @returns {Promise}
+   * @param {(() => void) | null} [callback]
+   * @returns {Promise<void>}
    */
   twpConfig.onReady = function(callback = null) {
     if (callback) {
@@ -95,68 +123,63 @@ const twpConfig = (function() {
         onReadyObservers.push(callback);
       }
     }
+
     return onReadyPromise;
   };
 
   /**
-   * get the value of a config
-   * @example
-   * twpConfig.get("targetLanguages")
-   * // returns ["en", "es", "de"]
-   * @param {DefaultConfigNames} name
-   * @returns {*} value
+   * @template {ConfigName} K
+   * @param {K} name
+   * @returns {ConfigStore[K]}
    */
   twpConfig.get = function(name) {
     return config[name];
   };
 
   /**
-   * set the value of a config
-   * @example
-   * twpConfig.set("showReleaseNotes", "no")
-   * @param {DefaultConfigNames} name
-   * @param {*} value
+   * @template {ConfigName} K
+   * @param {K} name
+   * @param {ConfigStore[K]} value
    */
   twpConfig.set = function(name, value) {
-    // @ts-ignore
     config[name] = value;
-    const obj = {};
-    obj[name] = toObjectOrArrayIfTypeIsMapOrSet(value);
-    chrome.storage.local.set(obj);
+
+    /** @type {Partial<PersistedConfigStore>} */
+    const storageValue = {};
+    storageValue[name] = toPersistedValue(value);
+
+    chrome.storage.local.set(storageValue);
     observers.forEach((callback) => callback(name, value));
   };
 
   /**
-   * export config as JSON string
-   * @returns {string} configJSON
+   * @returns {string}
    */
   twpConfig.export = function() {
-    const r = {
+    /** @type {Record<string, unknown>} */
+    const exportedConfig = {
       timeStamp: Date.now(),
       version: chrome.runtime.getManifest().version,
     };
 
-    for (const key in defaultConfig) {
-      // @ts-ignore
-      r[key] = toObjectOrArrayIfTypeIsMapOrSet(twpConfig.get(key));
+    for (const key of configNames) {
+      exportedConfig[key] = toPersistedValue(twpConfig.get(key));
     }
 
-    return JSON.stringify(r, null, 4);
+    return JSON.stringify(exportedConfig, null, 4);
   };
 
   /**
-   * import config and reload the extension
    * @param {string} configJSON
    */
   twpConfig.import = function(configJSON) {
-    const newconfig = JSON.parse(configJSON);
+    /** @type {Partial<PersistedConfigStore>} */
+    const newConfig = JSON.parse(configJSON);
 
-    for (const key in defaultConfig) {
-      if (typeof newconfig[key] !== 'undefined') {
-        let value = newconfig[key];
-        value = fixObjectType(key, value);
-        // @ts-ignore
-        twpConfig.set(key, value);
+    for (const key of configNames) {
+      const value = newConfig[key];
+      if (typeof value !== 'undefined') {
+        twpConfig.set(key, fromPersistedValue(key, value));
       }
     }
 
@@ -166,8 +189,8 @@ const twpConfig = (function() {
     ) {
       for (const name in config.hotkeys) {
         browser.commands.update({
-          name: name,
-          shortcut: config.hotkeys[name],
+          name,
+          shortcut: config.hotkeys[name] ?? '',
         });
       }
     }
@@ -175,29 +198,26 @@ const twpConfig = (function() {
     chrome.runtime.reload();
   };
 
-  /**
-   * restore the config to default and reaload the extension
-   */
   twpConfig.restoreToDefault = function() {
-    // try to reset the keyboard shortcuts
     if (
       typeof browser !== 'undefined' &&
       typeof browser.commands !== 'undefined'
     ) {
-      for (
-        const name of Object.keys(
-          chrome.runtime.getManifest().commands || {},
-        )
-      ) {
-        const info = chrome.runtime.getManifest().commands[name];
+      const commands = chrome.runtime.getManifest().commands || {};
+      for (const name of Object.keys(commands)) {
+        const info = commands[name];
+        if (!info) {
+          continue;
+        }
+
         if (info.suggested_key && info.suggested_key.default) {
           browser.commands.update({
-            name: name,
+            name,
             shortcut: info.suggested_key.default,
           });
         } else {
           browser.commands.update({
-            name: name,
+            name,
             shortcut: '',
           });
         }
@@ -208,82 +228,77 @@ const twpConfig = (function() {
   };
 
   /**
-   * create a listener to run when a config changes
-   * @param {function} callback
+   * @param {ConfigObserver} callback
    */
   twpConfig.onChanged = function(callback) {
     observers.push(callback);
   };
 
-  // listen to storage changes
   chrome.storage.onChanged.addListener((changes, areaName) => {
-    twpConfig.onReady(function() {
-      if (areaName === 'local') {
-        for (const name in changes) {
-          const newValue = changes[name].newValue;
-          if (config[name] !== newValue) {
-            config[name] = fixObjectType(name, newValue);
-            observers.forEach((callback) => callback(name, newValue));
-          }
+    twpConfig.onReady(() => {
+      if (areaName !== 'local') {
+        return;
+      }
+
+      for (const key of configNames) {
+        const storageChange = changes[key];
+        if (!storageChange || typeof storageChange.newValue === 'undefined') {
+          continue;
+        }
+
+        const newValue = fromPersistedValue(key, storageChange.newValue);
+        if (config[key] !== newValue) {
+          assignConfigValue(key, newValue);
+          observers.forEach((callback) => callback(key, newValue));
         }
       }
     });
   });
 
-  // load config
   chrome.i18n.getAcceptLanguages((acceptedLanguages) => {
     chrome.storage.local.get(null, (onGot) => {
-      // load config; convert object/array to map/set if necessary
-      for (const name in onGot) {
-        config[name] = fixObjectType(name, onGot[name]);
+      /** @type {Partial<PersistedConfigStore>} */
+      const storedConfig = onGot;
+
+      for (const key of configNames) {
+        const value = storedConfig[key];
+        if (typeof value !== 'undefined') {
+          assignConfigValue(key, fromPersistedValue(key, value));
+        }
       }
 
-      // if there are any targetLanguage undefined, replace them
-      if (config.targetLanguages.some((tl) => !tl)) {
+      if (config.targetLanguages.some((lang) => !lang)) {
         config.targetLanguages = [...defaultTargetLanguages];
         chrome.storage.local.set({
           targetLanguages: config.targetLanguages,
         });
       }
 
-      // Probably at this point it doesn't have 3 target languages.
+      for (const acceptedLanguage of acceptedLanguages) {
+        if (config.targetLanguages.length >= 3) {
+          break;
+        }
 
-      // try to get the 3 target languages through the user defined languages in the browser configuration.
-      for (let lang of acceptedLanguages) {
-        if (config.targetLanguages.length >= 3) { break; }
-        lang = twpLang.fixTLanguageCode(lang);
+        const lang = normalizeLanguageCode(acceptedLanguage);
         if (lang && config.targetLanguages.indexOf(lang) === -1) {
           config.targetLanguages.push(lang);
         }
       }
 
-      // then try to use de array defaultTargetLanguages ["en", "es", "de"]
-      for (const lang in defaultTargetLanguages) {
-        if (config.targetLanguages.length >= 3) { break; }
-        if (
-          config.targetLanguages.indexOf(defaultTargetLanguages[lang]) === -1
-        ) {
-          config.targetLanguages.push(defaultTargetLanguages[lang]);
-        }
-      }
-
-      // if targetLanguages is bigger than 3 remove the surplus
-      while (config.targetLanguages.length > 3) { config.targetLanguages.pop(); }
-
-      /*
-      // remove the duplicates languages
-      config.targetLanguages = [... new Set(config.targetLanguages)]
-      //*
-      // then try to use de array defaultTargetLanguages ["en", "es", "de"]
       for (const lang of defaultTargetLanguages) {
-        if (config.targetLanguages.length >= 3) break;
+        if (config.targetLanguages.length >= 3) {
+          break;
+        }
+
         if (config.targetLanguages.indexOf(lang) === -1) {
           config.targetLanguages.push(lang);
         }
       }
-      //*/
 
-      // if targetLanguage does not exits in targetLanguages, then set it to targetLanguages[0]
+      while (config.targetLanguages.length > 3) {
+        config.targetLanguages.pop();
+      }
+
       if (
         !config.targetLanguage ||
         config.targetLanguages.indexOf(config.targetLanguage) === -1
@@ -291,7 +306,6 @@ const twpConfig = (function() {
         config.targetLanguage = config.targetLanguages[0];
       }
 
-      // if targetLanguageTextTranslation does not exits in targetLanguages, then set it to targetLanguages[0]
       if (
         !config.targetLanguageTextTranslation ||
         config.targetLanguages.indexOf(config.targetLanguageTextTranslation) ===
@@ -300,41 +314,36 @@ const twpConfig = (function() {
         config.targetLanguageTextTranslation = config.targetLanguages[0];
       }
 
-      // fix targetLanguages
-      config.targetLanguages = config.targetLanguages.map((lang) => twpLang.fixTLanguageCode(lang));
-      // fix neverTranslateLangs
-      config.neverTranslateLangs = config.neverTranslateLangs.map((lang) =>
-        twpLang.fixTLanguageCode(lang)
+      config.targetLanguages = normalizeLanguageCodeList(config.targetLanguages);
+      config.neverTranslateLangs = normalizeLanguageCodeList(
+        config.neverTranslateLangs,
       );
-      // fix alwaysTranslateLangs
-      config.alwaysTranslateLangs = config.alwaysTranslateLangs.map((lang) =>
-        twpLang.fixTLanguageCode(lang)
+      config.alwaysTranslateLangs = normalizeLanguageCodeList(
+        config.alwaysTranslateLangs,
       );
-      // fix targetLanguage
-      config.targetLanguage = twpLang.fixTLanguageCode(config.targetLanguage);
-      // fix targetLanguageTextTranslation
-      config.targetLanguageTextTranslation = twpLang.fixTLanguageCode(
+      config.targetLanguage = normalizeLanguageCode(config.targetLanguage);
+      config.targetLanguageTextTranslation = normalizeLanguageCode(
         config.targetLanguageTextTranslation,
       );
 
-      // if targetLanguage does not exits in targetLanguages, then set it to targetLanguages[0]
-      if (config.targetLanguages.indexOf(config.targetLanguage) === -1) {
+      if (config.targetLanguages.indexOf(config.targetLanguage || '') === -1) {
         config.targetLanguage = config.targetLanguages[0];
       }
-      // if targetLanguageTextTranslation does not exits in targetLanguages, then set it to targetLanguages[0]
       if (
-        config.targetLanguages.indexOf(config.targetLanguageTextTranslation) ===
-          -1
+        config.targetLanguages.indexOf(
+          config.targetLanguageTextTranslation || '',
+        ) === -1
       ) {
         config.targetLanguageTextTranslation = config.targetLanguages[0];
       }
 
-      // try to save de keyboard shortcuts in the config
       if (typeof chrome.commands !== 'undefined') {
         chrome.commands.getAll((results) => {
           try {
             for (const result of results) {
-              config.hotkeys[result.name] = result.shortcut;
+              if (result.name) {
+                config.hotkeys[result.name] = result.shortcut;
+              }
             }
             twpConfig.set('hotkeys', config.hotkeys);
           } catch (e) {
@@ -349,6 +358,38 @@ const twpConfig = (function() {
     });
   });
 
+  /**
+   * @param {string | null | undefined} lang
+   * @returns {string | null}
+   */
+  function normalizeLanguageCode(lang) {
+    return /** @type {string | null} */ (
+      /** @type {any} */ (twpLang).fixTLanguageCode(lang) || null
+    );
+  }
+
+  /**
+   * @param {string[]} languages
+   * @returns {string[]}
+   */
+  function normalizeLanguageCodeList(languages) {
+    /** @type {string[]} */
+    const normalizedLanguages = [];
+
+    for (const lang of languages) {
+      const normalizedLang = normalizeLanguageCode(lang);
+      if (normalizedLang) {
+        normalizedLanguages.push(normalizedLang);
+      }
+    }
+
+    return normalizedLanguages;
+  }
+
+  /**
+   * @param {ArrayConfigName} configName
+   * @param {string} value
+   */
   function addInArray(configName, value) {
     const array = twpConfig.get(configName);
     if (array.indexOf(value) === -1) {
@@ -357,14 +398,23 @@ const twpConfig = (function() {
     }
   }
 
+  /**
+   * @param {MapConfigName} configName
+   * @param {string} key
+   * @param {string} value
+   */
   function addInMap(configName, key, value) {
-    let map = twpConfig.get(configName);
+    const map = twpConfig.get(configName);
     if (typeof map.get(key) === 'undefined') {
       map.set(key, value);
       twpConfig.set(configName, map);
     }
   }
 
+  /**
+   * @param {ArrayConfigName} configName
+   * @param {string} value
+   */
   function removeFromArray(configName, value) {
     const array = twpConfig.get(configName);
     const index = array.indexOf(value);
@@ -374,6 +424,10 @@ const twpConfig = (function() {
     }
   }
 
+  /**
+   * @param {MapConfigName} configName
+   * @param {string} key
+   */
   function removeFromMap(configName, key) {
     const map = twpConfig.get(configName);
     if (typeof map.get(key) !== 'undefined') {
@@ -402,23 +456,29 @@ const twpConfig = (function() {
     addInArray('alwaysTranslateSites', hostname);
     removeFromArray('neverTranslateSites', hostname);
   };
+
   twpConfig.removeSiteFromAlwaysTranslate = function(hostname) {
     removeFromArray('alwaysTranslateSites', hostname);
   };
+
   twpConfig.addSiteToNeverTranslate = function(hostname) {
     addInArray('neverTranslateSites', hostname);
     removeFromArray('alwaysTranslateSites', hostname);
     removeFromArray('sitesToTranslateWhenHovering', hostname);
   };
+
   twpConfig.addKeyWordTocustomDictionary = function(key, value) {
     addInMap('customDictionary', key, value);
   };
+
   twpConfig.removeSiteFromNeverTranslate = function(hostname) {
     removeFromArray('neverTranslateSites', hostname);
   };
+
   twpConfig.removeKeyWordFromcustomDictionary = function(keyWord) {
     removeFromMap('customDictionary', keyWord);
   };
+
   twpConfig.addLangToAlwaysTranslate = function(lang, hostname) {
     addInArray('alwaysTranslateLangs', lang);
     removeFromArray('neverTranslateLangs', lang);
@@ -427,9 +487,11 @@ const twpConfig = (function() {
       removeFromArray('neverTranslateSites', hostname);
     }
   };
+
   twpConfig.removeLangFromAlwaysTranslate = function(lang) {
     removeFromArray('alwaysTranslateLangs', lang);
   };
+
   twpConfig.addLangToNeverTranslate = function(lang, hostname) {
     addInArray('neverTranslateLangs', lang);
     removeFromArray('alwaysTranslateLangs', lang);
@@ -439,127 +501,116 @@ const twpConfig = (function() {
       removeFromArray('alwaysTranslateSites', hostname);
     }
   };
+
   twpConfig.removeLangFromNeverTranslate = function(lang) {
     removeFromArray('neverTranslateLangs', lang);
   };
 
   /**
-   * Add a new lang to the targetLanguages and remove the last target language. If the language is already in the targetLanguages then move it to the first position
-   * @example
-   * addTargetLanguage("de")
-   * @param {string} lang - langCode
-   * @returns
+   * @param {string} lang
    */
   function addTargetLanguage(lang) {
     const targetLanguages = twpConfig.get('targetLanguages');
-    lang = twpLang.fixTLanguageCode(lang);
-    if (!lang) { return; }
+    const normalizedLang = normalizeLanguageCode(lang);
+    if (!normalizedLang) {
+      return;
+    }
 
-    const index = targetLanguages.indexOf(lang);
+    const index = targetLanguages.indexOf(normalizedLang);
     if (index === -1) {
-      targetLanguages.unshift(lang);
+      targetLanguages.unshift(normalizedLang);
       targetLanguages.pop();
     } else {
       targetLanguages.splice(index, 1);
-      targetLanguages.unshift(lang);
+      targetLanguages.unshift(normalizedLang);
     }
 
     twpConfig.set('targetLanguages', targetLanguages);
   }
 
-  /**
-   * set lang as target language for page translation only (not text translation)
-   *
-   * if the lang in not in targetLanguages then call addTargetLanguage
-   * @example
-   * twpConfig.setTargetLanguage("de",  true)
-   * @param {string} lang - langCode
-   * @param {boolean} forTextToo - also call setTargetLanguageTextTranslation
-   * @returns
-   */
   twpConfig.setTargetLanguage = function(lang, forTextToo = false) {
     const targetLanguages = twpConfig.get('targetLanguages');
-    lang = twpLang.fixTLanguageCode(lang);
-    if (!lang) { return; }
-
-    if (targetLanguages.indexOf(lang) === -1 || forTextToo) {
-      addTargetLanguage(lang);
+    const normalizedLang = normalizeLanguageCode(lang);
+    if (!normalizedLang) {
+      return;
     }
 
-    twpConfig.set('targetLanguage', lang);
+    if (targetLanguages.indexOf(normalizedLang) === -1 || forTextToo) {
+      addTargetLanguage(normalizedLang);
+    }
+
+    twpConfig.set('targetLanguage', normalizedLang);
 
     if (forTextToo) {
-      twpConfig.setTargetLanguageTextTranslation(lang);
+      twpConfig.setTargetLanguageTextTranslation(normalizedLang);
     }
   };
 
-  /**
-   * set lang as target language for text translation only (not page translation)
-   * @example
-   * twpConfig.setTargetLanguage("de")
-   * @param {string} lang - langCode
-   * @returns
-   */
   twpConfig.setTargetLanguageTextTranslation = function(lang) {
-    lang = twpLang.fixTLanguageCode(lang);
-    if (!lang) { return; }
+    const normalizedLang = normalizeLanguageCode(lang);
+    if (!normalizedLang) {
+      return;
+    }
 
-    twpConfig.set('targetLanguageTextTranslation', lang);
+    twpConfig.set('targetLanguageTextTranslation', normalizedLang);
   };
 
   /**
-   * convert object to map or set if necessary, otherwise return the value itself
-   * @example
-   * fixObjectType("customDictionary", {})
-   * // returns Map
-   * fixObjectType("targetLanguages", ["en", "es", "de"])
-   * // return ["en", "es", "de"] -- Array
-   * @param {string} key
-   * @param {*} value
-   * @returns {Map | Set | *}
+   * @template {ConfigName} K
+   * @param {K} key
+   * @param {PersistedConfigStore[K]} value
+   * @returns {ConfigStore[K]}
    */
-  function fixObjectType(key, value) {
+  function fromPersistedValue(key, value) {
     if (defaultConfig[key] instanceof Map) {
-      return new Map(Object.entries(value));
-    } else if (defaultConfig[key] instanceof Set) {
-      return new Set(value);
-    } else {
-      return value;
+      return /** @type {ConfigStore[K]} */ (
+        /** @type {unknown} */ (
+          new Map(Object.entries(/** @type {Record<string, string>} */ (value)))
+        )
+      );
     }
+
+    return /** @type {ConfigStore[K]} */ (/** @type {unknown} */ (value));
   }
 
   /**
-   * convert map and set to object and array respectively, otherwise return the value itself
-   * @example
-   * toObjectOrArrayIfTypeIsMapOrSet(new Map())
-   * // returns {}
-   * toObjectOrArrayIfTypeIsMapOrSet({})
-   * // returns {}
-   * @param {Map | Set | *} value
-   * @returns {Object | Array | *}
+   * @template {ConfigName} K
+   * @param {ConfigStore[K]} value
+   * @returns {PersistedConfigStore[K]}
    */
-  function toObjectOrArrayIfTypeIsMapOrSet(value) {
+  function toPersistedValue(value) {
     if (value instanceof Map) {
-      return Object.fromEntries(value);
-    } else if (value instanceof Set) {
-      return Array.from(value);
-    } else {
-      return value;
+      return /** @type {PersistedConfigStore[K]} */ (
+        /** @type {unknown} */ (Object.fromEntries(value))
+      );
     }
+
+    return /** @type {PersistedConfigStore[K]} */ (
+      /** @type {unknown} */ (value)
+    );
   }
 
   /**
-   * Switch between page translation services that are enabled
-   * @returns {string} newServiceName
+   * @returns {PageTranslatorServiceName}
    */
   twpConfig.swapPageTranslationService = function() {
+    /** @type {PageTranslatorServiceName[]} */
     const pageTranslationServices = ['google', 'bing', 'yandex'];
-    const pageEnabledServices = twpConfig
-      .get('enabledServices')
-      .filter((svName) => pageTranslationServices.includes(svName));
+    /** @type {PageTranslatorServiceName[]} */
+    const pageEnabledServices = /** @type {PageTranslatorServiceName[]} */ (
+      twpConfig
+        .get('enabledServices')
+        .filter((serviceName) =>
+          pageTranslationServices.includes(
+            /** @type {PageTranslatorServiceName} */ (serviceName),
+          )
+        )
+    );
+
     const index = pageEnabledServices.indexOf(
       twpConfig.get('pageTranslatorService'),
     );
+
     if (index !== -1) {
       if (pageEnabledServices[index + 1]) {
         twpConfig.set('pageTranslatorService', pageEnabledServices[index + 1]);
@@ -569,6 +620,7 @@ const twpConfig = (function() {
     } else {
       twpConfig.set('pageTranslatorService', pageEnabledServices[0]);
     }
+
     return twpConfig.get('pageTranslatorService');
   };
 

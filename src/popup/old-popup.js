@@ -17,12 +17,9 @@ twpConfig
     };
 
     // get elements
-    const btnSwitchInterfaces = document.getElementById('btnSwitchInterfaces');
     const divIconTranslateContainer = document.getElementById(
       'divIconTranslateContainer',
     );
-    const divIconTranslate = document.getElementById('divIconTranslate');
-    const iconTranslate = document.getElementById('iconTranslate');
 
     const lblTranslate = document.getElementById('lblTranslate');
     const lblTranslating = document.getElementById('lblTranslating');
@@ -36,15 +33,9 @@ twpConfig
     const cbAlwaysTranslate = document.getElementById(
       'cbAlwaysTranslateThisLang',
     );
-    const lblAlwaysTranslate = document.getElementById(
-      'lblAlwaysTranslateThisLang',
-    );
-
     const selectTargetLanguage = document.getElementById(
       'selectTargetLanguage',
     );
-
-    const divOptionsList = document.getElementById('divOptionsList');
 
     const btnReset = document.getElementById('btnReset');
     const btnTranslate = document.getElementById('btnTranslate');
@@ -181,7 +172,6 @@ twpConfig
     }
 
     let originalTabLanguage = 'und';
-    let currentPageLanguage = 'und';
     let currentPageLanguageState = 'original';
     let currentPageTranslatorService = twpConfig.get('pageTranslatorService');
 
@@ -221,7 +211,6 @@ twpConfig
           (pageLanguage) => {
             checkedLastError();
             if (pageLanguage) {
-              currentPageLanguage = pageLanguage;
               updateInterface();
             }
           },

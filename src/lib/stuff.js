@@ -5,8 +5,7 @@
  */
 function tabsCreate(url, callback) {
   const userAgent = navigator.userAgent;
-  const isMobile =
-    userAgent.match(/Android/i) ||
+  const isMobile = userAgent.match(/Android/i) ||
     userAgent.match(/BlackBerry/i) ||
     userAgent.match(/iPhone|iPad|iPod/i) ||
     userAgent.match(/Opera Mini/i) ||

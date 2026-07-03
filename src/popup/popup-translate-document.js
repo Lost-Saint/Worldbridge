@@ -1,5 +1,4 @@
 const send = document.getElementById('send');
-const error = document.getElementById('error');
 const selectService = document.getElementById('selectService');
 const pleaseWait = document.getElementById('pleasewait');
 const googleTranslate = document.getElementById('googletranslate');

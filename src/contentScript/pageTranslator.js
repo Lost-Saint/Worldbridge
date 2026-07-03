@@ -917,7 +917,6 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
             };
             nodesToRestore.push(toRestore);
 
-            const originalText = originalTextNode.textContent;
             handleCustomWords(
               translated,
               nodes[j].textContent,
@@ -957,7 +956,6 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
             };
             nodesToRestore.push(toRestore);
 
-            const originalText = originalTextNode.textContent;
             handleCustomWords(
               translated,
               nodes[j].textContent,
