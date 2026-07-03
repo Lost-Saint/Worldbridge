@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
-    "target": "ES2022",
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "checkJs": true,
-    "alwaysStrict": true
+    "strict": true,
+    "types": ["chrome", "firefox-webext-browser"],
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "dist", "src/lib/polyfill.js"]
 }

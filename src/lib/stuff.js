@@ -1,6 +1,12 @@
-function tabsCreate(url, callback = null) {
+/**
+ * Opens a URL in a new tab, using the appropriate opener strategy for mobile vs desktop.
+ * @param {string} url
+ * @param {(tab: chrome.tabs.Tab) => void} [callback]
+ */
+function tabsCreate(url, callback) {
   const userAgent = navigator.userAgent;
-  const isMobile = userAgent.match(/Android/i) ||
+  const isMobile =
+    userAgent.match(/Android/i) ||
     userAgent.match(/BlackBerry/i) ||
     userAgent.match(/iPhone|iPad|iPod/i) ||
     userAgent.match(/Opera Mini/i) ||
