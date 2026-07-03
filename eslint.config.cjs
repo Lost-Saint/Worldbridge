@@ -83,7 +83,7 @@ module.exports = [
     },
   },
   {
-    files: ['eslint.config.js', 'gulpfile.js'],
+    files: ['eslint.config.cjs', 'gulpfile.cjs'],
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: 'script',

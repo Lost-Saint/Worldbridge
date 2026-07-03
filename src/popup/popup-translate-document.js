@@ -7,6 +7,12 @@ const cannotDownload = document.getElementById('cannotDownload');
 const conversion = document.getElementById('conversion');
 const conversionAlert = document.getElementById('conversionalert');
 
+/**
+ * Switches the popup into an unrecoverable error state.
+ *
+ * @param {unknown} e
+ * @returns {Promise<void>}
+ */
 async function showError(e) {
   console.error(e);
   selectService.style.display = 'none';
@@ -16,6 +22,12 @@ async function showError(e) {
   cannotDownload.style.display = 'block';
 }
 
+/**
+ * Downloads the current document as raw PDF bytes while updating progress text.
+ *
+ * @param {string} url
+ * @returns {Promise<ArrayBuffer>}
+ */
 async function downloadDocument(url) {
   return new Promise((resolve, reject) => {
     try {
@@ -45,6 +57,13 @@ async function downloadDocument(url) {
   });
 }
 
+/**
+ * Injects the downloaded PDF into the selected external translator form.
+ *
+ * @param {string} service
+ * @param {ArrayBuffer} data
+ * @returns {Promise<void>}
+ */
 async function convertDocument(service, data) {
   const file = new File([data], 'document.pdf', {
     type: 'application/pdf',
@@ -130,6 +149,11 @@ selectService.onclick = async (e) => {
 
 var $ = document.querySelector.bind(document);
 
+/**
+ * Applies the popup's light theme override.
+ *
+ * @returns {void}
+ */
 function disableDarkMode() {
   if (!$('#lightModeElement')) {
     const el = document.createElement('style');
@@ -152,6 +176,11 @@ function disableDarkMode() {
   }
 }
 
+/**
+ * Removes the popup's light theme override.
+ *
+ * @returns {void}
+ */
 function enableDarkMode() {
   if ($('#lightModeElement')) { $('#lightModeElement').remove(); }
 }

@@ -1,11 +1,26 @@
 'use strict';
 
+/**
+ * @typedef {Object} DetectedLanguageResult
+ * @property {string} lang
+ * @property {boolean} isReliable
+ */
+
 twpConfig
   .onReady()
   .then(() => twpI18n.updateUiMessages())
   .then(() => {
     twpI18n.translateDocument();
 
+    /**
+     * Sends a text translation request to the background service.
+     *
+     * @param {string} translationService
+     * @param {string} sourceLanguage
+     * @param {string} targetLanguage
+     * @param {string} source
+     * @returns {Promise<string>}
+     */
     function backgroundTranslateSingleText(
       translationService,
       sourceLanguage,
@@ -83,8 +98,16 @@ twpConfig
         break;
     }
 
+    /**
+     * Detects the source language for freeform text using the browser API.
+     *
+     * @param {string} text
+     * @returns {Promise<DetectedLanguageResult>}
+     */
     async function detectTextLanguage(text) {
-      if (!chrome.i18n.detectLanguage) { return 'und'; }
+      if (!chrome.i18n.detectLanguage) {
+        return { lang: 'und', isReliable: false };
+      }
 
       return await new Promise((resolve) => {
         chrome.i18n.detectLanguage(text, (result) => {
@@ -112,6 +135,14 @@ twpConfig
 
     let isPlayingAudio = false;
 
+    /**
+     * Starts text-to-speech playback and resets state when playback ends.
+     *
+     * @param {string} text
+     * @param {string} targetLanguage
+     * @param {() => void} [cbOnEnded=() => {}]
+     * @returns {void}
+     */
     function playAudio(text, targetLanguage, cbOnEnded = () => {}) {
       isPlayingAudio = true;
       chrome.runtime.sendMessage(
@@ -128,6 +159,11 @@ twpConfig
       );
     }
 
+    /**
+     * Stops any text-to-speech playback currently owned by the popup.
+     *
+     * @returns {void}
+     */
     function stopAudio() {
       if (isPlayingAudio) {
         chrome.runtime.sendMessage(
@@ -163,6 +199,11 @@ twpConfig
         });
     };
 
+    /**
+     * Restores the caret after hash-provided text is inserted into the editor.
+     *
+     * @returns {void}
+     */
     function setCaretAtEnd() {
       const el = eOrigText;
       const range = document.createRange();
@@ -266,6 +307,15 @@ twpConfig
       }
     };
 
+    /**
+     * Toggles audio playback for either the original or translated text.
+     *
+     * @param {'original' | 'translated'} type
+     * @param {HTMLElement} element
+     * @param {string} text
+     * @param {string} language
+     * @returns {void}
+     */
     function onListenClick(type, element, text, language) {
       const msgListen = twpI18n.getMessage('btnListen');
       const msgStopListening = twpI18n.getMessage('btnStopListening');
@@ -415,6 +465,11 @@ twpConfig
       }
     });
 
+    /**
+     * Translates the current editor text into the selected target language.
+     *
+     * @returns {void}
+     */
     function translateText() {
       stopAudio();
 

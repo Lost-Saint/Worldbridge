@@ -1,7 +1,17 @@
 'use strict';
 
+/**
+ * Shared browser and device detection flags derived from the persisted original
+ * user agent when available.
+ */
 const platformInfo = {};
 
+/**
+ * Populates platform flags once config is available so every script can make
+ * consistent browser-specific decisions.
+ *
+ * @returns {void}
+ */
 twpConfig.onReady(function() {
   if (chrome.tabs) {
     twpConfig.set('originalUserAgent', navigator.userAgent);

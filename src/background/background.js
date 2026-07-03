@@ -1,6 +1,7 @@
 'use strict';
 
 // get mimetype
+/** @type {Record<number, string | null | undefined>} */
 var tabToMimeType = {};
 chrome.webRequest.onHeadersReceived.addListener(
   function(details) {
@@ -116,6 +117,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+/**
+ * Recreates the selection context menu to match the current user preference.
+ *
+ * @returns {void}
+ */
 function updateTranslateSelectedContextMenu() {
   if (typeof chrome.contextMenus !== 'undefined') {
     chrome.contextMenus.remove('translate-selected-text', checkedLastError);
@@ -129,6 +135,12 @@ function updateTranslateSelectedContextMenu() {
   }
 }
 
+/**
+ * Rebuilds page translation context menu entries for the active page state.
+ *
+ * @param {'original' | 'translated'} [pageLanguageState='original']
+ * @returns {void}
+ */
 function updateContextMenu(pageLanguageState = 'original') {
   let contextMenuTitle;
   if (pageLanguageState === 'translated') {
