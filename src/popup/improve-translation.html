@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/w3css/4/w3.css" />
-  <style>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/w3css/4/w3.css" />
+    <style>
     body {
       user-select: none;
       font-family: Arial, sans-serif;
@@ -64,8 +63,8 @@
 
     .select:hover, .select:focus {
       background-color: rgba(0, 0, 0, 0.7);
-    } 
-    
+    }
+
     #btnApply {
       color: white;
       width: 90%;
@@ -84,75 +83,78 @@
       transform: translateY(-2px);
       background-color: rgba(0, 0, 0, 0.7);
     }
-  </style>
-</head>
+    </style>
+  </head>
 
-<body>
-  <div class="w3-display-topright">
-    <div id="btnClose">
-      <div id="mdiv">
-        <div class="mdiv">
-          <div class="md"></div>
+  <body>
+    <div class="w3-display-topright">
+      <div id="btnClose">
+        <div id="mdiv">
+          <div class="mdiv">
+            <div class="md"></div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div style="margin: 10px;">
-    <label for="selectOriginalLanguage" data-i18n="selectOriginalLanguage">Select the original website language</label>
-    <br>
-    <select class="select" id="selectOriginalLanguage">
-      <optgroup name="group_1" label="Recents" data-i18n-label="msgRecents">
-        <option value="auto" selected data-i18n="msgAutoDetect">Auto-detect</option>
-      </optgroup>
-      <optgroup name="group_2" label="All" data-i18n-label="msgAll"></optgroup>
-    </select>
-    <br>
-  </div>
+    <div style="margin: 10px">
+      <label for="selectOriginalLanguage" data-i18n="selectOriginalLanguage"
+      >Select the original website language</label>
+      <br>
+      <select class="select" id="selectOriginalLanguage">
+        <optgroup name="group_1" label="Recents" data-i18n-label="msgRecents">
+          <option value="auto" selected data-i18n="msgAutoDetect">Auto-detect</option>
+        </optgroup>
+        <optgroup name="group_2" label="All" data-i18n-label="msgAll"></optgroup>
+      </select>
+      <br>
+    </div>
 
-  <div style="margin: 10px;">
-    <label for="selectTargetLanguage" data-i18n="selectTargetLanguage">Select target language</label>
-    <br>
-    <select class="select" id="selectTargetLanguage">
-      <optgroup name="targets" label="Recents" data-i18n-label="msgRecents"></optgroup>
-      <optgroup name="all" label="All" data-i18n-label="msgAll"></optgroup>
-    </select>
-    <br>
-  </div>
+    <div style="margin: 10px">
+      <label for="selectTargetLanguage" data-i18n="selectTargetLanguage"
+      >Select target language</label>
+      <br>
+      <select class="select" id="selectTargetLanguage">
+        <optgroup name="targets" label="Recents" data-i18n-label="msgRecents"></optgroup>
+        <optgroup name="all" label="All" data-i18n-label="msgAll"></optgroup>
+      </select>
+      <br>
+    </div>
 
-  <div style="margin: 10px; margin-top: 5px;">
-    <label for="pageTranslatorService" data-i18n="lblPageTranslationService">Page translation service</label>
-    <br>
-    <select class="select" id="pageTranslatorService">
-      <option value="google">Google</option>
-      <option value="bing">Bing</option>
-      <option value="yandex">Yandex</option>
-    </select>
-    <br>
-  </div>
+    <div style="margin: 10px; margin-top: 5px">
+      <label for="pageTranslatorService" data-i18n="lblPageTranslationService"
+      >Page translation service</label>
+      <br>
+      <select class="select" id="pageTranslatorService">
+        <option value="google">Google</option>
+        <option value="bing">Bing</option>
+        <option value="yandex">Yandex</option>
+      </select>
+      <br>
+    </div>
 
-  <hr style="margin-bottom: 0;">
-  <div style="margin: 10px; margin-top: 5px;">
-    <label for="dontSortResults" data-i18n="lblDontSortResults">Do not sort translation results</label>
-    <br>
-    <select class="select" id="dontSortResults">
-      <option value="yes" data-i18n="msgYes">Yes</option>
-      <option value="no" data-i18n="msgNo" selected>No</option>
-    </select>
-    <br>
-  </div>
+    <hr style="margin-bottom: 0">
+    <div style="margin: 10px; margin-top: 5px">
+      <label for="dontSortResults" data-i18n="lblDontSortResults"
+      >Do not sort translation results</label>
+      <br>
+      <select class="select" id="dontSortResults">
+        <option value="yes" data-i18n="msgYes">Yes</option>
+        <option value="no" data-i18n="msgNo" selected>No</option>
+      </select>
+      <br>
+    </div>
 
-  <div style="margin: 10px; margin-top: 20px;">
-    <button data-i18n="btnApply" id="btnApply">Apply</button>
-  </div>
+    <div style="margin: 10px; margin-top: 20px">
+      <button data-i18n="btnApply" id="btnApply">Apply</button>
+    </div>
 
-  <script src="/lib/polyfill.js"></script>
-  <script src="/lib/checkedLastError.js"></script>
-  <script src="/lib/stuff.js"></script>
-  <script src="/lib/languages.js"></script>
-  <script src="/lib/config.js"></script>
-  <script src="/lib/i18n.js"></script>
-  <script src="improve-translation.js"></script>
-</body>
-
+    <script src="/lib/polyfill.js"></script>
+    <script src="/lib/checkedLastError.js"></script>
+    <script src="/lib/stuff.js"></script>
+    <script src="/lib/languages.js"></script>
+    <script src="/lib/config.js"></script>
+    <script src="/lib/i18n.js"></script>
+    <script src="improve-translation.js"></script>
+  </body>
 </html>

@@ -23,7 +23,7 @@ $("#btnApply").addEventListener("click", () => {
       (response) => {
         checkedLastError();
         window.history.back();
-      }
+      },
     );
   });
 });
@@ -45,7 +45,7 @@ twpConfig
           $("#selectOriginalLanguage").value = sourceLanguage
             ? sourceLanguage
             : "auto";
-        }
+        },
       );
 
       chrome.tabs.sendMessage(
@@ -56,7 +56,7 @@ twpConfig
           if (pageService) {
             $("#pageTranslatorService").value = pageService;
           }
-        }
+        },
       );
       chrome.tabs.sendMessage(
         tabs[0].id,
@@ -64,7 +64,7 @@ twpConfig
         (dontSortResults) => {
           checkedLastError();
           $("#dontSortResults").value = dontSortResults ? "yes" : "no";
-        }
+        },
       );
     });
 
@@ -76,11 +76,11 @@ twpConfig
       langsSorted.push([i, langs[i]]);
     }
 
-    langsSorted.sort(function (a, b) {
+    langsSorted.sort(function(a, b) {
       return a[1].localeCompare(b[1]);
     });
 
-    const eAllLangs = selectTargetLanguage.querySelector('[name="all"]');
+    const eAllLangs = selectTargetLanguage.querySelector("[name=\"all\"]");
     langsSorted.forEach((value) => {
       const option = document.createElement("option");
       option.value = value[0];
@@ -112,10 +112,10 @@ twpConfig
               }
             });
           }
-        }
+        },
       );
     });
-  
+
     const selectOriginalLanguage_group_2 = $("#selectOriginalLanguage > [name='group_2']");
     langsSorted.forEach((value) => {
       const option = document.createElement("option");
@@ -124,8 +124,7 @@ twpConfig
       selectOriginalLanguage_group_2.appendChild(option);
     });
 
-    const eRecentsLangs =
-      selectTargetLanguage.querySelector('[name="targets"]');
+    const eRecentsLangs = selectTargetLanguage.querySelector("[name=\"targets\"]");
     for (const value of twpConfig.get("targetLanguages")) {
       const option = document.createElement("option");
       option.value = value;

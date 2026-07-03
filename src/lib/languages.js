@@ -1,6 +1,6 @@
 "use strict";
 
-const twpLang = (function () {
+const twpLang = (function() {
   const allLanguagesNames = {
     af: {
       aa: "Afar Dili",
@@ -12232,11 +12232,10 @@ const twpLang = (function () {
    * get the list of localized languages for the current browser language
    * @returns {string[]} languageList
    */
-  twpLang.getLanguageList = function () {
-    let uiLanguage =
-      twpConfig.get("uiLanguage") !== "default"
-        ? twpConfig.get("uiLanguage")
-        : chrome.i18n.getUILanguage();
+  twpLang.getLanguageList = function() {
+    let uiLanguage = twpConfig.get("uiLanguage") !== "default"
+      ? twpConfig.get("uiLanguage")
+      : chrome.i18n.getUILanguage();
     uiLanguage = twpLang.fixUILanguageCode(uiLanguage) || "en";
     return allLanguagesNames[uiLanguage];
   };
@@ -12254,24 +12253,27 @@ const twpLang = (function () {
   twpLang.getAlternativeService = function getAlternativeService(
     lang,
     serviceName,
-    forPageTranslation = false
+    forPageTranslation = false,
   ) {
     lang = twpLang.fixTLanguageCode(lang);
     if (!twpLang.SupportedLanguages[serviceName]) return null;
     if (
-      forPageTranslation &&
-      pageTranslationServices.indexOf(serviceName) === -1
-    )
+      forPageTranslation
+      && pageTranslationServices.indexOf(serviceName) === -1
+    ) {
       return null;
-    if (twpLang.SupportedLanguages[serviceName].indexOf(lang) !== -1)
+    }
+    if (twpLang.SupportedLanguages[serviceName].indexOf(lang) !== -1) {
       return serviceName;
+    }
 
     if (twpConfig.get("useAlternativeService") !== "yes") return null;
 
     for (const sn in twpLang.SupportedLanguages) {
       if (sn === serviceName) continue;
-      if (forPageTranslation && pageTranslationServices.indexOf(sn) === -1)
+      if (forPageTranslation && pageTranslationServices.indexOf(sn) === -1) {
         continue;
+      }
       const langs = twpLang.SupportedLanguages[sn];
       if (langs.indexOf(lang) !== -1) {
         alternatives.set(lang, sn);
@@ -12291,7 +12293,7 @@ const twpLang = (function () {
    * @param {string} langCode
    * @returns {string} languageName
    */
-  twpLang.codeToLanguage = function (langCode) {
+  twpLang.codeToLanguage = function(langCode) {
     if (langCode === "und") {
       return twpI18n.getMessage("msgUnknownLanguage");
     }
@@ -12307,7 +12309,7 @@ const twpLang = (function () {
    * @param {string} langCode
    * @returns {string} langCode
    */
-  twpLang.fixUILanguageCode = function (langCode) {
+  twpLang.fixUILanguageCode = function(langCode) {
     if (typeof langCode !== "string") return;
 
     function getReplacer(langCode) {
@@ -12340,7 +12342,7 @@ const twpLang = (function () {
    * @param {string} langCode
    * @returns {string} langCode
    */
-  twpLang.fixTLanguageCode = function (langCode) {
+  twpLang.fixTLanguageCode = function(langCode) {
     if (typeof langCode !== "string") return;
 
     if (langCode === "zh") {
@@ -12377,15 +12379,15 @@ const twpLang = (function () {
    * @param {string} langCode
    * @returns {boolean} isRTL
    */
-  twpLang.isRtlLanguage = function (langCode) {
+  twpLang.isRtlLanguage = function(langCode) {
     const rtl_langs = [
       "ar",
       "ckb",
       "dv",
       "fa",
-      "he", //iw
+      "he", // iw
       "ks",
-      //"ku", equivale ao  ckb
+      // "ku", equivale ao  ckb
       "ms-Arab",
       "pa-Arab",
       "prs", // fa-AF

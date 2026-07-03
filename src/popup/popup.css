@@ -59,7 +59,8 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background-image: radial-gradient(black 2px, transparent 2px),
+  background-image:
+    radial-gradient(black 2px, transparent 2px),
     radial-gradient(black 2px, transparent 2px),
     radial-gradient(black 2px, transparent 2px);
   background-position: center -5px, center center, center 5px;
@@ -205,10 +206,9 @@ hr {
   box-sizing: border-box;
   position: relative;
   transform: translate(
-      calc(-10px / 2 * var(--ggs, 1)),
-      calc(-6px / 2 * var(--ggs, 1))
-    )
-    rotate(-45deg) scale(var(--ggs, 1));
+    calc(-10px / 2 * var(--ggs, 1)),
+    calc(-6px / 2 * var(--ggs, 1))
+  ) rotate(-45deg) scale(var(--ggs, 1));
   display: block;
 }
 .gg-heart::after,

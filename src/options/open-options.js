@@ -1,6 +1,6 @@
 function checkAuthorization(authorizationToOpenOptions) {
   if (authorizationToOpenOptions === location.hash.split("=")[1]) {
-    location.replace(chrome.runtime.getURL('/options/options.html'))
+    location.replace(chrome.runtime.getURL("/options/options.html"));
     chrome.storage.local.remove(["authorizationToOpenOptions"]);
   }
 }

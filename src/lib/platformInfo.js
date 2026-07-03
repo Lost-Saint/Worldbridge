@@ -2,7 +2,7 @@
 
 const platformInfo = {};
 
-twpConfig.onReady(function () {
+twpConfig.onReady(function() {
   if (chrome.tabs) {
     twpConfig.set("originalUserAgent", navigator.userAgent);
   }
@@ -21,12 +21,11 @@ twpConfig.onReady(function () {
     Opera: userAgent.match(/Opera Mini/i),
     Windows: userAgent.match(/IEMobile/i) || userAgent.match(/WPDesktop/i),
   };
-  platformInfo.isMobile.any =
-    platformInfo.isMobile.Android ||
-    platformInfo.isMobile.BlackBerry ||
-    platformInfo.isMobile.iOS ||
-    platformInfo.isMobile.Opera ||
-    platformInfo.isMobile.Windows;
+  platformInfo.isMobile.any = platformInfo.isMobile.Android
+    || platformInfo.isMobile.BlackBerry
+    || platformInfo.isMobile.iOS
+    || platformInfo.isMobile.Opera
+    || platformInfo.isMobile.Windows;
 
   platformInfo.isDesktop = {
     any: !platformInfo.isMobile.any,

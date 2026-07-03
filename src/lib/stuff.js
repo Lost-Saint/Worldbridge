@@ -1,12 +1,11 @@
 function tabsCreate(url, callback = null) {
   const userAgent = navigator.userAgent;
-  const isMobile =
-    userAgent.match(/Android/i) ||
-    userAgent.match(/BlackBerry/i) ||
-    userAgent.match(/iPhone|iPad|iPod/i) ||
-    userAgent.match(/Opera Mini/i) ||
-    userAgent.match(/IEMobile/i) ||
-    userAgent.match(/WPDesktop/i);
+  const isMobile = userAgent.match(/Android/i)
+    || userAgent.match(/BlackBerry/i)
+    || userAgent.match(/iPhone|iPad|iPod/i)
+    || userAgent.match(/Opera Mini/i)
+    || userAgent.match(/IEMobile/i)
+    || userAgent.match(/WPDesktop/i);
 
   if (isMobile) {
     chrome.tabs.create({ url }, callback);

@@ -1,6 +1,6 @@
 "use strict";
 
-const textToSpeech = (function () {
+const textToSpeech = (function() {
   const textToSpeech = {};
 
   class BingHelper {
@@ -84,7 +84,7 @@ const textToSpeech = (function () {
               }
               const abhText = responseText.slice(
                 abhStartIndex + abhStartText.length - 1,
-                abhEndIndex + 1
+                abhEndIndex + 1,
               );
               const abh = JSON.parse(abhText);
               const key = abh[0];
@@ -137,16 +137,16 @@ const textToSpeech = (function () {
       /** @type {{search: string, replace: string}[]} */
       // prettier-ignore
       const replacements = [
-        { search: "zh-CN", replace: "zh-Hans", },
-        { search: "zh-TW", replace: "zh-Hant", },
-        { search: "tl", replace: "fil", },
-        { search: "hmn", replace: "mww", },
-        { search: "ku", replace: "kmr", },
-        { search: "ckb", replace: "ku", },
-        { search: "mn", replace: "mn-Cyrl", },
-        { search: "no", replace: "nb", },
-        { search: "lg", replace: "lug", },
-        { search: "sr", replace: "sr-Cyrl", },
+        { search: "zh-CN", replace: "zh-Hans" },
+        { search: "zh-TW", replace: "zh-Hant" },
+        { search: "tl", replace: "fil" },
+        { search: "hmn", replace: "mww" },
+        { search: "ku", replace: "kmr" },
+        { search: "ckb", replace: "ku" },
+        { search: "mn", replace: "mn-Cyrl" },
+        { search: "no", replace: "nb" },
+        { search: "lg", replace: "lug" },
+        { search: "sr", replace: "sr-Cyrl" },
       ];
       replacements.forEach((r) => {
         if (language === r.search) {
@@ -156,70 +156,70 @@ const textToSpeech = (function () {
 
       // prettier-ignore
       const languageData = [
-        { language: 'af', locale: 'af-ZA', gender: 'Female', voice: 'af-ZA-AdriNeural' },
-        { language: 'am', locale: 'am-ET', gender: 'Female', voice: 'am-ET-MekdesNeural' },
-        { language: 'ar', locale: 'ar-SA', gender: 'Male', voice: 'ar-SA-HamedNeural' },
-        { language: 'bn', locale: 'bn-IN', gender: 'Female', voice: 'bn-IN-TanishaaNeural' },
-        { language: 'bg', locale: 'bg-BG', gender: 'Male', voice: 'bg-BG-BorislavNeural' },
-        { language: 'ca', locale: 'ca-ES', gender: 'Female', voice: 'ca-ES-JoanaNeural' },
-        { language: 'cs', locale: 'cs-CZ', gender: 'Male', voice: 'cs-CZ-AntoninNeural' },
-        { language: 'cy', locale: 'cy-GB', gender: 'Female', voice: 'cy-GB-NiaNeural' },
-        { language: 'da', locale: 'da-DK', gender: 'Female', voice: 'da-DK-ChristelNeural' },
-        { language: 'de', locale: 'de-DE', gender: 'Female', voice: 'de-DE-KatjaNeural' },
-        { language: 'el', locale: 'el-GR', gender: 'Male', voice: 'el-GR-NestorasNeural' },
-        { language: 'en', locale: 'en-US', gender: 'Female', voice: 'en-US-AriaNeural' },
-        { language: 'es', locale: 'es-ES', gender: 'Female', voice: 'es-ES-ElviraNeural' },
-        { language: 'et', locale: 'et-EE', gender: 'Female', voice: 'et-EE-AnuNeural' },
-        { language: 'fa', locale: 'fa-IR', gender: 'Female', voice: 'fa-IR-DilaraNeural' },
-        { language: 'fi', locale: 'fi-FI', gender: 'Female', voice: 'fi-FI-NooraNeural' },
-        { language: 'fr', locale: 'fr-FR', gender: 'Female', voice: 'fr-FR-DeniseNeural' },
-        { language: 'fr-CA', locale: 'fr-CA', gender: 'Female', voice: 'fr-CA-SylvieNeural' },
-        { language: 'ga', locale: 'ga-IE', gender: 'Female', voice: 'ga-IE-OrlaNeural' },
-        { language: 'gu', locale: 'gu-IN', gender: 'Female', voice: 'gu-IN-DhwaniNeural' },
-        { language: 'he', locale: 'he-IL', gender: 'Male', voice: 'he-IL-AvriNeural' },
-        { language: 'hi', locale: 'hi-IN', gender: 'Female', voice: 'hi-IN-SwaraNeural' },
-        { language: 'hr', locale: 'hr-HR', gender: 'Male', voice: 'hr-HR-SreckoNeural' },
-        { language: 'hu', locale: 'hu-HU', gender: 'Male', voice: 'hu-HU-TamasNeural' },
-        { language: 'id', locale: 'id-ID', gender: 'Male', voice: 'id-ID-ArdiNeural' },
-        { language: 'is', locale: 'is-IS', gender: 'Female', voice: 'is-IS-GudrunNeural' },
-        { language: 'it', locale: 'it-IT', gender: 'Male', voice: 'it-IT-DiegoNeural' },
-        { language: 'ja', locale: 'ja-JP', gender: 'Female', voice: 'ja-JP-NanamiNeural' },
-        { language: 'kk', locale: 'kk-KZ', gender: 'Female', voice: 'kk-KZ-AigulNeural' },
-        { language: 'km', locale: 'km-KH', gender: 'Female', voice: 'km-KH-SreymomNeural' },
-        { language: 'kn', locale: 'kn-IN', gender: 'Female', voice: 'kn-IN-SapnaNeural' },
-        { language: 'ko', locale: 'ko-KR', gender: 'Female', voice: 'ko-KR-SunHiNeural' },
-        { language: 'lo', locale: 'lo-LA', gender: 'Female', voice: 'lo-LA-KeomanyNeural' },
-        { language: 'lv', locale: 'lv-LV', gender: 'Female', voice: 'lv-LV-EveritaNeural' },
-        { language: 'lt', locale: 'lt-LT', gender: 'Female', voice: 'lt-LT-OnaNeural' },
-        { language: 'mk', locale: 'mk-MK', gender: 'Female', voice: 'mk-MK-MarijaNeural' },
-        { language: 'ml', locale: 'ml-IN', gender: 'Female', voice: 'ml-IN-SobhanaNeural' },
-        { language: 'mr', locale: 'mr-IN', gender: 'Female', voice: 'mr-IN-AarohiNeural' },
-        { language: 'ms', locale: 'ms-MY', gender: 'Male', voice: 'ms-MY-OsmanNeural' },
-        { language: 'mt', locale: 'mt-MT', gender: 'Female', voice: 'mt-MT-GraceNeural' },
-        { language: 'my', locale: 'my-MM', gender: 'Female', voice: 'my-MM-NilarNeural' },
-        { language: 'nl', locale: 'nl-NL', gender: 'Female', voice: 'nl-NL-ColetteNeural' },
-        { language: 'nb', locale: 'nb-NO', gender: 'Female', voice: 'nb-NO-PernilleNeural' },
-        { language: 'pl', locale: 'pl-PL', gender: 'Female', voice: 'pl-PL-ZofiaNeural' },
-        { language: 'ps', locale: 'ps-AF', gender: 'Female', voice: 'ps-AF-LatifaNeural' },
-        { language: 'pt', locale: 'pt-BR', gender: 'Female', voice: 'pt-BR-FranciscaNeural' },
-        { language: 'pt-PT', locale: 'pt-PT', gender: 'Female', voice: 'pt-PT-FernandaNeural' },
-        { language: 'ro', locale: 'ro-RO', gender: 'Male', voice: 'ro-RO-EmilNeural' },
-        { language: 'ru', locale: 'ru-RU', gender: 'Female', voice: 'ru-RU-DariyaNeural' },
-        { language: 'sk', locale: 'sk-SK', gender: 'Male', voice: 'sk-SK-LukasNeural' },
-        { language: 'sl', locale: 'sl-SI', gender: 'Male', voice: 'sl-SI-RokNeural' },
-        { language: 'sr-Cyrl', locale: 'sr-RS', gender: 'Female', voice: 'sr-RS-SophieNeural' },
-        { language: 'sv', locale: 'sv-SE', gender: 'Female', voice: 'sv-SE-SofieNeural' },
-        { language: 'ta', locale: 'ta-IN', gender: 'Female', voice: 'ta-IN-PallaviNeural' },
-        { language: 'te', locale: 'te-IN', gender: 'Male', voice: 'te-IN-ShrutiNeural' },
-        { language: 'th', locale: 'th-TH', gender: 'Male', voice: 'th-TH-NiwatNeural' },
-        { language: 'tr', locale: 'tr-TR', gender: 'Female', voice: 'tr-TR-EmelNeural' },
-        { language: 'uk', locale: 'uk-UA', gender: 'Female', voice: 'uk-UA-PolinaNeural' },
-        { language: 'ur', locale: 'ur-IN', gender: 'Female', voice: 'ur-IN-GulNeural' },
-        { language: 'uz', locale: 'uz-UZ', gender: 'Female', voice: 'uz-UZ-MadinaNeural' },
-        { language: 'vi', locale: 'vi-VN', gender: 'Male', voice: 'vi-VN-NamMinhNeural' },
-        { language: 'zh-Hans', locale: 'zh-CN', gender: 'Female', voice: 'zh-CN-XiaoxiaoNeural' },
-        { language: 'zh-Hant', locale: 'zh-CN', gender: 'Female', voice: 'zh-CN-XiaoxiaoNeural' },
-        { language: 'yue', locale: 'zh-HK', gender: 'Female', voice: 'zh-HK-HiuGaaiNeural' }
+        { language: "af", locale: "af-ZA", gender: "Female", voice: "af-ZA-AdriNeural" },
+        { language: "am", locale: "am-ET", gender: "Female", voice: "am-ET-MekdesNeural" },
+        { language: "ar", locale: "ar-SA", gender: "Male", voice: "ar-SA-HamedNeural" },
+        { language: "bn", locale: "bn-IN", gender: "Female", voice: "bn-IN-TanishaaNeural" },
+        { language: "bg", locale: "bg-BG", gender: "Male", voice: "bg-BG-BorislavNeural" },
+        { language: "ca", locale: "ca-ES", gender: "Female", voice: "ca-ES-JoanaNeural" },
+        { language: "cs", locale: "cs-CZ", gender: "Male", voice: "cs-CZ-AntoninNeural" },
+        { language: "cy", locale: "cy-GB", gender: "Female", voice: "cy-GB-NiaNeural" },
+        { language: "da", locale: "da-DK", gender: "Female", voice: "da-DK-ChristelNeural" },
+        { language: "de", locale: "de-DE", gender: "Female", voice: "de-DE-KatjaNeural" },
+        { language: "el", locale: "el-GR", gender: "Male", voice: "el-GR-NestorasNeural" },
+        { language: "en", locale: "en-US", gender: "Female", voice: "en-US-AriaNeural" },
+        { language: "es", locale: "es-ES", gender: "Female", voice: "es-ES-ElviraNeural" },
+        { language: "et", locale: "et-EE", gender: "Female", voice: "et-EE-AnuNeural" },
+        { language: "fa", locale: "fa-IR", gender: "Female", voice: "fa-IR-DilaraNeural" },
+        { language: "fi", locale: "fi-FI", gender: "Female", voice: "fi-FI-NooraNeural" },
+        { language: "fr", locale: "fr-FR", gender: "Female", voice: "fr-FR-DeniseNeural" },
+        { language: "fr-CA", locale: "fr-CA", gender: "Female", voice: "fr-CA-SylvieNeural" },
+        { language: "ga", locale: "ga-IE", gender: "Female", voice: "ga-IE-OrlaNeural" },
+        { language: "gu", locale: "gu-IN", gender: "Female", voice: "gu-IN-DhwaniNeural" },
+        { language: "he", locale: "he-IL", gender: "Male", voice: "he-IL-AvriNeural" },
+        { language: "hi", locale: "hi-IN", gender: "Female", voice: "hi-IN-SwaraNeural" },
+        { language: "hr", locale: "hr-HR", gender: "Male", voice: "hr-HR-SreckoNeural" },
+        { language: "hu", locale: "hu-HU", gender: "Male", voice: "hu-HU-TamasNeural" },
+        { language: "id", locale: "id-ID", gender: "Male", voice: "id-ID-ArdiNeural" },
+        { language: "is", locale: "is-IS", gender: "Female", voice: "is-IS-GudrunNeural" },
+        { language: "it", locale: "it-IT", gender: "Male", voice: "it-IT-DiegoNeural" },
+        { language: "ja", locale: "ja-JP", gender: "Female", voice: "ja-JP-NanamiNeural" },
+        { language: "kk", locale: "kk-KZ", gender: "Female", voice: "kk-KZ-AigulNeural" },
+        { language: "km", locale: "km-KH", gender: "Female", voice: "km-KH-SreymomNeural" },
+        { language: "kn", locale: "kn-IN", gender: "Female", voice: "kn-IN-SapnaNeural" },
+        { language: "ko", locale: "ko-KR", gender: "Female", voice: "ko-KR-SunHiNeural" },
+        { language: "lo", locale: "lo-LA", gender: "Female", voice: "lo-LA-KeomanyNeural" },
+        { language: "lv", locale: "lv-LV", gender: "Female", voice: "lv-LV-EveritaNeural" },
+        { language: "lt", locale: "lt-LT", gender: "Female", voice: "lt-LT-OnaNeural" },
+        { language: "mk", locale: "mk-MK", gender: "Female", voice: "mk-MK-MarijaNeural" },
+        { language: "ml", locale: "ml-IN", gender: "Female", voice: "ml-IN-SobhanaNeural" },
+        { language: "mr", locale: "mr-IN", gender: "Female", voice: "mr-IN-AarohiNeural" },
+        { language: "ms", locale: "ms-MY", gender: "Male", voice: "ms-MY-OsmanNeural" },
+        { language: "mt", locale: "mt-MT", gender: "Female", voice: "mt-MT-GraceNeural" },
+        { language: "my", locale: "my-MM", gender: "Female", voice: "my-MM-NilarNeural" },
+        { language: "nl", locale: "nl-NL", gender: "Female", voice: "nl-NL-ColetteNeural" },
+        { language: "nb", locale: "nb-NO", gender: "Female", voice: "nb-NO-PernilleNeural" },
+        { language: "pl", locale: "pl-PL", gender: "Female", voice: "pl-PL-ZofiaNeural" },
+        { language: "ps", locale: "ps-AF", gender: "Female", voice: "ps-AF-LatifaNeural" },
+        { language: "pt", locale: "pt-BR", gender: "Female", voice: "pt-BR-FranciscaNeural" },
+        { language: "pt-PT", locale: "pt-PT", gender: "Female", voice: "pt-PT-FernandaNeural" },
+        { language: "ro", locale: "ro-RO", gender: "Male", voice: "ro-RO-EmilNeural" },
+        { language: "ru", locale: "ru-RU", gender: "Female", voice: "ru-RU-DariyaNeural" },
+        { language: "sk", locale: "sk-SK", gender: "Male", voice: "sk-SK-LukasNeural" },
+        { language: "sl", locale: "sl-SI", gender: "Male", voice: "sl-SI-RokNeural" },
+        { language: "sr-Cyrl", locale: "sr-RS", gender: "Female", voice: "sr-RS-SophieNeural" },
+        { language: "sv", locale: "sv-SE", gender: "Female", voice: "sv-SE-SofieNeural" },
+        { language: "ta", locale: "ta-IN", gender: "Female", voice: "ta-IN-PallaviNeural" },
+        { language: "te", locale: "te-IN", gender: "Male", voice: "te-IN-ShrutiNeural" },
+        { language: "th", locale: "th-TH", gender: "Male", voice: "th-TH-NiwatNeural" },
+        { language: "tr", locale: "tr-TR", gender: "Female", voice: "tr-TR-EmelNeural" },
+        { language: "uk", locale: "uk-UA", gender: "Female", voice: "uk-UA-PolinaNeural" },
+        { language: "ur", locale: "ur-IN", gender: "Female", voice: "ur-IN-GulNeural" },
+        { language: "uz", locale: "uz-UZ", gender: "Female", voice: "uz-UZ-MadinaNeural" },
+        { language: "vi", locale: "vi-VN", gender: "Male", voice: "vi-VN-NamMinhNeural" },
+        { language: "zh-Hans", locale: "zh-CN", gender: "Female", voice: "zh-CN-XiaoxiaoNeural" },
+        { language: "zh-Hant", locale: "zh-CN", gender: "Female", voice: "zh-CN-XiaoxiaoNeural" },
+        { language: "yue", locale: "zh-HK", gender: "Female", voice: "zh-HK-HiuGaaiNeural" },
       ];
 
       const data = languageData.find((data) => data.language === language);
@@ -315,7 +315,7 @@ const textToSpeech = (function () {
       baseURL,
       xhrMethod,
       cbGetExtraParameters,
-      cbGetRequestBody = null
+      cbGetRequestBody = null,
     ) {
       this.serviceName = serviceName;
       this.baseURL = baseURL;
@@ -400,13 +400,13 @@ const textToSpeech = (function () {
         };
         xhr.open(
           this.xhrMethod,
-          this.baseURL + this.cbGetExtraParameters(text, targetLanguage)
+          this.baseURL + this.cbGetExtraParameters(text, targetLanguage),
         );
         xhr.responseType = "blob";
         if (this.cbGetRequestBody) {
           xhr.setRequestHeader(
             "Content-Type",
-            "application/x-www-form-urlencoded"
+            "application/x-www-form-urlencoded",
           );
           xhr.send(this.cbGetRequestBody(text, targetLanguage));
         } else {
@@ -439,21 +439,19 @@ const textToSpeech = (function () {
                   const audio = new Audio(response);
                   this.audios.set(audioKey, audio);
                   return response;
-                }
+                },
               )
               .catch((e) => {
                 console.error(e);
                 return null;
-              })
+              }),
           );
         }
       }
 
       await Promise.all(promises);
       return await this.play(
-        requests.map((text) =>
-          this.audios.get([targetLanguage, text].join(", "))
-        )
+        requests.map((text) => this.audios.get([targetLanguage, text].join(", "))),
       );
     }
 
@@ -478,7 +476,7 @@ const textToSpeech = (function () {
                   () => {
                     playAll(currentIndex + 1);
                   },
-                  { once: true }
+                  { once: true },
                 );
               } else {
                 resolve();
@@ -494,7 +492,7 @@ const textToSpeech = (function () {
               () => {
                 resolve();
               },
-              { once: true }
+              { once: true },
             );
           }
         } catch (e) {
@@ -550,10 +548,12 @@ const textToSpeech = (function () {
     "https://translate.google.com/translate_tts?ie=UTF-8",
     "GET",
     function getExtraParameters(text, targetLanguage) {
-      return `&tl=${targetLanguage}&client=dict-chrome-ex&ttsspeed=0.5&q=${encodeURIComponent(
-        text
-      )}`;
-    }
+      return `&tl=${targetLanguage}&client=dict-chrome-ex&ttsspeed=0.5&q=${
+        encodeURIComponent(
+          text,
+        )
+      }`;
+    },
   );
 
   // Create a Service instance based on bings's text-to-speech service.
@@ -562,9 +562,11 @@ const textToSpeech = (function () {
     "https://www.bing.com/tfettts?isVertical=1",
     "POST",
     function getExtraParameters(text, targetLanguage) {
-      return `&&IG=${encodeURIComponent(
-        BingHelper.IG
-      )}&IID=${encodeURIComponent(BingHelper.IID)}.${"1"}`;
+      return `&&IG=${
+        encodeURIComponent(
+          BingHelper.IG,
+        )
+      }&IID=${encodeURIComponent(BingHelper.IID)}.${"1"}`;
     },
     function getRequestBody(text, targetLanguage) {
       const languageData = BingHelper.getLanguageData(targetLanguage);
@@ -572,7 +574,7 @@ const textToSpeech = (function () {
       const domParser = new DOMParser();
       const doc = domParser.parseFromString(
         `<speak version='1.0' xml:lang=''><voice xml:lang='' xml:gender='' name=''><prosody rate='-20.00%'></prosody></voice></speak>`,
-        "text/xml"
+        "text/xml",
       );
       doc.querySelector("speak").setAttribute("xml:lang", languageData.locale);
       doc.querySelector("voice").setAttribute("xml:lang", languageData.locale);
@@ -587,7 +589,7 @@ const textToSpeech = (function () {
       params.append("token", BingHelper.token);
       params.append("key", BingHelper.key.toString());
       return params.toString();
-    }
+    },
   );
 
   // Listen for messages coming from contentScript or other scripts.

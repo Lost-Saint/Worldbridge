@@ -11,7 +11,7 @@ function getTabHostName() {
   );
 }
 
-Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
+Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   const tabHostName = _[1];
   if (platformInfo.isMobile.any) return;
 
@@ -25,10 +25,9 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
   let originalTabLanguage = "und";
   let currentTargetLanguages = twpConfig.get("targetLanguages");
   let currentTargetLanguage = twpConfig.get("targetLanguageTextTranslation");
-  let currentTextTranslatorService =
-    twpConfig.get("textTranslatorService") === "deepl"
-      ? "google"
-      : twpConfig.get("textTranslatorService");
+  let currentTextTranslatorService = twpConfig.get("textTranslatorService") === "deepl"
+    ? "google"
+    : twpConfig.get("textTranslatorService");
   let showTranslatedTextWhenHoveringThisSite =
     twpConfig.get("sitesToTranslateWhenHovering").indexOf(tabHostName) !== -1;
   let showTranslatedTextWhenHoveringThisLang = false;
@@ -36,11 +35,10 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     twpConfig.get("translateTextOverMouseWhenPressTwice") === "yes";
   let fooCount = 0;
 
-  twpConfig.onChanged(function (name, newValue) {
+  twpConfig.onChanged(function(name, newValue) {
     switch (name) {
       case "textTranslatorService":
-        currentTextTranslatorService =
-          newValue === "deepl" ? "google" : newValue;
+        currentTextTranslatorService = newValue === "deepl" ? "google" : newValue;
         break;
       case "targetLanguages":
         currentTargetLanguages = newValue;
@@ -49,13 +47,11 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
         currentTargetLanguage = newValue;
         break;
       case "sitesToTranslateWhenHovering":
-        showTranslatedTextWhenHoveringThisSite =
-          newValue.indexOf(tabHostName) !== -1;
+        showTranslatedTextWhenHoveringThisSite = newValue.indexOf(tabHostName) !== -1;
         updateEventListener();
         break;
       case "langsToTranslateWhenHovering":
-        showTranslatedTextWhenHoveringThisLang =
-          newValue.indexOf(originalTabLanguage) !== -1;
+        showTranslatedTextWhenHoveringThisLang = newValue.indexOf(originalTabLanguage) !== -1;
         updateEventListener();
         break;
       case "translateTextOverMouseWhenPressTwice":
@@ -99,7 +95,9 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     "textarea",
     "svg",
     "template",
-    "math", "mjx-container", "tex-math" // https://github.com/FilipePS/Traduzir-paginas-web/issues/704
+    "math",
+    "mjx-container",
+    "tex-math", // https://github.com/FilipePS/Traduzir-paginas-web/issues/704
   ];
 
   if (twpConfig.get("translateTag_pre") !== "yes") {
@@ -145,8 +143,8 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
 
     if (
       !(
-        !showTranslatedTextWhenHoveringThisSite &&
-        !showTranslatedTextWhenHoveringThisLang
+        !showTranslatedTextWhenHoveringThisSite
+        && !showTranslatedTextWhenHoveringThisLang
       )
     ) {
       destroy();
@@ -177,7 +175,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
 
         isPlayingAudio = false;
         cbOnEnded();
-      }
+      },
     );
   }
 
@@ -188,7 +186,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
       {
         action: "stopAudio",
       },
-      checkedLastError
+      checkedLastError,
     );
   }
 
@@ -199,7 +197,6 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
   let prevNode = null;
 
   /**
-   *
    * @param {HTMLElement} node
    * @returns
    */
@@ -211,9 +208,9 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     } else {
       // https://github.com/FilipePS/Traduzir-paginas-web/issues/654
       if (
-        nodeName === "script" &&
-        node.getAttribute("data-spotim-module") === "spotim-launcher" &&
-        [...node.childNodes].find((node) => node.nodeType === 1)
+        nodeName === "script"
+        && node.getAttribute("data-spotim-module") === "spotim-launcher"
+        && [...node.childNodes].find((node) => node.nodeType === 1)
       ) {
         return false;
       } else {
@@ -239,12 +236,12 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     }
     prevNode = node;
 
-    let hasChildNodeBlock = function (node) {
-      let foo = function (node) {
+    let hasChildNodeBlock = function(node) {
+      let foo = function(node) {
         const nodeName = node.nodeName.toLowerCase();
         if (
-          htmlTagsInlineText.indexOf(nodeName) === -1 &&
-          htmlTagsInlineIgnore.indexOf(nodeName) === -1
+          htmlTagsInlineText.indexOf(nodeName) === -1
+          && htmlTagsInlineIgnore.indexOf(nodeName) === -1
         ) {
           return true;
         }
@@ -264,8 +261,8 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
 
     const nodeName = node.nodeName.toLowerCase();
     if (
-      htmlTagsInlineText.indexOf(nodeName) === -1 &&
-      htmlTagsInlineIgnore.indexOf(nodeName) === -1
+      htmlTagsInlineText.indexOf(nodeName) === -1
+      && htmlTagsInlineIgnore.indexOf(nodeName) === -1
     ) {
       if (hasChildNodeBlock(node)) return;
     }
@@ -274,15 +271,15 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     if (nodeName === "input" || nodeName === "textarea") {
       text = node.value.length > 0 ? node.value : node.placeholder;
       if (
-        nodeName === "input" &&
-        !/^(?:text|search|button|submit)$/i.test(node.type)
+        nodeName === "input"
+        && !/^(?:text|search|button|submit)$/i.test(node.type)
       ) {
         text = null;
         return;
       }
       if (
-        nodeName === "input" &&
-        (node.type === "button" || node.type === "submit")
+        nodeName === "input"
+        && (node.type === "button" || node.type === "submit")
       ) {
         text = node.value;
         if (!text && node.type === "submit") {
@@ -294,8 +291,8 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
         const nodeName = node.nodeName.toLowerCase();
         if (isNoTranslateNode(node)) return;
         if (
-          htmlTagsInlineText.indexOf(nodeName) === -1 &&
-          htmlTagsInlineIgnore.indexOf(nodeName) === -1
+          htmlTagsInlineText.indexOf(nodeName) === -1
+          && htmlTagsInlineIgnore.indexOf(nodeName) === -1
         ) {
           break;
         } else {
@@ -315,7 +312,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
       currentTextTranslatorService,
       "auto",
       currentTargetLanguage,
-      text
+      text,
     )
       .then((result) => {
         if (!result) return;
@@ -409,9 +406,11 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
       mode: "closed",
     });
     shadowRoot.innerHTML = `
-        <link rel="stylesheet" href="${chrome.runtime.getURL(
-          "/contentScript/css/showTranslated.css"
-        )}">
+        <link rel="stylesheet" href="${
+      chrome.runtime.getURL(
+        "/contentScript/css/showTranslated.css",
+      )
+    }">
 
         <div id="eDivResult">
                 <div id="eTextTranslated" dir="auto"></div>
@@ -488,7 +487,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
 
     dragElement(
       shadowRoot.getElementById("eDivResult"),
-      shadowRoot.getElementById("drag")
+      shadowRoot.getElementById("drag"),
     );
 
     function enableDarkMode() {
@@ -516,8 +515,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
                 }
                 `;
         shadowRoot.appendChild(el);
-        shadowRoot.querySelector("#listen svg").style =
-          "fill: rgb(231, 230, 228)";
+        shadowRoot.querySelector("#listen svg").style = "fill: rgb(231, 230, 228)";
       }
     }
 
@@ -606,7 +604,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     setTargetLanguage.onclick = (e) => {
       if (e.target.getAttribute("value")) {
         const langCode = twpLang.fixTLanguageCode(
-          e.target.getAttribute("value")
+          e.target.getAttribute("value"),
         );
         if (langCode) {
           currentTargetLanguage = langCode;
@@ -647,7 +645,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     twpI18n.translateDocument(shadowRoot);
 
     const targetLanguageButtons = shadowRoot.querySelectorAll(
-      "#setTargetLanguage li"
+      "#setTargetLanguage li",
     );
 
     for (let i = 0; i < 3; i++) {
@@ -658,7 +656,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
       targetLanguageButtons[i].setAttribute("value", currentTargetLanguages[i]);
       targetLanguageButtons[i].setAttribute(
         "title",
-        twpLang.codeToLanguage(currentTargetLanguages[i])
+        twpLang.codeToLanguage(currentTargetLanguages[i]),
       );
     }
 
@@ -689,14 +687,14 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     const activeEl = document.activeElement;
     const activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
     if (
-      activeElTagName == "textarea" ||
-      (activeElTagName == "input" &&
-        /^(?:text|search)$/i.test(activeEl.type) &&
-        typeof activeEl.selectionStart == "number")
+      activeElTagName == "textarea"
+      || (activeElTagName == "input"
+        && /^(?:text|search)$/i.test(activeEl.type)
+        && typeof activeEl.selectionStart == "number")
     ) {
       const text = activeEl.value.slice(
         activeEl.selectionStart,
-        activeEl.selectionEnd
+        activeEl.selectionEnd,
       );
       if (text) return true;
     } else if (window.getSelection) {
@@ -720,9 +718,9 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
     if (!translateTextOverMouseWhenPressTwice) return;
     if (e.key == "Control") {
       if (
-        lastTimePressedCtrl &&
-        performance.now() - lastTimePressedCtrl < 280 &&
-        !isSelectingText()
+        lastTimePressedCtrl
+        && performance.now() - lastTimePressedCtrl < 280
+        && !isSelectingText()
       ) {
         lastTimePressedCtrl = performance.now();
 
@@ -738,12 +736,12 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
 
   function updateEventListener() {
     if (
-      platformInfo.isMobile.any ||
-      pageLanguageState == "translated" ||
-      !(
-        showTranslatedTextWhenHoveringThisSite ||
-        showTranslatedTextWhenHoveringThisLang ||
-        translateTextOverMouseWhenPressTwice
+      platformInfo.isMobile.any
+      || pageLanguageState == "translated"
+      || !(
+        showTranslatedTextWhenHoveringThisSite
+        || showTranslatedTextWhenHoveringThisLang
+        || translateTextOverMouseWhenPressTwice
       )
     ) {
       window.removeEventListener("scroll", onScroll);
@@ -771,12 +769,11 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function (_) {
   }
   updateEventListener();
 
-  pageTranslator.onGetOriginalTabLanguage(function (tabLanguage) {
+  pageTranslator.onGetOriginalTabLanguage(function(tabLanguage) {
     originalTabLanguage = tabLanguage;
-    showTranslatedTextWhenHoveringThisLang =
-      twpConfig
-        .get("langsToTranslateWhenHovering")
-        .indexOf(originalTabLanguage) !== -1;
+    showTranslatedTextWhenHoveringThisLang = twpConfig
+      .get("langsToTranslateWhenHovering")
+      .indexOf(originalTabLanguage) !== -1;
     updateEventListener();
   });
 

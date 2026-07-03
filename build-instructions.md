@@ -9,9 +9,10 @@
 
 ## How to build **polyfill.js**
 
-- Run the `pnpm polyfill` command and the  **polyfill.js** file in the root directory will be compiled generating the  **src/lib/polyfill.js** file.
+- Run the `pnpm polyfill` command and the **polyfill.js** file in the root directory will be compiled generating the **src/lib/polyfill.js** file.
 
 ## How to build the extension
+
 - To make the build that adds compatibility with previous versions of browsers, run the command `pnpm build:local-sourcemaps`.
 - The files I sent for review were built with the `pnpm build` command. The difference is that the **source-maps** were outside the extension folder, with a configured Github URL. I upload the source-maps to this repository: https://github.com/FilipePS/TWP---Source-Maps
 - The reason I use remote **source-maps** is to reduce the download size of the extension, but still allow users to easily debug without needing the original source code.

@@ -33,8 +33,8 @@ function enableDarkMode() {
 }
 
 if (
-  sessionStorage !== null &&
-  sessionStorage.getItem("darkModeIsEnabled") === "yes"
+  sessionStorage !== null
+  && sessionStorage.getItem("darkModeIsEnabled") === "yes"
 ) {
   enableDarkMode();
 }

@@ -26,11 +26,10 @@ async function downloadDocument(url) {
       http.onprogress = (e) => {
         if (e.lengthComputable) {
           const percentComplete = (e.loaded / e.total) * 100;
-          pleaseWait.textContent =
-            twpI18n.getMessage("msgPleaseWait") +
-            " " +
-            percentComplete.toFixed(1) +
-            "%";
+          pleaseWait.textContent = twpI18n.getMessage("msgPleaseWait")
+            + " "
+            + percentComplete.toFixed(1)
+            + "%";
         }
       };
       http.onload = (e) => {
@@ -55,14 +54,14 @@ async function convertDocument(service, data) {
   const container = new DataTransfer();
   container.items.add(file);
   const myForm = document.getElementById("form_" + service);
-  myForm.querySelector('[type="file"]').files = container.files;
-  if (myForm.querySelector('[name="tl"]')) {
-    myForm.querySelector('[name="tl"]').value = twpConfig.get("targetLanguage");
+  myForm.querySelector("[type=\"file\"]").files = container.files;
+  if (myForm.querySelector("[name=\"tl\"]")) {
+    myForm.querySelector("[name=\"tl\"]").value = twpConfig.get("targetLanguage");
   }
   pleaseWait.style.display = "none";
   send.style.display = "block";
   send.onclick = (e) => {
-    myForm.querySelector('[type="submit"]').click();
+    myForm.querySelector("[type=\"submit\"]").click();
     window.close();
   };
 }
@@ -97,7 +96,7 @@ selectService.onclick = async (e) => {
           selectService.style.display = "block";
           cannotUseGoogle.textContent = twpI18n.getMessage(
             "msgFileLargerThan",
-            "10 MB"
+            "10 MB",
           );
           cannotUseGoogle.style.display = "block";
         } else {
@@ -109,10 +108,12 @@ selectService.onclick = async (e) => {
     });
   } else if (e.target.dataset.name === "google") {
     window.open(
-      `https://translate.google.com/?sl=auto&tl=${twpConfig.get(
-        "targetLanguage"
-      )}&op=docs`,
-      "_blank"
+      `https://translate.google.com/?sl=auto&tl=${
+        twpConfig.get(
+          "targetLanguage",
+        )
+      }&op=docs`,
+      "_blank",
     );
     window.close();
   } else if (e.target.dataset.name === "deepl") {
@@ -120,7 +121,7 @@ selectService.onclick = async (e) => {
   } else if (e.target.dataset.name === "onlinedoctranslator") {
     window.open(
       "https://www.onlinedoctranslator.com/translationform",
-      "_blank"
+      "_blank",
     );
   } else if (e.target.dataset.name === "pdftwp") {
     window.open("https://pdf.translatewebpages.org", "_blank");
@@ -164,9 +165,9 @@ twpConfig
 
     switch (twpConfig.get("darkMode")) {
       case "auto":
-        if (matchMedia("(prefers-color-scheme: dark)").matches)
+        if (matchMedia("(prefers-color-scheme: dark)").matches) {
           enableDarkMode();
-        else disableDarkMode();
+        } else disableDarkMode();
         break;
       case "yes":
         enableDarkMode();

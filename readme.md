@@ -1,4 +1,3 @@
-
 # <img src="https://github.com/FilipePS/Traduzir-paginas-web/blob/master/src/icons/icon-128.png" height="50"> Translate Web Pages
 
 Translate your page in real time using Google, Bing or Yandex.
@@ -11,6 +10,7 @@ Translate your page in real time using Google, Bing or Yandex.
 ## Install
 
 ### Firefox
+
 - Desktop users, download from [Mozilla Addons](https://addons.mozilla.org/firefox/addon/traduzir-paginas-web/).
 - Android users
   1. Install the latest version of _Firefox (v120+)_.
@@ -20,13 +20,15 @@ Translate your page in real time using Google, Bing or Yandex.
   5. Install the **TWP - Translate For Mobile** extension.
 
 ### Chrome, Edge and Brave
+
 - The extension will be officially released for these browsers in the future.
 - If you installed the extension in these browsers previously through a registry modification, please undo those changes.\
-Note: If you want to undo registry changes, download and run this [twp-registry-uninstall-self.reg](https://raw.githubusercontent.com/FilipePS/Traduzir-paginas-web/master/dist/chromium/twp-registry-uninstall-self.reg). If you want a deeper removal download and run this other file [twp-registry-uninstall-all.reg](https://raw.githubusercontent.com/FilipePS/Traduzir-paginas-web/master/dist/chromium/twp-registry-uninstall-all.reg)
+  Note: If you want to undo registry changes, download and run this [twp-registry-uninstall-self.reg](https://raw.githubusercontent.com/FilipePS/Traduzir-paginas-web/master/dist/chromium/twp-registry-uninstall-self.reg). If you want a deeper removal download and run this other file [twp-registry-uninstall-all.reg](https://raw.githubusercontent.com/FilipePS/Traduzir-paginas-web/master/dist/chromium/twp-registry-uninstall-all.reg)
 
 ## Screenshots
-| Menu 1 | Menu 2 | Translated |
-| :--: | :--: | :--: |
+
+|                                           Menu 1                                            |                                           Menu 2                                            |                                         Translated                                          |
+| :-----------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------: |
 | <img src="https://addons.mozilla.org/user-media/previews/full/258/258434.png" height="200"> | <img src="https://addons.mozilla.org/user-media/previews/full/258/258435.png" height="200"> | <img src="https://addons.mozilla.org/user-media/previews/full/258/258436.png" height="200"> |
 
 ## Contribute
@@ -46,7 +48,7 @@ To make a donation use [Patreon](https://www.patreon.com/filipeps).
 Your current page is translated without having to open new tabs.
 It is possible to change the translation language.
 You can select to automatically translate.
-To change the translation engine just touch the Google Translate icon. 
+To change the translation engine just touch the Google Translate icon.
 
 **Why do you need to access your data on all the websites you visit?**
 
@@ -65,4 +67,5 @@ The pages are translated using the Google or Yandex translation engine (you choo
 Some pages like [support.mozilla.org](https://support.mozilla.org/) and [addons.mozilla.org](http://addons.mozilla.org/) will not be translated. For security reasons, the browser blocks extensions from accessing these sites.
 
 ## Build instructions
+
 - You can see all the build instructions in the [build-instructions.md](build-instructions.md) file.

@@ -2,7 +2,7 @@
 
 var showOriginal = {};
 
-twpConfig.onReady(function () {
+twpConfig.onReady(function() {
   if (platformInfo.isMobile.any) {
     showOriginal.enable = () => {};
     showOriginal.disable = () => {};
@@ -14,7 +14,7 @@ twpConfig.onReady(function () {
   }
 
   const enabledObservers = [];
-  showOriginal.enabledObserverSubscribe = function (callback) {
+  showOriginal.enabledObserverSubscribe = function(callback) {
     enabledObservers.push(callback);
   };
 
@@ -25,10 +25,10 @@ twpConfig.onReady(function () {
     .catch((e) => console.error(e));
 
   let showOriginalTextWhenHovering = twpConfig.get(
-    "showOriginalTextWhenHovering"
+    "showOriginalTextWhenHovering",
   );
   showOriginal.isEnabled = showOriginalTextWhenHovering === "yes";
-  twpConfig.onChanged(function (name, newValue) {
+  twpConfig.onChanged(function(name, newValue) {
     if (name === "showOriginalTextWhenHovering") {
       showOriginalTextWhenHovering = newValue;
       showOriginal.isEnabled = showOriginalTextWhenHovering === "yes";
@@ -69,7 +69,7 @@ twpConfig.onReady(function () {
     if (window.isTranslatingSelected) return;
 
     const nodeInf = nodesToShowOriginal.find(
-      (nodeInf) => nodeInf.node === node
+      (nodeInf) => nodeInf.node === node,
     );
     if (nodeInf) {
       const eOriginalText = shadowRoot.getElementById("originalText");
@@ -116,15 +116,17 @@ twpConfig.onReady(function () {
     if (!divElement) return;
     if (!isShowingOriginalText()) return;
 
-    if (e.target === currentNodeOverMouse && e.relatedTarget === divElement)
+    if (e.target === currentNodeOverMouse && e.relatedTarget === divElement) {
       return;
-    if (e.target === divElement && e.relatedTarget === currentNodeOverMouse)
+    }
+    if (e.target === divElement && e.relatedTarget === currentNodeOverMouse) {
       return;
+    }
 
     hideOriginalText();
   }
 
-  showOriginal.add = function (node) {
+  showOriginal.add = function(node) {
     if (platformInfo.isMobile.any) return;
 
     if (node && nodesToShowOriginal.indexOf(node) === -1) {
@@ -137,7 +139,7 @@ twpConfig.onReady(function () {
     }
   };
 
-  showOriginal.removeAll = function () {
+  showOriginal.removeAll = function() {
     nodesToShowOriginal.forEach((nodeInf) => {
       nodeInf.node.removeEventListener("mouseenter", onMouseEnter);
       nodeInf.node.removeEventListener("mouseout", onMouseOut);
@@ -145,7 +147,7 @@ twpConfig.onReady(function () {
     nodesToShowOriginal = [];
   };
 
-  showOriginal.enable = function (dontDeleteNodesToShowOriginal = false) {
+  showOriginal.enable = function(dontDeleteNodesToShowOriginal = false) {
     showOriginal.disable(dontDeleteNodesToShowOriginal);
 
     if (platformInfo.isMobile.any) return;
@@ -160,9 +162,11 @@ twpConfig.onReady(function () {
       mode: "closed",
     });
     shadowRoot.innerHTML = `
-            <link rel="stylesheet" href="${chrome.runtime.getURL(
-              "/contentScript/css/showOriginal.css"
-            )}">
+            <link rel="stylesheet" href="${
+      chrome.runtime.getURL(
+        "/contentScript/css/showOriginal.css",
+      )
+    }">
             <div id="originalText" dir="auto"></div>
         `;
 
@@ -225,7 +229,7 @@ twpConfig.onReady(function () {
     document.addEventListener("keyup", hideOnESC, true);
   };
 
-  showOriginal.disable = function (dontDeleteNodesToShowOriginal = false) {
+  showOriginal.disable = function(dontDeleteNodesToShowOriginal = false) {
     if (divElement) {
       hideOriginalText();
       divElement.remove();

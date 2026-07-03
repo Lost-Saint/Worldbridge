@@ -9,13 +9,14 @@ function getTabHostName() {
   );
 }
 
-void (async function () {
+void (async function() {
   await twpConfig.onReady();
   if (
-    !platformInfo.isMobile.any &&
-    twpConfig.get("showMobilePopupOnDesktop") !== "yes"
-  )
+    !platformInfo.isMobile.any
+    && twpConfig.get("showMobilePopupOnDesktop") !== "yes"
+  ) {
     return;
+  }
 
   const tabHostName = await getTabHostName();
   let tabLanguage = "und";
@@ -23,16 +24,16 @@ void (async function () {
 
   // load html and icons
   const htmlText = await fetch(
-    chrome.runtime.getURL("/contentScript/html/popupMobile.html")
+    chrome.runtime.getURL("/contentScript/html/popupMobile.html"),
   ).then((response) => response.text());
   const googleIcon = await fetch(
-    chrome.runtime.getURL("/icons/google-translate-32.png")
+    chrome.runtime.getURL("/icons/google-translate-32.png"),
   ).then((response) => response.blob());
   const yandexIcon = await fetch(
-    chrome.runtime.getURL("/icons/yandex-translate-32.png")
+    chrome.runtime.getURL("/icons/yandex-translate-32.png"),
   ).then((response) => response.blob());
   const bingIcon = await fetch(
-    chrome.runtime.getURL("/icons/bing-translate-32.png")
+    chrome.runtime.getURL("/icons/bing-translate-32.png"),
   ).then((response) => response.blob());
 
   // Load i18n messages based on your language preference
@@ -52,7 +53,7 @@ void (async function () {
     const menuOptions = shadowRoot.getElementById("menu-options");
     menuOptions.style.setProperty(
       "--popup-height",
-      `${popupElement.clientHeight}px`
+      `${popupElement.clientHeight}px`,
     );
   }, 1000);
 
@@ -71,13 +72,12 @@ void (async function () {
         let padding = popupElement.clientHeight + "px";
 
         const scrollTop = document.documentElement.scrollTop;
-        
+
         document.documentElement.style.height = null;
         document.documentElement.style.paddingTop = null;
         document.documentElement.style.paddingBottom = null;
 
-        document.documentElement.style.height =
-          document.documentElement.scrollHeight + "px";
+        document.documentElement.style.height = document.documentElement.scrollHeight + "px";
         if (twpConfig.get("popupMobilePosition") === "top") {
           document.documentElement.style.paddingTop = padding;
           document.documentElement.style.paddingBottom = null;
@@ -99,10 +99,10 @@ void (async function () {
 
         const menuContainer = shadowRoot.getElementById("menu-container");
         if (
-          Date.now() - lastInteraction > 1000 * 8 &&
-          menuContainer.style.display !== "block" &&
-          serviceSelectorIsOpen === false &&
-          twpConfig.get("popupMobileKeepOnScren") === "no"
+          Date.now() - lastInteraction > 1000 * 8
+          && menuContainer.style.display !== "block"
+          && serviceSelectorIsOpen === false
+          && twpConfig.get("popupMobileKeepOnScren") === "no"
         ) {
           hidePopup();
         }
@@ -129,7 +129,7 @@ void (async function () {
         {
           duration: 200,
           iterations: 1,
-        }
+        },
       );
       animation.onfinish = () => {
         rootElement.remove();
@@ -156,8 +156,8 @@ void (async function () {
   // set text direction
   if (
     twpLang.isRtlLanguage(
-      twpConfig.get("uiLanguage") ||
-        twpLang.fixUILanguageCode(chrome.i18n.getUILanguage())
+      twpConfig.get("uiLanguage")
+        || twpLang.fixUILanguageCode(chrome.i18n.getUILanguage()),
     )
   ) {
     shadowRoot.querySelector("main").setAttribute("dir", "rtl");
@@ -349,16 +349,15 @@ void (async function () {
     } else if (action === "show-translate-selected-button") {
       twpConfig.set(
         "showTranslateSelectedButton",
-        twpConfig.get("showTranslateSelectedButton") === "yes" ? "no" : "yes"
+        twpConfig.get("showTranslateSelectedButton") === "yes" ? "no" : "yes",
       );
     } else if (action === "more-options") {
       const generateRandomHash = (length) => {
-        const characters =
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         let hash = "";
         for (let i = 0; i < length; i++) {
           hash += characters.charAt(
-            Math.floor(Math.random() * characters.length)
+            Math.floor(Math.random() * characters.length),
           );
         }
         return hash;
@@ -369,19 +368,19 @@ void (async function () {
         authorizationToOpenOptions,
       });
       window.open(
-        chrome.runtime.getURL("/options/open-options.html") +
-          `#!authorizationToOpenOptions=${authorizationToOpenOptions}`,
-        "blank"
+        chrome.runtime.getURL("/options/open-options.html")
+          + `#!authorizationToOpenOptions=${authorizationToOpenOptions}`,
+        "blank",
       );
     } else if (action === "keep-on-screen") {
       twpConfig.set(
         "popupMobileKeepOnScren",
-        twpConfig.get("popupMobileKeepOnScren") === "yes" ? "no" : "yes"
+        twpConfig.get("popupMobileKeepOnScren") === "yes" ? "no" : "yes",
       );
     } else if (action === "change-position") {
       twpConfig.set(
         "popupMobilePosition",
-        twpConfig.get("popupMobilePosition") === "top" ? "bottom" : "top"
+        twpConfig.get("popupMobilePosition") === "top" ? "bottom" : "top",
       );
     }
 
@@ -406,22 +405,22 @@ void (async function () {
     // update show-translate-selected-button checkicon
     if (twpConfig.get("showTranslateSelectedButton") === "yes") {
       shadowRoot.querySelector(
-        `#menu-options [data-value="show-translate-selected-button"] [checkicon]`
+        `#menu-options [data-value="show-translate-selected-button"] [checkicon]`,
       ).textContent = "✔";
     } else {
       shadowRoot.querySelector(
-        `#menu-options [data-value="show-translate-selected-button"] [checkicon]`
+        `#menu-options [data-value="show-translate-selected-button"] [checkicon]`,
       ).textContent = "";
     }
 
     // update never-translate-this-site checkicon
     if (twpConfig.get("neverTranslateSites").indexOf(tabHostName) !== -1) {
       shadowRoot.querySelector(
-        `#menu-options [data-value="never-translate-this-site"] [checkicon]`
+        `#menu-options [data-value="never-translate-this-site"] [checkicon]`,
       ).textContent = "✔";
     } else {
       shadowRoot.querySelector(
-        `#menu-options [data-value="never-translate-this-site"] [checkicon]`
+        `#menu-options [data-value="never-translate-this-site"] [checkicon]`,
       ).textContent = "";
     }
 
@@ -436,27 +435,27 @@ void (async function () {
 
     // show or hide always-translate-from and never-translate-from
     if (
-      tabLanguage === "und" ||
-      tabLanguage == twpConfig.get("targetLanguage")
+      tabLanguage === "und"
+      || tabLanguage == twpConfig.get("targetLanguage")
     ) {
       shadowRoot.querySelector(
-        `#menu-options [data-value="always-translate-from"]`
+        `#menu-options [data-value="always-translate-from"]`,
       ).style.display = "none";
       shadowRoot.querySelector(
-        `#menu-options [data-value="never-translate-from"]`
+        `#menu-options [data-value="never-translate-from"]`,
       ).style.display = "none";
     } else {
       shadowRoot.querySelector(
-        `#menu-options [data-value="always-translate-from"]`
+        `#menu-options [data-value="always-translate-from"]`,
       ).style.display = "flex";
       shadowRoot.querySelector(
-        `#menu-options [data-value="never-translate-from"]`
+        `#menu-options [data-value="never-translate-from"]`,
       ).style.display = "flex";
     }
 
     // update always-translate-from text
     shadowRoot.querySelector(
-      `#menu-options [data-value="always-translate-from"] [data-i18n]`
+      `#menu-options [data-value="always-translate-from"] [data-i18n]`,
     ).textContent = twpI18n.getMessage("lblAlwaysTranslate", [
       twpLang.codeToLanguage(tabLanguage),
     ]);
@@ -464,33 +463,33 @@ void (async function () {
     // update always-translate-from checkicon
     if (twpConfig.get("alwaysTranslateLangs").indexOf(tabLanguage) !== -1) {
       shadowRoot.querySelector(
-        `#menu-options [data-value="always-translate-from"] [checkicon]`
+        `#menu-options [data-value="always-translate-from"] [checkicon]`,
       ).textContent = "✔";
     } else {
       shadowRoot.querySelector(
-        `#menu-options [data-value="always-translate-from"] [checkicon]`
+        `#menu-options [data-value="always-translate-from"] [checkicon]`,
       ).textContent = "";
     }
 
     // update never-translate-from checkicon
     if (twpConfig.get("neverTranslateLangs").indexOf(tabLanguage) !== -1) {
       shadowRoot.querySelector(
-        `#menu-options [data-value="never-translate-from"] [checkicon]`
+        `#menu-options [data-value="never-translate-from"] [checkicon]`,
       ).textContent = "✔";
     } else {
       shadowRoot.querySelector(
-        `#menu-options [data-value="never-translate-from"] [checkicon]`
+        `#menu-options [data-value="never-translate-from"] [checkicon]`,
       ).textContent = "";
     }
 
     // update keep-on-screen checkicon
     if (twpConfig.get("popupMobileKeepOnScren") === "yes") {
       shadowRoot.querySelector(
-        `#menu-options [data-value="keep-on-screen"] [checkicon]`
+        `#menu-options [data-value="keep-on-screen"] [checkicon]`,
       ).textContent = "✔";
     } else {
       shadowRoot.querySelector(
-        `#menu-options [data-value="keep-on-screen"] [checkicon]`
+        `#menu-options [data-value="keep-on-screen"] [checkicon]`,
       ).textContent = "";
     }
 
@@ -566,7 +565,7 @@ void (async function () {
   };
 
   // fill language list
-  (function () {
+  (function() {
     let langs = twpLang.getLanguageList();
 
     const langsSorted = [];
@@ -575,7 +574,7 @@ void (async function () {
       langsSorted.push([i, langs[i]]);
     }
 
-    langsSorted.sort(function (a, b) {
+    langsSorted.sort(function(a, b) {
       return a[1].localeCompare(b[1]);
     });
 
@@ -583,7 +582,7 @@ void (async function () {
       shadowRoot.getElementById("language-selector")
     );
 
-    const eAllLangs = menuSelectLanguage.querySelector('[name="all"]');
+    const eAllLangs = menuSelectLanguage.querySelector("[name=\"all\"]");
     langsSorted.forEach((value) => {
       const option = document.createElement("option");
       option.value = value[0];
@@ -591,7 +590,7 @@ void (async function () {
       eAllLangs.appendChild(option);
     });
 
-    const eRecentsLangs = menuSelectLanguage.querySelector('[name="targets"]');
+    const eRecentsLangs = menuSelectLanguage.querySelector("[name=\"targets\"]");
 
     const buildRecentsLanguages = () => {
       eRecentsLangs.innerHTML = "";
@@ -633,17 +632,17 @@ void (async function () {
     }
   });
 
-  pageTranslator.onGetOriginalTabLanguage(function (_tabLanguage) {
+  pageTranslator.onGetOriginalTabLanguage(function(_tabLanguage) {
     tabLanguage = _tabLanguage || "und";
     if (tabLanguage !== "und") {
       tabLanguage = twpLang.fixTLanguageCode(tabLanguage);
     }
     if (
-      twpConfig.get("whenShowMobilePopup") !== "only-when-i-touch" &&
-      tabLanguage !== "und" &&
-      twpConfig.get("neverTranslateLangs").indexOf(tabLanguage) === -1 &&
-      twpConfig.get("neverTranslateSites").indexOf(tabHostName) === -1 &&
-      twpConfig.get("targetLanguage") !== tabLanguage
+      twpConfig.get("whenShowMobilePopup") !== "only-when-i-touch"
+      && tabLanguage !== "und"
+      && twpConfig.get("neverTranslateLangs").indexOf(tabLanguage) === -1
+      && twpConfig.get("neverTranslateSites").indexOf(tabHostName) === -1
+      && twpConfig.get("targetLanguage") !== tabLanguage
     ) {
       showPopup();
     } else if (twpConfig.get("whenShowMobilePopup") === "always-show") {

@@ -6,30 +6,32 @@ setTimeout(() => {
     .then((responseText) => {
       window.scrollTo(0, 0);
       document.getElementById("release_notes").innerHTML = responseText;
-      document.getElementById("_msgHasBeenUpdated").textContent =
-        twpI18n.getMessage("msgHasBeenUpdated");
+      document.getElementById("_msgHasBeenUpdated").textContent = twpI18n.getMessage(
+        "msgHasBeenUpdated",
+      );
       document.getElementById("_msgHasBeenUpdated").innerHTML = document
         .getElementById("_msgHasBeenUpdated")
         .textContent.replace(
           "#EXTENSION_NAME#",
-          "<b>" + chrome.runtime.getManifest().name + "</b>"
+          "<b>" + chrome.runtime.getManifest().name + "</b>",
         )
         .replace(
           "#EXTENSION_VERSION#",
-          "<b>" + chrome.runtime.getManifest().version + "</b>"
+          "<b>" + chrome.runtime.getManifest().version + "</b>",
         );
-      document.getElementById("_donationText").textContent =
-        twpI18n.getMessage("donationText");
-      document.getElementById("_donatewithpaypal").textContent =
-        twpI18n.getMessage("donatewithpaypal");
+      document.getElementById("_donationText").textContent = twpI18n.getMessage("donationText");
+      document.getElementById("_donatewithpaypal").textContent = twpI18n.getMessage(
+        "donatewithpaypal",
+      );
 
-      document.getElementById("_donationRecipient").textContent =
-        twpI18n.getMessage("msgDonationRecipient");
+      document.getElementById("_donationRecipient").textContent = twpI18n.getMessage(
+        "msgDonationRecipient",
+      );
       document.getElementById("_donationRecipient").innerHTML = document
         .getElementById("_donationRecipient")
         .textContent.replace(
           "#EXTENSION_NAME#",
-          "<b>" + chrome.runtime.getManifest().name + "</b>"
+          "<b>" + chrome.runtime.getManifest().name + "</b>",
         );
 
       // donation options
@@ -67,7 +69,7 @@ twpConfig
     // https://github.com/FilipePS/Traduzir-paginas-web/issues/774
     if (sessionStorage !== null) {
       return twpI18n.updateUiMessages(
-        sessionStorage.getItem("temporaryUiLanguage")
+        sessionStorage.getItem("temporaryUiLanguage"),
       );
     } else {
       return twpI18n.updateUiMessages();
@@ -133,7 +135,7 @@ twpConfig
       });
 
       $(hash).style.display = "block";
-      $('a[href="' + hash + '"]').classList.add("w3-light-grey");
+      $("a[href=\"" + hash + "\"]").classList.add("w3-light-grey");
 
       let text;
       if (hash === "#donation") {
@@ -160,12 +162,12 @@ twpConfig
       if (hash === "#translations") {
         $("#translations").insertBefore(
           $("#selectServiceContainer"),
-          $("#translations").firstChild
+          $("#translations").firstChild,
         );
       } else if (hash === "#privacy") {
         $("#privacy").insertBefore(
           $("#selectServiceContainer"),
-          $("#privacy").firstChild
+          $("#privacy").firstChild,
         );
       }
     }
@@ -181,7 +183,7 @@ twpConfig
         langsSorted.push([i, langs[i]]);
       }
 
-      langsSorted.sort(function (a, b) {
+      langsSorted.sort(function(a, b) {
         return a[1].localeCompare(b[1]);
       });
 
@@ -226,8 +228,7 @@ twpConfig
     updateDarkMode();
 
     // target languages
-    $("#selectUiLanguage").value =
-      temporaryUiLanguage || twpConfig.get("uiLanguage");
+    $("#selectUiLanguage").value = temporaryUiLanguage || twpConfig.get("uiLanguage");
     $("#selectUiLanguage").onchange = (e) => {
       if (e.target.value === "default") {
         twpConfig.set("uiLanguage", "default");
@@ -246,7 +247,7 @@ twpConfig
           "uiLanguage",
           temporaryUiLanguage === "default"
             ? "default"
-            : twpLang.fixUILanguageCode(temporaryUiLanguage)
+            : twpLang.fixUILanguageCode(temporaryUiLanguage),
         );
         // timeout prevents: TypeError: NetworkError when attempting to fetch resource.
         setTimeout(() => location.reload(), 100);
@@ -254,7 +255,7 @@ twpConfig
         const lang = $("#selectUiLanguage").value;
         twpConfig.set(
           "uiLanguage",
-          lang === "default" ? "default" : twpLang.fixUILanguageCode(lang)
+          lang === "default" ? "default" : twpLang.fixUILanguageCode(lang),
         );
         // timeout prevents: TypeError: NetworkError when attempting to fetch resource.
         setTimeout(() => location.reload(), 100);
@@ -269,7 +270,7 @@ twpConfig
     };
 
     const targetLanguageTextTranslation = twpConfig.get(
-      "targetLanguageTextTranslation"
+      "targetLanguageTextTranslation",
     );
     $("#selectTargetLanguageForText").value = targetLanguageTextTranslation;
     $("#selectTargetLanguageForText").onchange = (e) => {
@@ -292,7 +293,7 @@ twpConfig
       }
       if (
         targetLanguages.indexOf(
-          twpConfig.get("targetLanguageTextTranslation")
+          twpConfig.get("targetLanguageTextTranslation"),
         ) == -1
       ) {
         twpConfig.set("targetLanguageTextTranslation", targetLanguages[0]);
@@ -308,7 +309,7 @@ twpConfig
       }
       if (
         targetLanguages.indexOf(
-          twpConfig.get("targetLanguageTextTranslation")
+          twpConfig.get("targetLanguageTextTranslation"),
         ) == -1
       ) {
         twpConfig.set("targetLanguageTextTranslation", targetLanguages[0]);
@@ -324,7 +325,7 @@ twpConfig
       }
       if (
         targetLanguages.indexOf(
-          twpConfig.get("targetLanguageTextTranslation")
+          twpConfig.get("targetLanguageTextTranslation"),
         ) == -1
       ) {
         twpConfig.set("targetLanguageTextTranslation", targetLanguages[0]);
@@ -439,14 +440,14 @@ twpConfig
     }
 
     const langsToTranslateWhenHovering = twpConfig.get(
-      "langsToTranslateWhenHovering"
+      "langsToTranslateWhenHovering",
     );
     langsToTranslateWhenHovering.sort((a, b) => a.localeCompare(b));
     langsToTranslateWhenHovering.forEach((langCode) => {
       const langName = twpLang.codeToLanguage(langCode);
       const li = createNodeToLangsToTranslateWhenHoveringList(
         langCode,
-        langName
+        langName,
       );
       $("#langsToTranslateWhenHovering").appendChild(li);
     });
@@ -456,7 +457,7 @@ twpConfig
       const langName = twpLang.codeToLanguage(langCode);
       const li = createNodeToLangsToTranslateWhenHoveringList(
         langCode,
-        langName
+        langName,
       );
       $("#langsToTranslateWhenHovering").appendChild(li);
 
@@ -569,11 +570,9 @@ twpConfig
 
     let customDictionary = twpConfig.get("customDictionary");
     customDictionary = new Map(
-      [...customDictionary.entries()].sort((a, b) =>
-        String(a[0]).localeCompare(String(b[0]))
-      )
+      [...customDictionary.entries()].sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
     );
-    customDictionary.forEach(function (customValue, keyWord) {
+    customDictionary.forEach(function(customValue, keyWord) {
       const li = createcustomDictionary(keyWord, customValue);
       $("#customDictionary").appendChild(li);
     });
@@ -584,7 +583,7 @@ twpConfig
       keyWord = keyWord.trim().toLowerCase();
       let customValue = prompt(
         "(Optional)\nYou can enter a value to replace it , or fill in nothing.",
-        ""
+        "",
       );
       if (!customValue) customValue = "";
       customValue = customValue.trim();
@@ -618,7 +617,7 @@ twpConfig
     }
 
     const sitesToTranslateWhenHovering = twpConfig.get(
-      "sitesToTranslateWhenHovering"
+      "sitesToTranslateWhenHovering",
     );
     sitesToTranslateWhenHovering.sort((a, b) => a.localeCompare(b));
     sitesToTranslateWhenHovering.forEach((hostname) => {
@@ -670,7 +669,7 @@ twpConfig
       twpConfig.set("showOriginalTextWhenHovering", e.target.value);
     };
     $("#showOriginalTextWhenHovering").value = twpConfig.get(
-      "showOriginalTextWhenHovering"
+      "showOriginalTextWhenHovering",
     );
 
     $("#translateTag_pre").onchange = (e) => {
@@ -682,7 +681,7 @@ twpConfig
       twpConfig.set("enableIframePageTranslation", e.target.value);
     };
     $("#enableIframePageTranslation").value = twpConfig.get(
-      "enableIframePageTranslation"
+      "enableIframePageTranslation",
     );
 
     $("#dontSortResults").onchange = (e) => {
@@ -694,7 +693,7 @@ twpConfig
       twpConfig.set("translateDynamicallyCreatedContent", e.target.value);
     };
     $("#translateDynamicallyCreatedContent").value = twpConfig.get(
-      "translateDynamicallyCreatedContent"
+      "translateDynamicallyCreatedContent",
     );
 
     $("#autoTranslateWhenClickingALink").onchange = (e) => {
@@ -710,7 +709,7 @@ twpConfig
               twpConfig.set("autoTranslateWhenClickingALink", "no");
               e.target.value = "no";
             }
-          }
+          },
         );
       } else {
         twpConfig.set("autoTranslateWhenClickingALink", "no");
@@ -720,7 +719,7 @@ twpConfig
       }
     };
     $("#autoTranslateWhenClickingALink").value = twpConfig.get(
-      "autoTranslateWhenClickingALink"
+      "autoTranslateWhenClickingALink",
     );
 
     function enableOrDisableTranslateSelectedAdvancedOptions(value) {
@@ -744,25 +743,26 @@ twpConfig
       enableOrDisableTranslateSelectedAdvancedOptions(e.target.value);
     };
     $("#showTranslateSelectedButton").value = twpConfig.get(
-      "showTranslateSelectedButton"
+      "showTranslateSelectedButton",
     );
     enableOrDisableTranslateSelectedAdvancedOptions(
-      twpConfig.get("showTranslateSelectedButton")
+      twpConfig.get("showTranslateSelectedButton"),
     );
 
     $("#dontShowIfIsNotValidText").onchange = (e) => {
       twpConfig.set(
         "dontShowIfIsNotValidText",
-        e.target.checked ? "yes" : "no"
+        e.target.checked ? "yes" : "no",
       );
     };
-    $("#dontShowIfIsNotValidText").checked =
-      twpConfig.get("dontShowIfIsNotValidText") === "yes" ? true : false;
+    $("#dontShowIfIsNotValidText").checked = twpConfig.get("dontShowIfIsNotValidText") === "yes"
+      ? true
+      : false;
 
     $("#dontShowIfPageLangIsTargetLang").onchange = (e) => {
       twpConfig.set(
         "dontShowIfPageLangIsTargetLang",
-        e.target.checked ? "yes" : "no"
+        e.target.checked ? "yes" : "no",
       );
     };
     $("#dontShowIfPageLangIsTargetLang").checked =
@@ -771,7 +771,7 @@ twpConfig
     $("#dontShowIfPageLangIsUnknown").onchange = (e) => {
       twpConfig.set(
         "dontShowIfPageLangIsUnknown",
-        e.target.checked ? "yes" : "no"
+        e.target.checked ? "yes" : "no",
       );
     };
     $("#dontShowIfPageLangIsUnknown").checked =
@@ -780,7 +780,7 @@ twpConfig
     $("#dontShowIfSelectedTextIsTargetLang").onchange = (e) => {
       twpConfig.set(
         "dontShowIfSelectedTextIsTargetLang",
-        e.target.checked ? "yes" : "no"
+        e.target.checked ? "yes" : "no",
       );
     };
     $("#dontShowIfSelectedTextIsTargetLang").checked =
@@ -791,7 +791,7 @@ twpConfig
     $("#dontShowIfSelectedTextIsUnknown").onchange = (e) => {
       twpConfig.set(
         "dontShowIfSelectedTextIsUnknown",
-        e.target.checked ? "yes" : "no"
+        e.target.checked ? "yes" : "no",
       );
     };
     $("#dontShowIfSelectedTextIsUnknown").checked =
@@ -814,7 +814,7 @@ twpConfig
       twpConfig.set("popupBlueWhenSiteIsTranslated", e.target.value);
     };
     $("#popupBlueWhenSiteIsTranslated").value = twpConfig.get(
-      "popupBlueWhenSiteIsTranslated"
+      "popupBlueWhenSiteIsTranslated",
     );
 
     // hotkeys options
@@ -826,11 +826,11 @@ twpConfig
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
     }
-    $('[data-i18n="lblTranslateSelectedWhenPressTwice"]').innerHTML = $(
-      '[data-i18n="lblTranslateSelectedWhenPressTwice"]'
+    $("[data-i18n=\"lblTranslateSelectedWhenPressTwice\"]").innerHTML = $(
+      "[data-i18n=\"lblTranslateSelectedWhenPressTwice\"]",
     ).innerHTML.replace("[Ctrl]", "<kbd>Ctrl</kbd>");
-    $('[data-i18n="lblTranslateTextOverMouseWhenPressTwice"]').innerHTML = $(
-      '[data-i18n="lblTranslateTextOverMouseWhenPressTwice"]'
+    $("[data-i18n=\"lblTranslateTextOverMouseWhenPressTwice\"]").innerHTML = $(
+      "[data-i18n=\"lblTranslateTextOverMouseWhenPressTwice\"]",
     ).innerHTML.replace("[Ctrl]", "<kbd>Ctrl</kbd>");
 
     $("#openNativeShortcutManager").onclick = (e) => {
@@ -840,7 +840,7 @@ twpConfig
     $("#translateSelectedWhenPressTwice").onclick = (e) => {
       twpConfig.set(
         "translateSelectedWhenPressTwice",
-        e.target.checked ? "yes" : "no"
+        e.target.checked ? "yes" : "no",
       );
     };
     $("#translateSelectedWhenPressTwice").checked =
@@ -849,16 +849,18 @@ twpConfig
     $("#translateTextOverMouseWhenPressTwice").onclick = (e) => {
       twpConfig.set(
         "translateTextOverMouseWhenPressTwice",
-        e.target.checked ? "yes" : "no"
+        e.target.checked ? "yes" : "no",
       );
     };
     $("#translateTextOverMouseWhenPressTwice").checked =
       twpConfig.get("translateTextOverMouseWhenPressTwice") === "yes";
 
     const defaultShortcuts = {};
-    for (const name of Object.keys(
-      chrome.runtime.getManifest().commands || {}
-    )) {
+    for (
+      const name of Object.keys(
+        chrome.runtime.getManifest().commands || {},
+      )
+    ) {
       const info = chrome.runtime.getManifest().commands[name];
       if (info.suggested_key && info.suggested_key.default) {
         defaultShortcuts[name] = info.suggested_key.default;
@@ -918,8 +920,7 @@ twpConfig
       }
       description = translateHotkeysDescription(hotkeyname) || description;
 
-      const enterShortcut =
-        twpI18n.getMessage("enterShortcut") || "Enter shortcut";
+      const enterShortcut = twpI18n.getMessage("enterShortcut") || "Enter shortcut";
 
       function escapeHtml(unsafe) {
         return unsafe
@@ -1071,7 +1072,7 @@ twpConfig
         resetKey.style.display = "none";
       };
 
-      //*
+      // *
       if (typeof browser === "undefined") {
         input.setAttribute("disabled", "");
         resetKey.style.display = "none";
@@ -1138,8 +1139,8 @@ twpConfig
             }
           });
           if (
-            enabledCount === 0 ||
-            (enabledCount === 1 && $("#btnEnableDeepL").checked)
+            enabledCount === 0
+            || (enabledCount === 1 && $("#btnEnableDeepL").checked)
           ) {
             if (e.target === $("#btnEnableGoogle")) {
               $("#btnEnableBing").checked = true;
@@ -1169,27 +1170,26 @@ twpConfig
             {
               action: "restorePagesWithServiceNames",
               serviceNames: pageTranslationServices.filter(
-                (svName) => !enabledServices.includes(svName)
+                (svName) => !enabledServices.includes(svName),
               ),
               newServiceName: twpConfig.get("pageTranslatorService"),
             },
-            checkedLastError
+            checkedLastError,
           );
 
           twpConfig.set("enabledServices", enabledServices);
 
           $("#pageTranslatorService").value = twpConfig.get(
-            "pageTranslatorService"
+            "pageTranslatorService",
           );
           $("#textTranslatorService").value = twpConfig.get(
-            "textTranslatorService"
+            "textTranslatorService",
           );
           updateServiceSelector(enabledServices);
         };
-        $(svInfo.selector).checked =
-          twpConfig.get("enabledServices").indexOf(svInfo.svName) === -1
-            ? false
-            : true;
+        $(svInfo.selector).checked = twpConfig.get("enabledServices").indexOf(svInfo.svName) === -1
+          ? false
+          : true;
 
         updateServiceSelector(twpConfig.get("enabledServices"));
       });
@@ -1203,7 +1203,7 @@ twpConfig
             action: "deleteTranslationCache",
             reload: true,
           },
-          checkedLastError
+          checkedLastError,
         );
       }
     };
@@ -1219,17 +1219,17 @@ twpConfig
       const element = document.createElement("a");
       element.setAttribute(
         "href",
-        "data:text/plain;charset=utf-8," + encodeURIComponent(configJSON)
+        "data:text/plain;charset=utf-8," + encodeURIComponent(configJSON),
       );
       element.setAttribute(
         "download",
-        "twp-backup_" +
-          new Date()
+        "twp-backup_"
+          + new Date()
             .toISOString()
             .replace(/T/, "_")
             .replace(/\..+/, "")
-            .replace(/\:/g, ".") +
-          ".txt"
+            .replace(/\:/g, ".")
+          + ".txt",
       );
 
       element.style.display = "none";
@@ -1251,7 +1251,7 @@ twpConfig
         const input = e.target;
 
         const reader = new FileReader();
-        reader.onload = function () {
+        reader.onload = function() {
           try {
             if (confirm(twpI18n.getMessage("doYouWantOverwriteAllSettings"))) {
               twpConfig.import(reader.result);
@@ -1290,21 +1290,21 @@ twpConfig
       twpConfig.set("showTranslatePageContextMenu", e.target.value);
     };
     $("#showTranslatePageContextMenu").value = twpConfig.get(
-      "showTranslatePageContextMenu"
+      "showTranslatePageContextMenu",
     );
 
     $("#showTranslateSelectedContextMenu").onchange = (e) => {
       twpConfig.set("showTranslateSelectedContextMenu", e.target.value);
     };
     $("#showTranslateSelectedContextMenu").value = twpConfig.get(
-      "showTranslateSelectedContextMenu"
+      "showTranslateSelectedContextMenu",
     );
 
     $("#showButtonInTheAddressBar").onchange = (e) => {
       twpConfig.set("showButtonInTheAddressBar", e.target.value);
     };
     $("#showButtonInTheAddressBar").value = twpConfig.get(
-      "showButtonInTheAddressBar"
+      "showButtonInTheAddressBar",
     );
 
     $("#translateClickingOnce").onchange = (e) => {
@@ -1326,7 +1326,7 @@ twpConfig
 
           $("#storageUsed").textContent = result;
           $("#storageUsed").style.display = "inline-block";
-        }
+        },
       );
     };
 
@@ -1367,14 +1367,14 @@ twpConfig
         twpConfig.set("customServices", customServices);
         chrome.runtime.sendMessage(
           { action: "removeLibreService" },
-          checkedLastError
+          checkedLastError,
         );
       }
 
       if (twpConfig.get("textTranslatorService") === "libre") {
         twpConfig.set(
           "textTranslatorService",
-          twpConfig.get("pageTranslatorService")
+          twpConfig.get("pageTranslatorService"),
         );
       }
 
@@ -1415,7 +1415,7 @@ twpConfig
           const customServices = twpConfig.get("customServices");
 
           const index = customServices.findIndex(
-            (cs) => cs.name === "deepl_freeapi"
+            (cs) => cs.name === "deepl_freeapi",
           );
           if (index !== -1) {
             customServices.splice(index, 1);
@@ -1438,14 +1438,14 @@ twpConfig
     $("#removeDeepL").onclick = () => {
       const customServices = twpConfig.get("customServices");
       const index = customServices.findIndex(
-        (cs) => cs.name === "deepl_freeapi"
+        (cs) => cs.name === "deepl_freeapi",
       );
       if (index !== -1) {
         customServices.splice(index, 1);
         twpConfig.set("customServices", customServices);
         chrome.runtime.sendMessage(
           { action: "removeDeeplFreeApiService" },
-          checkedLastError
+          checkedLastError,
         );
       }
       $("#deeplKEY").value = "";
@@ -1466,7 +1466,7 @@ twpConfig
       twpConfig.set("showMobilePopupOnDesktop", e.target.value);
     };
     $("#showMobilePopupOnDesktop").value = twpConfig.get(
-      "showMobilePopupOnDesktop"
+      "showMobilePopupOnDesktop",
     );
 
     $("#addPaddingToPage").onchange = (e) => {
@@ -1485,7 +1485,7 @@ twpConfig
     $("#addGoogleProxy").onclick = (e) => {
       try {
         const inputTranslationServer = $(
-          "#googleTranslateProxyServer"
+          "#googleTranslateProxyServer",
         ).value.trim();
         const inputTtsServer = $("#googleTtsProxyServer").value.trim();
         const translateServer = inputTranslationServer
@@ -1517,7 +1517,7 @@ twpConfig
 
       $("#googleTranslateProxyServer").value = "";
       $("#googleTtsProxyServer").value = "";
-    }
+    };
 
     const googleProxy = twpConfig.get("proxyServers").google;
     if (googleProxy) {

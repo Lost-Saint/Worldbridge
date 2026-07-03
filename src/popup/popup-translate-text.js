@@ -12,7 +12,7 @@ twpConfig
       translationService,
       sourceLanguage,
       targetLanguage,
-      source
+      source,
     ) {
       return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage(
@@ -26,7 +26,7 @@ twpConfig
           (response) => {
             checkedLastError();
             resolve(response);
-          }
+          },
         );
       });
     }
@@ -54,10 +54,8 @@ twpConfig
             }
             `;
         document.body.appendChild(el);
-        document.querySelector("#listenTranslated svg").style =
-          "fill: rgb(0, 0, 0)";
-        document.querySelector("#listenOriginal svg").style =
-          "fill: rgb(0, 0, 0)";
+        document.querySelector("#listenTranslated svg").style = "fill: rgb(0, 0, 0)";
+        document.querySelector("#listenOriginal svg").style = "fill: rgb(0, 0, 0)";
       }
     }
 
@@ -108,8 +106,9 @@ twpConfig
 
     let originalTabLanguage = "und";
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.detectLanguage(tabs[0].id, (lang) =>
-        lang ? (originalTabLanguage = lang) : void 0
+      chrome.tabs.detectLanguage(
+        tabs[0].id,
+        (lang) => lang ? (originalTabLanguage = lang) : void 0,
       );
     });
 
@@ -127,7 +126,7 @@ twpConfig
           checkedLastError();
           isPlayingAudio = false;
           cbOnEnded();
-        }
+        },
       );
     }
 
@@ -137,7 +136,7 @@ twpConfig
           {
             action: "stopAudio",
           },
-          checkedLastError
+          checkedLastError,
         );
       }
       isPlayingAudio = false;
@@ -254,7 +253,7 @@ twpConfig
     setTargetLanguage.onclick = (e) => {
       if (e.target.getAttribute("value")) {
         const langCode = twpLang.fixTLanguageCode(
-          e.target.getAttribute("value")
+          e.target.getAttribute("value"),
         );
         if (langCode) {
           currentTargetLanguage = langCode;
@@ -294,7 +293,7 @@ twpConfig
     let lastListenAudioType = null;
     eListenOriginal.onclick = async () => {
       let { lang, isReliable } = await detectTextLanguage(
-        eOrigText.textContent
+        eOrigText.textContent,
       );
       if (!isReliable && originalTabLanguage !== "und") {
         lang = originalTabLanguage;
@@ -315,12 +314,12 @@ twpConfig
         "translated",
         eListenTranslated,
         eTextTranslated.textContent,
-        currentTargetLanguage
+        currentTargetLanguage,
       );
     };
 
     const targetLanguageButtons = document.querySelectorAll(
-      "#setTargetLanguage li"
+      "#setTargetLanguage li",
     );
 
     for (let i = 0; i < 3; i++) {
@@ -331,7 +330,7 @@ twpConfig
       targetLanguageButtons[i].setAttribute("value", currentTargetLanguages[i]);
       targetLanguageButtons[i].setAttribute(
         "title",
-        twpLang.codeToLanguage(currentTargetLanguages[i])
+        twpLang.codeToLanguage(currentTargetLanguages[i]),
       );
     }
 
@@ -426,7 +425,7 @@ twpConfig
         currentTextTranslatorService,
         "auto",
         currentTargetLanguage,
-        eOrigText.textContent
+        eOrigText.textContent,
       ).then((result) => {
         if (twpLang.isRtlLanguage(currentTargetLanguage)) {
           eTextTranslated.setAttribute("dir", "rtl");

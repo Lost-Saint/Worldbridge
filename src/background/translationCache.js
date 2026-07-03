@@ -1,6 +1,6 @@
 "use strict";
 
-const translationCache = (function () {
+const translationCache = (function() {
   const translationCache = {};
 
   /**
@@ -38,8 +38,7 @@ const translationCache = (function () {
             resolve(size);
           }
         };
-        transaction.onerror = (err) =>
-          reject("error in " + storageName + ": " + err);
+        transaction.onerror = (err) => reject("error in " + storageName + ": " + err);
       });
     }
 
@@ -150,7 +149,7 @@ const translationCache = (function () {
         Cache.openDataBaseCache(
           this.translationService,
           this.sourceLanguage,
-          this.targetLanguage
+          this.targetLanguage,
         )
           .then((db) => {
             this.db = db;
@@ -161,7 +160,7 @@ const translationCache = (function () {
             Cache.deleteDatabase(
               this.translationService,
               this.sourceLanguage,
-              this.targetLanguage
+              this.targetLanguage,
             );
             resolve(false);
           });
@@ -308,7 +307,7 @@ const translationCache = (function () {
         request.onerror = request.onblocked = (event) => {
           console.error(
             "Error opening the database, switching to non-database mode",
-            event
+            event,
           );
           reject();
         };
@@ -335,12 +334,12 @@ const translationCache = (function () {
     static async openDataBaseCache(
       translationService,
       sourceLanguage,
-      targetLanguage
+      targetLanguage,
     ) {
       const dbName = Cache.getDataBaseName(
         translationService,
         sourceLanguage,
-        targetLanguage
+        targetLanguage,
       );
       const storageName = Cache.getCacheStorageName();
       const db = await Cache.openIndexeddb(dbName, 1, [storageName]);
@@ -357,14 +356,14 @@ const translationCache = (function () {
     static async deleteDatabase(
       translationService,
       sourceLanguage,
-      targetLanguage
+      targetLanguage,
     ) {
       return await new Promise((resolve) => {
         try {
           const dbName = Cache.getDataBaseName(
             translationService,
             sourceLanguage,
-            targetLanguage
+            targetLanguage,
           );
           const request = indexedDB.deleteDatabase(dbName);
 
@@ -459,7 +458,7 @@ const translationCache = (function () {
       const cache = new Cache(
         translationService,
         sourceLanguage,
-        targetLanguage
+        targetLanguage,
       );
       this.#addCache(translationService, sourceLanguage, targetLanguage, cache);
       try {
@@ -482,7 +481,7 @@ const translationCache = (function () {
       const dbName = Cache.getDataBaseName(
         translationService,
         sourceLanguage,
-        targetLanguage
+        targetLanguage,
       );
       const cache = this.list.get(dbName);
       if (cache) {
@@ -492,7 +491,7 @@ const translationCache = (function () {
         return await this.#createCache(
           translationService,
           sourceLanguage,
-          targetLanguage
+          targetLanguage,
         );
       }
     }
@@ -508,7 +507,7 @@ const translationCache = (function () {
       const dbName = Cache.getDataBaseName(
         translationService,
         sourceLanguage,
-        targetLanguage
+        targetLanguage,
       );
       this.list.set(dbName, cache);
       try {
@@ -534,7 +533,7 @@ const translationCache = (function () {
 
         request.onsuccess = (event) => {
           // TODO this cast is realy necessary?
-          //cast
+          // cast
           resolve(/** @type {string[]} */ (request.result));
         };
 
@@ -608,7 +607,7 @@ const translationCache = (function () {
         });
         const results = await Promise.all(promises);
         return Utils.humanReadableSize(
-          results.reduce((total, size) => total + size, 0)
+          results.reduce((total, size) => total + size, 0),
         );
       } catch (e) {
         console.error(e);
@@ -632,13 +631,13 @@ const translationCache = (function () {
     translationService,
     sourceLanguage,
     targetLanguage,
-    originalText
+    originalText,
   ) => {
     try {
       const cache = await cacheList.getCache(
         translationService,
         sourceLanguage,
-        targetLanguage
+        targetLanguage,
       );
       return await cache.query(originalText);
     } catch (e) {
@@ -662,13 +661,13 @@ const translationCache = (function () {
     targetLanguage,
     originalText,
     translatedText,
-    detectedLanguage
+    detectedLanguage,
   ) => {
     try {
       const cache = await cacheList.getCache(
         translationService,
         sourceLanguage,
-        targetLanguage
+        targetLanguage,
       );
       return await cache.add(originalText, translatedText, detectedLanguage);
     } catch (e) {

@@ -4,7 +4,7 @@
   When the DeepL tab is not activated, the timers will have a minimum delay of 1 second which delays the translation.
 */
 
-void (function () {
+void (function() {
   /**
    * Put the original text in the correct place, select the target language, wait and return the translation result.
    * @param {string} text
@@ -15,7 +15,7 @@ void (function () {
     return await new Promise((resolve) => {
       /** @type {HTMLTextAreaElement} */
       const source_textarea = document.querySelector(
-        "d-textarea[data-testid=translator-source-input] > div"
+        "d-textarea[data-testid=translator-source-input] > div",
       );
       if (!source_textarea) {
         throw new Error("source_textarea not found.");
@@ -23,7 +23,7 @@ void (function () {
 
       /** @type {HTMLTextAreaElement} */
       const target_textarea = document.querySelector(
-        "d-textarea[data-testid=translator-target-input]"
+        "d-textarea[data-testid=translator-target-input]",
       );
       if (!target_textarea) {
         throw new Error("target_textarea not found.");
@@ -31,7 +31,7 @@ void (function () {
 
       /** @type {HTMLButtonElement} */
       const select_language_el = document.querySelector(
-        "button[data-testid=translator-target-lang-btn]"
+        "button[data-testid=translator-target-lang-btn]",
       );
       if (!select_language_el) {
         throw new Error("select_language_el not found.");
@@ -42,7 +42,7 @@ void (function () {
       setTimeout(() => {
         /** @type {HTMLButtonElement} */
         const btn = document.querySelector(
-          `[data-testid=translator-target-lang-list] button[data-testid^=translator-lang-option-${targetLanguage}]`
+          `[data-testid=translator-target-lang-list] button[data-testid^=translator-lang-option-${targetLanguage}]`,
         );
         if (!btn) {
           throw new Error(`btn ${targetLanguage} not found.`);
@@ -57,9 +57,8 @@ void (function () {
         source_textarea.dispatchEvent(new Event("input", { bubbles: true }));
       }, 400);
 
-
       // set the URL hash, the translation will start immediately
-      //location.hash = `#/auto/${targetLanguage}/${encodeURIComponent(text)}`;
+      // location.hash = `#/auto/${targetLanguage}/${encodeURIComponent(text)}`;
 
       const startTime = performance.now();
 
@@ -70,9 +69,9 @@ void (function () {
        */
       function checkresult(oldvalue) {
         if (
-          performance.now() - startTime > 2400 ||
-          (target_textarea.textContent &&
-            target_textarea.textContent !== oldvalue)
+          performance.now() - startTime > 2400
+          || (target_textarea.textContent
+            && target_textarea.textContent !== oldvalue)
         ) {
           return resolve(target_textarea.textContent);
         }
@@ -154,7 +153,7 @@ void (function () {
               action: "DeepL_firstTranslationResult",
               result,
             },
-            checkedLastError
+            checkedLastError,
           );
         })
         .catch((e) => {
@@ -164,7 +163,7 @@ void (function () {
               action: "DeepL_firstTranslationResult",
               result: "",
             },
-            checkedLastError
+            checkedLastError,
           );
         });
     }, 100);

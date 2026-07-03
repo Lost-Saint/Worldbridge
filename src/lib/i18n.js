@@ -1,6 +1,6 @@
 "use strict";
 
-const twpI18n = (function () {
+const twpI18n = (function() {
   const twpI18n = {};
   let messages = null;
 
@@ -15,7 +15,7 @@ const twpI18n = (function () {
    * @param {string | string[]} substitutions
    * @returns {string} localizedString
    */
-  twpI18n.getMessage = function (messageName, substitutions = null) {
+  twpI18n.getMessage = function(messageName, substitutions = null) {
     try {
       if (messages) {
         messageName = messageName.toLowerCase();
@@ -35,12 +35,12 @@ const twpI18n = (function () {
               if (substitutions instanceof Array) {
                 content = content.replaceAll(
                   "$" + index,
-                  String(substitutions[index - 1])
+                  String(substitutions[index - 1]),
                 );
               } else if (index === 1) {
                 content = content.replaceAll(
                   "$" + index,
-                  String(substitutions)
+                  String(substitutions),
                 );
               } else {
                 content = content.replaceAll("$" + index, "");
@@ -66,12 +66,14 @@ const twpI18n = (function () {
    * @param {string} attributeName
    */
   function translateAttributes(root, attributeName) {
-    for (const element of root.querySelectorAll(
-      `[data-i18n-${attributeName}]`
-    )) {
+    for (
+      const element of root.querySelectorAll(
+        `[data-i18n-${attributeName}]`,
+      )
+    ) {
       let text = twpI18n.getMessage(
         element.getAttribute(`data-i18n-${attributeName}`),
-        element.getAttribute("data-i18n-ph-value")
+        element.getAttribute("data-i18n-ph-value"),
       );
       if (!text) {
         continue;
@@ -85,11 +87,11 @@ const twpI18n = (function () {
    * translate innerText and attributes for a Document or HTMLElement
    * @param {Document | HTMLElement | ShadowRoot} root
    */
-  twpI18n.translateDocument = function (root = document) {
+  twpI18n.translateDocument = function(root = document) {
     for (const element of root.querySelectorAll("[data-i18n]")) {
       let text = twpI18n.getMessage(
         element.getAttribute("data-i18n"),
-        element.getAttribute("data-i18n-ph-value")
+        element.getAttribute("data-i18n-ph-value"),
       );
       if (!text) {
         continue;
@@ -113,7 +115,7 @@ const twpI18n = (function () {
       messages = null;
     } else {
       return await fetch(
-        chrome.runtime.getURL(`/_locales/${uiLanguage}/messages.json`)
+        chrome.runtime.getURL(`/_locales/${uiLanguage}/messages.json`),
       )
         .then((response) => response.json())
         .then((result) => {
@@ -130,10 +132,10 @@ const twpI18n = (function () {
     }
   };
 
-  twpConfig.onReady(function () {
+  twpConfig.onReady(function() {
     twpI18n.updateUiMessages();
 
-    twpConfig.onChanged(function (name, newValue) {
+    twpConfig.onChanged(function(name, newValue) {
       if (name === "uiLanguage") {
         twpI18n.updateUiMessages();
       }

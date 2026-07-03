@@ -1,6 +1,6 @@
 "use strict";
 
-const translationService = (function () {
+const translationService = (function() {
   const translationService = {};
 
   class Utils {
@@ -15,8 +15,8 @@ const translationService = (function () {
      * @returns {string} escapedString
      */
     static escapeHTML(unsafe) {
-      const bingMarkFrontPart = '<mstrans:dictionary translation="';
-      const bingMarkSecondPart = '"></mstrans:dictionary>';
+      const bingMarkFrontPart = "<mstrans:dictionary translation=\"";
+      const bingMarkSecondPart = "\"></mstrans:dictionary>";
 
       unsafe = unsafe
         .replaceAll(bingMarkFrontPart, "@-/629^*")
@@ -46,7 +46,7 @@ const translationService = (function () {
         .replace(/\&amp;/g, "&")
         .replace(/\&lt;/g, "<")
         .replace(/\&gt;/g, ">")
-        .replace(/\&quot;/g, '"')
+        .replace(/\&quot;/g, "\"")
         .replace(/\&\#39;/g, "'");
     }
   }
@@ -57,7 +57,6 @@ const translationService = (function () {
     }
 
     /**
-     *
      * @param {number} num
      * @param {string} optString
      * @returns {number}
@@ -86,7 +85,6 @@ const translationService = (function () {
     }
 
     /**
-     *
      * @param {string} query
      * @returns {Array<number>}
      */
@@ -104,14 +102,13 @@ const translationService = (function () {
             bytesArray[idx++] = (charCode >> 6) | 192;
           } else {
             if (
-              55296 == (charCode & 64512) &&
-              i + 1 < query.length &&
-              56320 == (query.charCodeAt(i + 1) & 64512)
+              55296 == (charCode & 64512)
+              && i + 1 < query.length
+              && 56320 == (query.charCodeAt(i + 1) & 64512)
             ) {
-              charCode =
-                65536 +
-                ((charCode & 1023) << 10) +
-                (query.charCodeAt(++i) & 1023);
+              charCode = 65536
+                + ((charCode & 1023) << 10)
+                + (query.charCodeAt(++i) & 1023);
               bytesArray[idx++] = (charCode >> 18) | 240;
               bytesArray[idx++] = ((charCode >> 12) & 63) | 128;
             } else {
@@ -143,12 +140,12 @@ const translationService = (function () {
         encondingRound += item;
         encondingRound = GoogleHelper.shiftLeftOrRightThenSumOrXor(
           encondingRound,
-          "+-a^+6"
+          "+-a^+6",
         );
       }
       encondingRound = GoogleHelper.shiftLeftOrRightThenSumOrXor(
         encondingRound,
-        "+-3^+b+-f"
+        "+-3^+b+-f",
       );
 
       encondingRound ^= tkkKey;
@@ -180,8 +177,9 @@ const translationService = (function () {
      * @returns {Promise<void>}
      */
     static async findAuth() {
-      if (GoogleHelper_v2.#authPromise)
+      if (GoogleHelper_v2.#authPromise) {
         return await GoogleHelper_v2.#authPromise;
+      }
 
       GoogleHelper_v2.#authPromise = new Promise((resolve) => {
         let updateGoogleAuth = false;
@@ -206,22 +204,58 @@ const translationService = (function () {
 
           const alternativeKey = new TextDecoder().decode(
             new Uint8Array([
-              65, 73, 122, 97, 83, 121, 65, 84, 66, 88, 97, 106, 118, 122, 81,
-              76, 84, 68, 72, 69, 81, 98, 99, 112, 113, 48, 73, 104, 101, 48,
-              118, 87, 68, 72, 109, 79, 53, 50, 48,
-            ])
+              65,
+              73,
+              122,
+              97,
+              83,
+              121,
+              65,
+              84,
+              66,
+              88,
+              97,
+              106,
+              118,
+              122,
+              81,
+              76,
+              84,
+              68,
+              72,
+              69,
+              81,
+              98,
+              99,
+              112,
+              113,
+              48,
+              73,
+              104,
+              101,
+              48,
+              118,
+              87,
+              68,
+              72,
+              109,
+              79,
+              53,
+              50,
+              48,
+            ]),
           );
 
           const http = new XMLHttpRequest();
           http.open(
             "GET",
-            "https://translate.googleapis.com/_/translate_http/_/js/k=translate_http.tr.en_US.YusFYy3P_ro.O/am=AAg/d=1/exm=el_conf/ed=1/rs=AN8SPfq1Hb8iJRleQqQc8zhdzXmF9E56eQ/m=el_main"
+            "https://translate.googleapis.com/_/translate_http/_/js/k=translate_http.tr.en_US.YusFYy3P_ro.O/am=AAg/d=1/exm=el_conf/ed=1/rs=AN8SPfq1Hb8iJRleQqQc8zhdzXmF9E56eQ/m=el_main",
           );
           http.send();
           http.onload = (e) => {
             if (http.responseText && http.responseText.length > 1) {
               const result = http.responseText.match(
-                /['"]x\-goog\-api\-key['"]\s*\:\s*['"](\w{39})['"]/i
+                /['"]x\-goog\-api\-key['"]\s*\:\s*['"](\w{39})['"]/i,
               );
               console.log(result);
               if (result && result.length === 2) {
@@ -302,7 +336,7 @@ const translationService = (function () {
           const http = new XMLHttpRequest();
           http.open(
             "GET",
-            "https://translate.yandex.net/website-widget/v1/widget.js?widgetId=ytWidget&pageLang=es&widgetTheme=light&autoMode=false"
+            "https://translate.yandex.net/website-widget/v1/widget.js?widgetId=ytWidget&pageLang=es&widgetTheme=light&autoMode=false",
           );
           http.send();
           http.onload = (e) => {
@@ -487,7 +521,7 @@ const translationService = (function () {
       cbTransformResponse,
       cbGetExtraParameters = null,
       cbGetRequestBody = null,
-      cbGetExtraHeaders = null
+      cbGetExtraHeaders = null,
     ) {
       this.serviceName = serviceName;
       this.baseURL = baseURL;
@@ -504,7 +538,7 @@ const translationService = (function () {
        *
        * It works as an in-memory translation cache.
        * Ensures that two identical requests share the same `XMLHttpRequest`.
-       * */
+       */
       this.translationsInProgress = new Map();
     }
 
@@ -547,7 +581,7 @@ const translationService = (function () {
 
       for (const sourceArray of sourceArray2d) {
         const requestString = this.fixString(
-          this.cbTransformRequest(sourceArray)
+          this.cbTransformRequest(sourceArray),
         );
         const requestHash = [
           sourceLanguage,
@@ -582,18 +616,18 @@ const translationService = (function () {
           currentTranslationsInProgress.push(progressInfo);
           this.translationsInProgress.set(requestHash, progressInfo);
 
-          //cast
+          // cast
           const cacheEntry = await translationCache.get(
             this.serviceName,
             sourceLanguage,
             targetLanguage,
-            requestString
+            requestString,
           );
           if (cacheEntry) {
             progressInfo.translatedText = cacheEntry.translatedText;
             progressInfo.detectedLanguage = cacheEntry.detectedLanguage;
             progressInfo.status = "complete";
-            //this.translationsInProgress.delete([sourceLanguage, targetLanguage, requestString])
+            // this.translationsInProgress.delete([sourceLanguage, targetLanguage, requestString])
           } else {
             currentRequest.push(progressInfo);
             currentSize += progressInfo.originalText.length;
@@ -627,14 +661,14 @@ const translationService = (function () {
         const xhr = new XMLHttpRequest();
         xhr.open(
           this.xhrMethod,
-          this.baseURL +
-            (this.cbGetExtraParameters
+          this.baseURL
+            + (this.cbGetExtraParameters
               ? this.cbGetExtraParameters(
-                  sourceLanguage,
-                  targetLanguage,
-                  requests
-                )
-              : "")
+                sourceLanguage,
+                targetLanguage,
+                requests,
+              )
+              : ""),
         );
 
         if (this.cbGetExtraHeaders) {
@@ -661,7 +695,7 @@ const translationService = (function () {
         xhr.send(
           this.cbGetRequestBody
             ? this.cbGetRequestBody(sourceLanguage, targetLanguage, requests)
-            : undefined
+            : undefined,
         );
       });
     }
@@ -684,12 +718,12 @@ const translationService = (function () {
       targetLanguage,
       sourceArray2d,
       dontSaveInPersistentCache = false,
-      dontSortResults = false
+      dontSortResults = false,
     ) {
       const [requests, currentTranslationsInProgress] = await this.getRequests(
         sourceLanguage,
         targetLanguage,
-        sourceArray2d
+        sourceArray2d,
       );
       /** @type {Promise<void>[]} */
       const promises = [];
@@ -708,8 +742,8 @@ const translationService = (function () {
                 transInfo.status = "complete";
 
                 if (
-                  dontSaveInPersistentCache === false &&
-                  transInfo.translatedText
+                  dontSaveInPersistentCache === false
+                  && transInfo.translatedText
                 ) {
                   translationCache.set(
                     this.serviceName,
@@ -717,7 +751,7 @@ const translationService = (function () {
                     targetLanguage,
                     transInfo.originalText,
                     transInfo.translatedText,
-                    transInfo.detectedLanguage
+                    transInfo.detectedLanguage,
                   );
                 }
               }
@@ -726,13 +760,13 @@ const translationService = (function () {
               console.error(e);
               for (const transInfo of request) {
                 transInfo.status = "error";
-                //this.translationsInProgress.delete([sourceLanguage, targetLanguage, transInfo.originalText])
+                // this.translationsInProgress.delete([sourceLanguage, targetLanguage, transInfo.originalText])
               }
-            })
+            }),
         );
       }
       await Promise.all(
-        currentTranslationsInProgress.map((transInfo) => transInfo.waitTranlate)
+        currentTranslationsInProgress.map((transInfo) => transInfo.waitTranlate),
       );
       return currentTranslationsInProgress.map((transInfo) =>
         this.cbTransformResponse(transInfo.translatedText, dontSortResults)
@@ -759,7 +793,7 @@ const translationService = (function () {
           sourceArray = sourceArray.map((text) => Utils.escapeHTML(text));
           if (sourceArray.length > 1) {
             sourceArray = sourceArray.map(
-              (text, index) => `<a i=${index}>${text}</a>`
+              (text, index) => `<a i=${index}>${text}</a>`,
             );
           }
           // the <pre> tag is to preserve the text formating
@@ -786,14 +820,14 @@ const translationService = (function () {
           responseJson = response[0].map(
             /** @returns {Service_Single_Result_Response} */ (
               /** @type {string} */ value,
-              /** @type {number} */ index
+              /** @type {number} */ index,
             ) => {
               let detectedLanguage = null;
               if (response[1] && response[1][index]) {
                 detectedLanguage = response[1][index];
               }
               return { text: value, detectedLanguage };
-            }
+            },
           );
           return responseJson;
         },
@@ -819,7 +853,7 @@ const translationService = (function () {
             // the <i> tag is the original text in each sentence
             const sentenceFinalIndex = result.indexOf(
               "<i>",
-              sentenceStartIndex
+              sentenceStartIndex,
             );
 
             if (sentenceFinalIndex === -1) {
@@ -827,7 +861,7 @@ const translationService = (function () {
               break;
             } else {
               sentences.push(
-                result.slice(sentenceStartIndex + 3, sentenceFinalIndex)
+                result.slice(sentenceStartIndex + 3, sentenceFinalIndex),
               );
             }
             idx = sentenceFinalIndex;
@@ -842,14 +876,16 @@ const translationService = (function () {
           // maybe some text will be outside of <a i={number}> (Usually text before the first <a> tag, and some whitespace between the <a> tags),
           // in this case, The outside text will be placed inside the <a i={number}> closer
           // https://github.com/FilipePS/Traduzir-paginas-web/issues/449
-          //TODO: lidar com tags dentro de tags e tags vazias
+          // TODO: lidar com tags dentro de tags e tags vazias
           // https://de.wikipedia.org/wiki/Wikipedia:Hauptseite
           // "{\"originalText\":\"<pre><a i=0>\\nFür den </a><a i=1>37. Schreib­wettbewerb</a><a i=2> und den </a><a i=3>18. Miniaturwettbewerb</a><a i=4> können ab sofort Artikel nominiert werden.</a></pre>\",\"translatedText\":\"<pre><a i=0>\\n</a>Artigos já podem ser indicados <a i=0>para o</a> <a i=1>37º Concurso de Redação <a i=2>e</a></a> <a i=3><a i=4>18º</a> Concurso de Miniaturas</a> .</pre>\",\"detectedLanguage\":\"de\",\"status\":\"complete\",\"waitTranlate\":{}}"
           let resultArray = [];
           let lastEndPos = 0;
-          for (const r of result.matchAll(
-            /(\<a\si\=[0-9]+\>)([^\<\>]*(?=\<\/a\>))*/g
-          )) {
+          for (
+            const r of result.matchAll(
+              /(\<a\si\=[0-9]+\>)([^\<\>]*(?=\<\/a\>))*/g,
+            )
+          ) {
             const fullText = r[0];
             const fullLength = r[0].length;
             const pos = r.index;
@@ -943,7 +979,7 @@ const translationService = (function () {
         function cbGetExtraParameters(
           sourceLanguage,
           targetLanguage,
-          requests
+          requests,
         ) {
           return ``;
         },
@@ -968,7 +1004,7 @@ const translationService = (function () {
               value: GoogleHelper_v2.translateAuth,
             },
           ];
-        }
+        },
       );
     }
 
@@ -981,7 +1017,7 @@ const translationService = (function () {
       targetLanguage,
       sourceArray2d,
       dontSaveInPersistentCache,
-      dontSortResults = false
+      dontSortResults = false,
     ) {
       /** @type {{search: string, replace: string}[]} */
       const replacements = [
@@ -1007,7 +1043,7 @@ const translationService = (function () {
         targetLanguage,
         sourceArray2d,
         dontSaveInPersistentCache,
-        dontSortResults
+        dontSortResults,
       );
     }
   })();
@@ -1028,8 +1064,8 @@ const translationService = (function () {
           const detectedLanguage = lang ? lang.split("-")[0] : null;
           return response.text.map(
             /** @return {Service_Single_Result_Response} */ (
-              /** @type {string} */ text
-            ) => ({ text, detectedLanguage })
+              /** @type {string} */ text,
+            ) => ({ text, detectedLanguage }),
           );
         },
         function cbTransformResponse(result, dontSortResults) {
@@ -1040,13 +1076,15 @@ const translationService = (function () {
         function cbGetExtraParameters(
           sourceLanguage,
           targetLanguage,
-          requests
+          requests,
         ) {
           return `&id=${YandexHelper.translateSid}-0-0&format=html&lang=${
             sourceLanguage === "auto" ? "" : sourceLanguage + "-"
-          }${targetLanguage}${requests
-            .map((info) => `&text=${encodeURIComponent(info.originalText)}`)
-            .join("")}`;
+          }${targetLanguage}${
+            requests
+              .map((info) => `&text=${encodeURIComponent(info.originalText)}`)
+              .join("")
+          }`;
         },
         function cbGetRequestBody(sourceLanguage, targetLanguage, requests) {
           return undefined;
@@ -1058,7 +1096,7 @@ const translationService = (function () {
               value: "application/x-www-form-urlencoded",
             },
           ];
-        }
+        },
       );
     }
 
@@ -1070,7 +1108,7 @@ const translationService = (function () {
       targetLanguage,
       sourceArray2d,
       dontSaveInPersistentCache,
-      dontSortResults = false
+      dontSortResults = false,
     ) {
       await YandexHelper.findSID();
       if (!YandexHelper.translateSid) return;
@@ -1111,7 +1149,7 @@ const translationService = (function () {
         targetLanguage,
         sourceArray2d,
         dontSaveInPersistentCache,
-        dontSortResults
+        dontSortResults,
       );
     }
   })();
@@ -1138,7 +1176,7 @@ const translationService = (function () {
             (/** @type {object} */ r) => ({
               text: r.translations[0].text,
               detectedLanguage: r.detectedLanguage?.language,
-            })
+            }),
           );
         },
         function cbTransformResponse(result, dontSortResults) {
@@ -1171,7 +1209,7 @@ const translationService = (function () {
         function cbGetExtraParameters(
           sourceLanguage,
           targetLanguage,
-          requests
+          requests,
         ) {
           return `${
             sourceLanguage !== "auto-detect" ? "&from=" + sourceLanguage : ""
@@ -1181,7 +1219,7 @@ const translationService = (function () {
           return JSON.stringify(
             requests.map((info) => ({
               text: info.originalText,
-            }))
+            })),
           );
         },
         function cbGetExtraHeaders() {
@@ -1195,7 +1233,7 @@ const translationService = (function () {
               value: "Bearer " + BingHelper.translateAuth,
             },
           ];
-        }
+        },
       );
     }
 
@@ -1208,7 +1246,7 @@ const translationService = (function () {
       targetLanguage,
       sourceArray2d,
       dontSaveInPersistentCache,
-      dontSortResults = false
+      dontSortResults = false,
     ) {
       /** @type {{search: string, replace: string}[]} */
       const replacements = [
@@ -1278,7 +1316,7 @@ const translationService = (function () {
         targetLanguage,
         sourceArray2d,
         dontSaveInPersistentCache,
-        dontSortResults
+        dontSortResults,
       );
     }
   })();
@@ -1288,7 +1326,6 @@ const translationService = (function () {
       this.DeepLTab = null;
     }
     /**
-     *
      * @param {string} sourceLanguage - This parameter is not used
      * @param {*} targetLanguage
      * @param {*} sourceArray2d - Only the string `sourceArray2d[0][0]` will be translated.
@@ -1301,7 +1338,7 @@ const translationService = (function () {
       targetLanguage,
       sourceArray2d,
       dontSaveInPersistentCache,
-      dontSortResults = false
+      dontSortResults = false,
     ) {
       if (targetLanguage === "pt") {
         targetLanguage = "pt-BR";
@@ -1333,7 +1370,7 @@ const translationService = (function () {
           chrome.tabs.get(this.DeepLTab.id, (tab) => {
             checkedLastError();
             if (tab) {
-              //chrome.tabs.update(tab.id, {active: true})
+              // chrome.tabs.update(tab.id, {active: true})
               chrome.tabs.sendMessage(
                 tab.id,
                 {
@@ -1347,30 +1384,34 @@ const translationService = (function () {
                 (response) => {
                   checkedLastError();
                   resolve([[response]]);
-                }
+                },
               );
             } else {
               tabsCreate(
-                `https://www.deepl.com/#!${targetLanguage}!#${encodeURIComponent(
-                  sourceArray2d[0][0]
-                )}`,
+                `https://www.deepl.com/#!${targetLanguage}!#${
+                  encodeURIComponent(
+                    sourceArray2d[0][0],
+                  )
+                }`,
                 (tab) => {
                   this.DeepLTab = tab;
                   waitFirstTranslationResult();
-                }
+                },
               );
               // resolve([[""]])
             }
           });
         } else {
           tabsCreate(
-            `https://www.deepl.com/#!${targetLanguage}!#${encodeURIComponent(
-              sourceArray2d[0][0]
-            )}`,
+            `https://www.deepl.com/#!${targetLanguage}!#${
+              encodeURIComponent(
+                sourceArray2d[0][0],
+              )
+            }`,
             (tab) => {
               this.DeepLTab = tab;
               waitFirstTranslationResult();
-            }
+            },
           );
           // resolve([[""]])
         }
@@ -1422,12 +1463,11 @@ const translationService = (function () {
                 value: "application/x-www-form-urlencoded",
               },
             ];
-          }
+          },
         );
       }
 
       /**
-       *
        * @param {string} sourceLanguage - This parameter is not used
        * @param {*} targetLanguage
        * @param {*} sourceArray2d - Only the string `sourceArray2d[0][0]` will be translated.
@@ -1467,8 +1507,7 @@ const translationService = (function () {
             return [
               {
                 text: response.translations[0].text,
-                detectedLanguage:
-                  response.translations[0].detected_source_language,
+                detectedLanguage: response.translations[0].detected_source_language,
               },
             ];
           },
@@ -1505,12 +1544,11 @@ const translationService = (function () {
                 value: "DeepL-Auth-Key " + apiKey,
               },
             ];
-          }
+          },
         );
       }
 
       /**
-       *
        * @param {string} sourceLanguage - This parameter is not used
        * @param {*} targetLanguage
        * @param {*} sourceArray2d - Only the string `sourceArray2d[0][0]` will be translated.
@@ -1539,7 +1577,7 @@ const translationService = (function () {
   serviceList.set("bing", bingService);
   serviceList.set(
     "deepl",
-    /** @type {Service} */ /** @type {?} */ (deeplService)
+    /** @type {Service} */ /** @type {?} */ (deeplService),
   );
 
   /**
@@ -1550,8 +1588,8 @@ const translationService = (function () {
    */
   const getSafeServiceByName = (serviceName) => {
     if (
-      twpConfig.get("enabledServices").includes(serviceName) ||
-      twpConfig.get("customServices").find((cs) => cs.name === serviceName)
+      twpConfig.get("enabledServices").includes(serviceName)
+      || twpConfig.get("customServices").find((cs) => cs.name === serviceName)
     ) {
       return serviceList.get(serviceName);
     } else {
@@ -1565,12 +1603,12 @@ const translationService = (function () {
     targetLanguage,
     sourceArray2d,
     dontSaveInPersistentCache = false,
-    dontSortResults = false
+    dontSortResults = false,
   ) => {
     serviceName = twpLang.getAlternativeService(
       targetLanguage,
       serviceName,
-      true
+      true,
     );
     const service = getSafeServiceByName(serviceName);
     return await service.translate(
@@ -1578,7 +1616,7 @@ const translationService = (function () {
       targetLanguage,
       sourceArray2d,
       dontSaveInPersistentCache,
-      dontSortResults
+      dontSortResults,
     );
   };
 
@@ -1587,12 +1625,12 @@ const translationService = (function () {
     sourceLanguage,
     targetLanguage,
     sourceArray,
-    dontSaveInPersistentCache = false
+    dontSaveInPersistentCache = false,
   ) => {
     serviceName = twpLang.getAlternativeService(
       targetLanguage,
       serviceName,
-      false
+      false,
     );
     const service = getSafeServiceByName(serviceName);
     return (
@@ -1600,7 +1638,7 @@ const translationService = (function () {
         sourceLanguage,
         targetLanguage,
         sourceArray.map((text) => [text]),
-        dontSaveInPersistentCache
+        dontSaveInPersistentCache,
       )
     ).map((result) => result[0]);
   };
@@ -1610,12 +1648,12 @@ const translationService = (function () {
     sourceLanguage,
     targetLanguage,
     originalText,
-    dontSaveInPersistentCache = false
+    dontSaveInPersistentCache = false,
   ) => {
     serviceName = twpLang.getAlternativeService(
       targetLanguage,
       serviceName,
-      false
+      false,
     );
     const service = getSafeServiceByName(serviceName);
     return (
@@ -1623,7 +1661,7 @@ const translationService = (function () {
         sourceLanguage,
         targetLanguage,
         [[originalText]],
-        dontSaveInPersistentCache
+        dontSaveInPersistentCache,
       )
     )[0][0];
   };
@@ -1645,7 +1683,7 @@ const translationService = (function () {
           request.targetLanguage,
           request.sourceArray2d,
           dontSaveInPersistentCache,
-          request.dontSortResults
+          request.dontSortResults,
         )
         .then((results) => sendResponse(results))
         .catch((e) => {
@@ -1661,7 +1699,7 @@ const translationService = (function () {
           request.sourceLanguage,
           request.targetLanguage,
           request.sourceArray,
-          dontSaveInPersistentCache
+          dontSaveInPersistentCache,
         )
         .then((results) => sendResponse(results))
         .catch((e) => {
@@ -1677,7 +1715,7 @@ const translationService = (function () {
           request.sourceLanguage,
           request.targetLanguage,
           request.source,
-          dontSaveInPersistentCache
+          dontSaveInPersistentCache,
         )
         .then((results) => sendResponse(results))
         .catch((e) => {
@@ -1695,24 +1733,24 @@ const translationService = (function () {
     } else if (request.action === "createLibreService") {
       serviceList.set(
         "libre",
-        createLibreService(request.libre.url, request.libre.apiKey)
+        createLibreService(request.libre.url, request.libre.apiKey),
       );
     } else if (request.action === "removeLibreService") {
       serviceList.delete("libre");
     } else if (request.action === "createDeeplFreeApiService") {
       serviceList.set(
         "deepl",
-        createDeeplFreeApiService(request.deepl_freeapi.apiKey)
+        createDeeplFreeApiService(request.deepl_freeapi.apiKey),
       );
     } else if (request.action === "removeDeeplFreeApiService") {
       serviceList.set(
         "deepl",
-        /** @type {Service} */ /** @type {?} */ (deeplService)
+        /** @type {Service} */ /** @type {?} */ (deeplService),
       );
     }
   });
 
-  twpConfig.onReady(function () {
+  twpConfig.onReady(function() {
     if (twpConfig.get("customServices").find((cs) => cs.name === "libre")) {
       const libre = twpConfig
         .get("customServices")
