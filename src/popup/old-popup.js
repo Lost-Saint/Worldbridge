@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var $ = document.querySelector.bind(document);
 
@@ -8,90 +8,90 @@ twpConfig
   .then(() => {
     twpI18n.translateDocument();
 
-    if (!navigator.userAgent.includes("Firefox")) {
-      document.body.style.minWidth = "300px";
+    if (!navigator.userAgent.includes('Firefox')) {
+      document.body.style.minWidth = '300px';
     }
 
-    $("#btnImproveTranslation").onclick = () => {
-      window.location = "improve-translation.html";
+    $('#btnImproveTranslation').onclick = () => {
+      window.location = 'improve-translation.html';
     };
 
     // get elements
-    const btnSwitchInterfaces = document.getElementById("btnSwitchInterfaces");
+    const btnSwitchInterfaces = document.getElementById('btnSwitchInterfaces');
     const divIconTranslateContainer = document.getElementById(
-      "divIconTranslateContainer",
+      'divIconTranslateContainer',
     );
-    const divIconTranslate = document.getElementById("divIconTranslate");
-    const iconTranslate = document.getElementById("iconTranslate");
+    const divIconTranslate = document.getElementById('divIconTranslate');
+    const iconTranslate = document.getElementById('iconTranslate');
 
-    const lblTranslate = document.getElementById("lblTranslate");
-    const lblTranslating = document.getElementById("lblTranslating");
-    const lblTranslated = document.getElementById("lblTranslated");
-    const lblError = document.getElementById("lblError");
-    const lblTargetLanguage = document.getElementById("lblTargetLanguage");
+    const lblTranslate = document.getElementById('lblTranslate');
+    const lblTranslating = document.getElementById('lblTranslating');
+    const lblTranslated = document.getElementById('lblTranslated');
+    const lblError = document.getElementById('lblError');
+    const lblTargetLanguage = document.getElementById('lblTargetLanguage');
 
     const divAlwaysTranslate = document.getElementById(
-      "divAlwaysTranslateThisLang",
+      'divAlwaysTranslateThisLang',
     );
     const cbAlwaysTranslate = document.getElementById(
-      "cbAlwaysTranslateThisLang",
+      'cbAlwaysTranslateThisLang',
     );
     const lblAlwaysTranslate = document.getElementById(
-      "lblAlwaysTranslateThisLang",
+      'lblAlwaysTranslateThisLang',
     );
 
     const selectTargetLanguage = document.getElementById(
-      "selectTargetLanguage",
+      'selectTargetLanguage',
     );
 
-    const divOptionsList = document.getElementById("divOptionsList");
+    const divOptionsList = document.getElementById('divOptionsList');
 
-    const btnReset = document.getElementById("btnReset");
-    const btnTranslate = document.getElementById("btnTranslate");
-    const btnRestore = document.getElementById("btnRestore");
-    const btnTryAgain = document.getElementById("btnTryAgain");
-    const btnOptionsDiv = document.getElementById("btnOptionsDiv");
-    const btnOptions = document.getElementById("btnOptions");
+    const btnReset = document.getElementById('btnReset');
+    const btnTranslate = document.getElementById('btnTranslate');
+    const btnRestore = document.getElementById('btnRestore');
+    const btnTryAgain = document.getElementById('btnTryAgain');
+    const btnOptionsDiv = document.getElementById('btnOptionsDiv');
+    const btnOptions = document.getElementById('btnOptions');
     const divShowTranslateSelectedButton = document.getElementById(
-      "divShowTranslateSelectedButton",
+      'divShowTranslateSelectedButton',
     );
     const cbShowTranslateSelectedButton = document.getElementById(
-      "cbShowTranslateSelectedButton",
+      'cbShowTranslateSelectedButton',
     );
 
     cbShowTranslateSelectedButton.oninput = (e) => {
       console.log(e.target.checked);
       twpConfig.set(
-        "showTranslateSelectedButton",
-        e.target.checked ? "yes" : "no",
+        'showTranslateSelectedButton',
+        e.target.checked ? 'yes' : 'no',
       );
     };
-    cbShowTranslateSelectedButton.checked = twpConfig.get("showTranslateSelectedButton") == "yes"
-      ? true
-      : false;
+    cbShowTranslateSelectedButton.checked = twpConfig.get('showTranslateSelectedButton') == 'yes' ?
+      true :
+      false;
 
-    $("#btnPatreon").onclick = (e) => {
-      window.open("https://www.patreon.com/filipeps", "_blank");
+    $('#btnPatreon').onclick = (e) => {
+      window.open('https://www.patreon.com/filipeps', '_blank');
     };
 
-    $("#btnOptionB").innerHTML += " <i class=\"arrow down\"></i>";
-    $("#btnOptions option[value='donate']").innerHTML += " &#10084;";
+    $('#btnOptionB').innerHTML += ' <i class="arrow down"></i>';
+    $("#btnOptions option[value='donate']").innerHTML += ' &#10084;';
 
-    var cStyle = getComputedStyle(document.querySelector("#btnOptionB"));
-    btnOptions.style.width = parseInt(cStyle.width) + 0 + "px";
+    var cStyle = getComputedStyle(document.querySelector('#btnOptionB'));
+    btnOptions.style.width = parseInt(cStyle.width) + 0 + 'px';
 
     // fill language list
     {
       let langs = twpLang.getLanguageList();
       lblTranslate.textContent = twpI18n.getMessage(
-        "lblTranslatePageInto",
-        langs[twpConfig.get("targetLanguage")]
-          || twpConfig.get("targetLanguage"),
+        'lblTranslatePageInto',
+        langs[twpConfig.get('targetLanguage')] ||
+          twpConfig.get('targetLanguage'),
       );
       lblTranslated.textContent = twpI18n.getMessage(
-        "lblPageTranslateInto",
-        langs[twpConfig.get("targetLanguage")]
-          || twpConfig.get("targetLanguage"),
+        'lblPageTranslateInto',
+        langs[twpConfig.get('targetLanguage')] ||
+          twpConfig.get('targetLanguage'),
       );
 
       const langsSorted = [];
@@ -104,29 +104,29 @@ twpConfig
         return a[1].localeCompare(b[1]);
       });
 
-      const eAllLangs = selectTargetLanguage.querySelector("[name=\"all\"]");
+      const eAllLangs = selectTargetLanguage.querySelector('[name="all"]');
       langsSorted.forEach((value) => {
-        const option = document.createElement("option");
+        const option = document.createElement('option');
         option.value = value[0];
         option.textContent = value[1];
         eAllLangs.appendChild(option);
       });
 
-      const eRecentsLangs = selectTargetLanguage.querySelector("[name=\"recents\"]");
-      twpConfig.get("targetLanguages").forEach((value) => {
-        const option = document.createElement("option");
+      const eRecentsLangs = selectTargetLanguage.querySelector('[name="recents"]');
+      twpConfig.get('targetLanguages').forEach((value) => {
+        const option = document.createElement('option');
         option.value = value;
         option.textContent = langs[value];
         eRecentsLangs.appendChild(option);
       });
     }
-    selectTargetLanguage.value = twpConfig.get("targetLanguage");
+    selectTargetLanguage.value = twpConfig.get('targetLanguage');
 
     function enableDarkMode() {
-      if (!document.getElementById("darkModeElement")) {
-        const el = document.createElement("style");
-        el.setAttribute("id", "darkModeElement");
-        el.setAttribute("rel", "stylesheet");
+      if (!document.getElementById('darkModeElement')) {
+        const el = document.createElement('style');
+        el.setAttribute('id', 'darkModeElement');
+        el.setAttribute('rel', 'stylesheet');
         el.textContent = `
             * {
                 scrollbar-color: #202324 #454a4d;
@@ -163,27 +163,27 @@ twpConfig
     }
 
     function disableDarkMode() {
-      if (document.getElementById("darkModeElement")) {
-        document.getElementById("darkModeElement").remove();
+      if (document.getElementById('darkModeElement')) {
+        document.getElementById('darkModeElement').remove();
       }
     }
 
-    if (twpConfig.get("darkMode") == "auto") {
-      if (matchMedia("(prefers-color-scheme: dark)").matches) {
+    if (twpConfig.get('darkMode') == 'auto') {
+      if (matchMedia('(prefers-color-scheme: dark)').matches) {
         enableDarkMode();
       } else {
         disableDarkMode();
       }
-    } else if (twpConfig.get("darkMode") == "yes") {
+    } else if (twpConfig.get('darkMode') == 'yes') {
       enableDarkMode();
     } else {
       disableDarkMode();
     }
 
-    let originalTabLanguage = "und";
-    let currentPageLanguage = "und";
-    let currentPageLanguageState = "original";
-    let currentPageTranslatorService = twpConfig.get("pageTranslatorService");
+    let originalTabLanguage = 'und';
+    let currentPageLanguage = 'und';
+    let currentPageLanguageState = 'original';
+    let currentPageTranslatorService = twpConfig.get('pageTranslatorService');
 
     chrome.tabs.query(
       {
@@ -194,7 +194,7 @@ twpConfig
         chrome.tabs.sendMessage(
           tabs[0].id,
           {
-            action: "getOriginalTabLanguage",
+            action: 'getOriginalTabLanguage',
           },
           {
             frameId: 0,
@@ -202,8 +202,8 @@ twpConfig
           (tabLanguage) => {
             checkedLastError();
             if (
-              tabLanguage
-              && (tabLanguage = twpLang.fixTLanguageCode(tabLanguage))
+              tabLanguage &&
+              (tabLanguage = twpLang.fixTLanguageCode(tabLanguage))
             ) {
               originalTabLanguage = tabLanguage;
             }
@@ -213,7 +213,7 @@ twpConfig
         chrome.tabs.sendMessage(
           tabs[0].id,
           {
-            action: "getCurrentPageLanguage",
+            action: 'getCurrentPageLanguage',
           },
           {
             frameId: 0,
@@ -230,7 +230,7 @@ twpConfig
         chrome.tabs.sendMessage(
           tabs[0].id,
           {
-            action: "getCurrentPageLanguageState",
+            action: 'getCurrentPageLanguageState',
           },
           {
             frameId: 0,
@@ -247,7 +247,7 @@ twpConfig
         chrome.tabs.sendMessage(
           tabs[0].id,
           {
-            action: "getCurrentPageTranslatorService",
+            action: 'getCurrentPageTranslatorService',
           },
           {
             frameId: 0,
@@ -266,174 +266,174 @@ twpConfig
     let showSelectTargetLanguage = false;
 
     function updateInterface() {
-      if (currentPageTranslatorService == "yandex") {
+      if (currentPageTranslatorService == 'yandex') {
         $("#btnOptions option[value='translateInExternalSite']").textContent = twpI18n.getMessage(
-          "msgOpenOnYandexTranslator",
+          'msgOpenOnYandexTranslator',
         );
-        $("#iconTranslate").setAttribute(
-          "src",
-          "/icons/yandex-translate-32.png",
+        $('#iconTranslate').setAttribute(
+          'src',
+          '/icons/yandex-translate-32.png',
         );
-      } else if (currentPageTranslatorService == "bing") {
+      } else if (currentPageTranslatorService == 'bing') {
         $("#btnOptions option[value='translateInExternalSite']").textContent = twpI18n.getMessage(
-          "btnOpenOnGoogleTranslate",
+          'btnOpenOnGoogleTranslate',
         );
-        $("#iconTranslate").setAttribute("src", "/icons/bing-translate-32.png");
+        $('#iconTranslate').setAttribute('src', '/icons/bing-translate-32.png');
       } else {
         // google
         $("#btnOptions option[value='translateInExternalSite']").textContent = twpI18n.getMessage(
-          "btnOpenOnGoogleTranslate",
+          'btnOpenOnGoogleTranslate',
         );
-        $("#iconTranslate").setAttribute(
-          "src",
-          "/icons/google-translate-32.png",
+        $('#iconTranslate').setAttribute(
+          'src',
+          '/icons/google-translate-32.png',
         );
       }
 
       let showAlwaysTranslateCheckbox = false;
 
       if (
-        originalTabLanguage !== "und"
-        && originalTabLanguage !== twpConfig.get("targetLanguage")
+        originalTabLanguage !== 'und' &&
+        originalTabLanguage !== twpConfig.get('targetLanguage')
       ) {
         showAlwaysTranslateCheckbox = true;
       }
 
-      if (originalTabLanguage !== "und") {
-        $("#cbAlwaysTranslateThisLang").checked =
-          twpConfig.get("alwaysTranslateLangs").indexOf(originalTabLanguage)
-            !== -1;
-        $("#lblAlwaysTranslateThisLang").textContent = twpI18n.getMessage(
-          "lblAlwaysTranslate",
+      if (originalTabLanguage !== 'und') {
+        $('#cbAlwaysTranslateThisLang').checked =
+          twpConfig.get('alwaysTranslateLangs').indexOf(originalTabLanguage) !==
+            -1;
+        $('#lblAlwaysTranslateThisLang').textContent = twpI18n.getMessage(
+          'lblAlwaysTranslate',
           twpLang.codeToLanguage(originalTabLanguage),
         );
 
         const translatedWhenHoveringThisLangText = twpI18n.getMessage(
-          "lblShowTranslatedWhenHoveringThisLang",
+          'lblShowTranslatedWhenHoveringThisLang',
           twpLang.codeToLanguage(originalTabLanguage),
         );
         if (
           twpConfig
-            .get("langsToTranslateWhenHovering")
+            .get('langsToTranslateWhenHovering')
             .indexOf(originalTabLanguage) === -1
         ) {
           $(
-            "option[data-i18n=lblShowTranslatedWhenHoveringThisLang]",
+            'option[data-i18n=lblShowTranslatedWhenHoveringThisLang]',
           ).textContent = translatedWhenHoveringThisLangText;
         } else {
           $(
-            "option[data-i18n=lblShowTranslatedWhenHoveringThisLang]",
-          ).textContent = "✔ " + translatedWhenHoveringThisLangText;
+            'option[data-i18n=lblShowTranslatedWhenHoveringThisLang]',
+          ).textContent = '✔ ' + translatedWhenHoveringThisLangText;
         }
         $(
-          "option[data-i18n=lblShowTranslatedWhenHoveringThisLang]",
-        ).removeAttribute("hidden");
+          'option[data-i18n=lblShowTranslatedWhenHoveringThisLang]',
+        ).removeAttribute('hidden');
 
         const neverTranslateLangText = twpI18n.getMessage(
-          "btnNeverTranslateThisLanguage",
+          'btnNeverTranslateThisLanguage',
         );
         if (
-          twpConfig.get("neverTranslateLangs").indexOf(originalTabLanguage)
-            === -1
+          twpConfig.get('neverTranslateLangs').indexOf(originalTabLanguage) ===
+            -1
         ) {
-          $("option[data-i18n=btnNeverTranslateThisLanguage]").textContent = neverTranslateLangText;
+          $('option[data-i18n=btnNeverTranslateThisLanguage]').textContent = neverTranslateLangText;
         } else {
-          $("option[data-i18n=btnNeverTranslateThisLanguage]").textContent = "✔ "
-            + neverTranslateLangText;
+          $('option[data-i18n=btnNeverTranslateThisLanguage]').textContent = '✔ ' +
+            neverTranslateLangText;
         }
-        $("option[data-i18n=btnNeverTranslateThisLanguage]").style.display = "block";
+        $('option[data-i18n=btnNeverTranslateThisLanguage]').style.display = 'block';
       }
 
-      btnRestore.className = btnRestore.className.replace(" w3-disabled", "");
-      cbAlwaysTranslate.removeAttribute("disabled");
+      btnRestore.className = btnRestore.className.replace(' w3-disabled', '');
+      cbAlwaysTranslate.removeAttribute('disabled');
 
       if (showSelectTargetLanguage) {
-        lblTranslate.style.display = "none";
-        lblTranslating.style.display = "none";
-        lblTranslated.style.display = "none";
-        lblError.style.display = "none";
-        lblTargetLanguage.style.display = "inline";
+        lblTranslate.style.display = 'none';
+        lblTranslating.style.display = 'none';
+        lblTranslated.style.display = 'none';
+        lblError.style.display = 'none';
+        lblTargetLanguage.style.display = 'inline';
 
-        selectTargetLanguage.style.display = "inline";
-        btnReset.style.display = "inline";
+        selectTargetLanguage.style.display = 'inline';
+        btnReset.style.display = 'inline';
 
-        divAlwaysTranslate.style.display = "none";
-        btnTranslate.style.display = "inline";
-        btnRestore.style.display = "none";
-        btnTryAgain.style.display = "none";
-        btnOptionsDiv.style.display = "none";
+        divAlwaysTranslate.style.display = 'none';
+        btnTranslate.style.display = 'inline';
+        btnRestore.style.display = 'none';
+        btnTryAgain.style.display = 'none';
+        btnOptionsDiv.style.display = 'none';
       } else {
-        divIconTranslateContainer.style.display = "none";
-        lblTargetLanguage.style.display = "none";
-        selectTargetLanguage.style.display = "none";
-        btnReset.style.display = "none";
+        divIconTranslateContainer.style.display = 'none';
+        lblTargetLanguage.style.display = 'none';
+        selectTargetLanguage.style.display = 'none';
+        btnReset.style.display = 'none';
 
-        divShowTranslateSelectedButton.style.display = "none";
+        divShowTranslateSelectedButton.style.display = 'none';
 
         switch (currentPageLanguageState) {
-          case "translated":
-            lblTranslate.style.display = "none";
-            lblTranslating.style.display = "none";
-            lblTranslated.style.display = "inline";
-            lblError.style.display = "none";
+          case 'translated':
+            lblTranslate.style.display = 'none';
+            lblTranslating.style.display = 'none';
+            lblTranslated.style.display = 'inline';
+            lblError.style.display = 'none';
 
-            divAlwaysTranslate.style.display = "none";
-            btnTranslate.style.display = "none";
-            btnRestore.style.display = "inline";
-            btnTryAgain.style.display = "none";
-            btnOptionsDiv.style.display = "inline";
+            divAlwaysTranslate.style.display = 'none';
+            btnTranslate.style.display = 'none';
+            btnRestore.style.display = 'inline';
+            btnTryAgain.style.display = 'none';
+            btnOptionsDiv.style.display = 'inline';
 
-            divShowTranslateSelectedButton.style.display = "block";
+            divShowTranslateSelectedButton.style.display = 'block';
 
-            divIconTranslateContainer.style.display = "block";
+            divIconTranslateContainer.style.display = 'block';
 
             break;
-          case "translating":
-            lblTranslate.style.display = "none";
-            lblTranslating.style.display = "inline";
-            lblTranslated.style.display = "none";
-            lblError.style.display = "none";
+          case 'translating':
+            lblTranslate.style.display = 'none';
+            lblTranslating.style.display = 'inline';
+            lblTranslated.style.display = 'none';
+            lblError.style.display = 'none';
 
-            divAlwaysTranslate.style.display = "none";
-            btnTranslate.style.display = "none";
-            btnRestore.style.display = "inline";
-            btnTryAgain.style.display = "none";
-            btnOptionsDiv.style.display = "none";
+            divAlwaysTranslate.style.display = 'none';
+            btnTranslate.style.display = 'none';
+            btnRestore.style.display = 'inline';
+            btnTryAgain.style.display = 'none';
+            btnOptionsDiv.style.display = 'none';
 
-            if (btnRestore.className.indexOf("w3-disabled") == -1) {
-              btnRestore.className += " w3-disabled";
+            if (btnRestore.className.indexOf('w3-disabled') == -1) {
+              btnRestore.className += ' w3-disabled';
             }
             break;
-          case "error":
-            lblTranslate.style.display = "none";
-            lblTranslating.style.display = "none";
-            lblTranslated.style.display = "none";
-            lblError.style.display = "inline";
+          case 'error':
+            lblTranslate.style.display = 'none';
+            lblTranslating.style.display = 'none';
+            lblTranslated.style.display = 'none';
+            lblError.style.display = 'inline';
 
-            divAlwaysTranslate.style.display = "none";
-            btnTranslate.style.display = "none";
-            btnRestore.style.display = "none";
-            btnTryAgain.style.display = "inline";
-            btnOptionsDiv.style.display = "none";
+            divAlwaysTranslate.style.display = 'none';
+            btnTranslate.style.display = 'none';
+            btnRestore.style.display = 'none';
+            btnTryAgain.style.display = 'inline';
+            btnOptionsDiv.style.display = 'none';
 
-            divIconTranslateContainer.style.display = "block";
+            divIconTranslateContainer.style.display = 'block';
             break;
           default:
-            lblTranslate.style.display = "inline";
-            lblTranslating.style.display = "none";
-            lblTranslated.style.display = "none";
-            lblError.style.display = "none";
+            lblTranslate.style.display = 'inline';
+            lblTranslating.style.display = 'none';
+            lblTranslated.style.display = 'none';
+            lblError.style.display = 'none';
 
-            divAlwaysTranslate.style.display = "block";
-            showAlwaysTranslateCheckbox
-              ? void 0
-              : cbAlwaysTranslate.setAttribute("disabled", "disabled");
-            btnTranslate.style.display = "inline";
-            btnRestore.style.display = "none";
-            btnTryAgain.style.display = "none";
-            btnOptionsDiv.style.display = "inline";
+            divAlwaysTranslate.style.display = 'block';
+            showAlwaysTranslateCheckbox ?
+              void 0 :
+              cbAlwaysTranslate.setAttribute('disabled', 'disabled');
+            btnTranslate.style.display = 'inline';
+            btnRestore.style.display = 'none';
+            btnTryAgain.style.display = 'none';
+            btnOptionsDiv.style.display = 'inline';
 
-            divIconTranslateContainer.style.display = "block";
+            divIconTranslateContainer.style.display = 'block';
             break;
         }
       }
@@ -441,7 +441,7 @@ twpConfig
     updateInterface();
 
     function onTranslateClick() {
-      currentPageLanguageState = "translated";
+      currentPageLanguageState = 'translated';
 
       chrome.tabs.query(
         {
@@ -449,7 +449,7 @@ twpConfig
           currentWindow: true,
         },
         (tabs) => {
-          if (twpConfig.get("targetLanguage") !== selectTargetLanguage.value) {
+          if (twpConfig.get('targetLanguage') !== selectTargetLanguage.value) {
             twpConfig.setTargetLanguage(selectTargetLanguage.value, true);
           } else {
             twpConfig.setTargetLanguage(selectTargetLanguage.value);
@@ -457,21 +457,21 @@ twpConfig
 
           const langs = twpLang.getLanguageList();
           lblTranslate.textContent = twpI18n.getMessage(
-            "lblTranslatePageInto",
-            langs[twpConfig.get("targetLanguage")]
-              || twpConfig.get("targetLanguage"),
+            'lblTranslatePageInto',
+            langs[twpConfig.get('targetLanguage')] ||
+              twpConfig.get('targetLanguage'),
           );
           lblTranslated.textContent = twpI18n.getMessage(
-            "lblPageTranslateInto",
-            langs[twpConfig.get("targetLanguage")]
-              || twpConfig.get("targetLanguage"),
+            'lblPageTranslateInto',
+            langs[twpConfig.get('targetLanguage')] ||
+              twpConfig.get('targetLanguage'),
           );
 
-          if (twpConfig.get("enableIframePageTranslation") === "yes") {
+          if (twpConfig.get('enableIframePageTranslation') === 'yes') {
             chrome.tabs.sendMessage(
               tabs[0].id,
               {
-                action: "translatePage",
+                action: 'translatePage',
                 targetLanguage: selectTargetLanguage.value,
               },
               checkedLastError,
@@ -480,7 +480,7 @@ twpConfig
             chrome.tabs.sendMessage(
               tabs[0].id,
               {
-                action: "translatePage",
+                action: 'translatePage',
                 targetLanguage: selectTargetLanguage.value,
               },
               { frameId: 0 },
@@ -494,10 +494,10 @@ twpConfig
       updateInterface();
     }
 
-    $("#btnTranslate").onclick = () => onTranslateClick();
+    $('#btnTranslate').onclick = () => onTranslateClick();
 
     function onRestoreClick() {
-      currentPageLanguageState = "original";
+      currentPageLanguageState = 'original';
 
       chrome.tabs.query(
         {
@@ -508,7 +508,7 @@ twpConfig
           chrome.tabs.sendMessage(
             tabs[0].id,
             {
-              action: "restorePage",
+              action: 'restorePage',
             },
             checkedLastError,
           );
@@ -518,14 +518,14 @@ twpConfig
       updateInterface();
     }
 
-    $("#btnRestore").onclick = () => onRestoreClick();
+    $('#btnRestore').onclick = () => onRestoreClick();
 
-    $("#btnSwitchInterfaces").addEventListener("click", () => {
-      twpConfig.set("useOldPopup", "no");
-      window.location = "popup.html";
+    $('#btnSwitchInterfaces').addEventListener('click', () => {
+      twpConfig.set('useOldPopup', 'no');
+      window.location = 'popup.html';
     });
 
-    $("#divIconTranslate").addEventListener("click", () => {
+    $('#divIconTranslate').addEventListener('click', () => {
       currentPageTranslatorService = twpConfig.swapPageTranslationService();
 
       chrome.tabs.query(
@@ -537,7 +537,7 @@ twpConfig
           chrome.tabs.sendMessage(
             tabs[0].id,
             {
-              action: "swapTranslationService",
+              action: 'swapTranslationService',
               newServiceName: currentPageTranslatorService,
             },
             checkedLastError,
@@ -554,7 +554,7 @@ twpConfig
         currentWindow: true,
       },
       (tabs) => {
-        $("#cbAlwaysTranslateThisLang").addEventListener("change", (e) => {
+        $('#cbAlwaysTranslateThisLang').addEventListener('change', (e) => {
           const hostname = new URL(tabs[0].url).hostname;
           if (e.target.checked) {
             twpConfig.addLangToAlwaysTranslate(originalTabLanguage, hostname);
@@ -565,7 +565,7 @@ twpConfig
       },
     );
 
-    $("#btnOptions").addEventListener("change", (event) => {
+    $('#btnOptions').addEventListener('change', (event) => {
       const btnOptions = event.target;
 
       chrome.tabs.query(
@@ -576,13 +576,13 @@ twpConfig
         (tabs) => {
           const hostname = new URL(tabs[0].url).hostname;
           switch (btnOptions.value) {
-            case "changeLanguage":
+            case 'changeLanguage':
               showSelectTargetLanguage = true;
               updateInterface();
               break;
-            case "alwaysTranslateThisSite":
+            case 'alwaysTranslateThisSite':
               if (
-                twpConfig.get("alwaysTranslateSites").indexOf(hostname) === -1
+                twpConfig.get('alwaysTranslateSites').indexOf(hostname) === -1
               ) {
                 twpConfig.addSiteToAlwaysTranslate(hostname);
                 onTranslateClick();
@@ -591,9 +591,9 @@ twpConfig
               }
               window.close();
               break;
-            case "neverTranslateThisSite":
+            case 'neverTranslateThisSite':
               if (
-                twpConfig.get("neverTranslateSites").indexOf(hostname) === -1
+                twpConfig.get('neverTranslateSites').indexOf(hostname) === -1
               ) {
                 twpConfig.addSiteToNeverTranslate(hostname);
                 onRestoreClick();
@@ -602,13 +602,13 @@ twpConfig
               }
               window.close();
               break;
-            case "alwaysTranslateThisLanguage":
+            case 'alwaysTranslateThisLanguage':
               twpConfig.addLangToAlwaysTranslate(originalTabLanguage, hostname);
               break;
-            case "neverTranslateThisLanguage":
+            case 'neverTranslateThisLanguage':
               if (
                 twpConfig
-                  .get("neverTranslateLangs")
+                  .get('neverTranslateLangs')
                   .indexOf(originalTabLanguage) === -1
               ) {
                 twpConfig.addLangToNeverTranslate(
@@ -621,26 +621,26 @@ twpConfig
               }
               window.close();
               break;
-            case "showTranslateSelectedButton":
-              if (twpConfig.get("showTranslateSelectedButton") === "yes") {
-                twpConfig.set("showTranslateSelectedButton", "no");
+            case 'showTranslateSelectedButton':
+              if (twpConfig.get('showTranslateSelectedButton') === 'yes') {
+                twpConfig.set('showTranslateSelectedButton', 'no');
               } else {
-                twpConfig.set("showTranslateSelectedButton", "yes");
+                twpConfig.set('showTranslateSelectedButton', 'yes');
               }
               window.close();
               break;
-            case "showOriginalTextWhenHovering":
-              if (twpConfig.get("showOriginalTextWhenHovering") === "yes") {
-                twpConfig.set("showOriginalTextWhenHovering", "no");
+            case 'showOriginalTextWhenHovering':
+              if (twpConfig.get('showOriginalTextWhenHovering') === 'yes') {
+                twpConfig.set('showOriginalTextWhenHovering', 'no');
               } else {
-                twpConfig.set("showOriginalTextWhenHovering", "yes");
+                twpConfig.set('showOriginalTextWhenHovering', 'yes');
               }
               window.close();
               break;
-            case "showTranslatedWhenHoveringThisSite":
+            case 'showTranslatedWhenHoveringThisSite':
               if (
                 twpConfig
-                  .get("sitesToTranslateWhenHovering")
+                  .get('sitesToTranslateWhenHovering')
                   .indexOf(hostname) === -1
               ) {
                 twpConfig.addSiteToTranslateWhenHovering(hostname);
@@ -649,10 +649,10 @@ twpConfig
               }
               window.close();
               break;
-            case "showTranslatedWhenHoveringThisLang":
+            case 'showTranslatedWhenHoveringThisLang':
               if (
                 twpConfig
-                  .get("langsToTranslateWhenHovering")
+                  .get('langsToTranslateWhenHovering')
                   .indexOf(originalTabLanguage) === -1
               ) {
                 twpConfig.addLangToTranslateWhenHovering(originalTabLanguage);
@@ -663,27 +663,27 @@ twpConfig
               }
               window.close();
               break;
-            case "translateInExternalSite":
+            case 'translateInExternalSite':
               chrome.tabs.query(
                 {
                   active: true,
                   currentWindow: true,
                 },
                 (tabs) => {
-                  if (currentPageTranslatorService === "yandex") {
+                  if (currentPageTranslatorService === 'yandex') {
                     tabsCreate(
                       `https://translate.yandex.com/translate?view=compact&url=${
                         encodeURIComponent(
                           tabs[0].url,
                         )
-                      }&lang=${twpConfig.get("targetLanguage").split("-")[0]}`,
+                      }&lang=${twpConfig.get('targetLanguage').split('-')[0]}`,
                     );
                   } else {
                     // google
                     tabsCreate(
                       `https://translate.google.com/translate?tl=${
                         twpConfig.get(
-                          "targetLanguage",
+                          'targetLanguage',
                         )
                       }&u=${encodeURIComponent(tabs[0].url)}`,
                     );
@@ -691,21 +691,21 @@ twpConfig
                 },
               );
               break;
-            case "moreOptions":
-              tabsCreate(chrome.runtime.getURL("/options/options.html"));
+            case 'moreOptions':
+              tabsCreate(chrome.runtime.getURL('/options/options.html'));
               break;
-            case "donate":
+            case 'donate':
               tabsCreate(
-                chrome.runtime.getURL("/options/options.html#donation"),
+                chrome.runtime.getURL('/options/options.html#donation'),
               );
               break;
-            case "translatePDF":
-              tabsCreate("https://pdf.translatewebpages.org/");
+            case 'translatePDF':
+              tabsCreate('https://pdf.translatewebpages.org/');
               break;
             default:
               break;
           }
-          btnOptions.value = "options";
+          btnOptions.value = 'options';
         },
       );
     });
@@ -718,51 +718,51 @@ twpConfig
       (tabs) => {
         const hostname = new URL(tabs[0].url).hostname;
 
-        const btnNeverTranslateText = twpI18n.getMessage("btnNeverTranslate");
-        if (twpConfig.get("neverTranslateSites").indexOf(hostname) === -1) {
-          $("option[data-i18n=btnNeverTranslate]").textContent = btnNeverTranslateText;
+        const btnNeverTranslateText = twpI18n.getMessage('btnNeverTranslate');
+        if (twpConfig.get('neverTranslateSites').indexOf(hostname) === -1) {
+          $('option[data-i18n=btnNeverTranslate]').textContent = btnNeverTranslateText;
         } else {
-          $("option[data-i18n=btnNeverTranslate]").textContent = "✔ " + btnNeverTranslateText;
+          $('option[data-i18n=btnNeverTranslate]').textContent = '✔ ' + btnNeverTranslateText;
         }
 
-        const btnAlwaysTranslateText = twpI18n.getMessage("btnAlwaysTranslate");
-        if (twpConfig.get("alwaysTranslateSites").indexOf(hostname) === -1) {
-          $("option[data-i18n=btnAlwaysTranslate]").textContent = btnAlwaysTranslateText;
+        const btnAlwaysTranslateText = twpI18n.getMessage('btnAlwaysTranslate');
+        if (twpConfig.get('alwaysTranslateSites').indexOf(hostname) === -1) {
+          $('option[data-i18n=btnAlwaysTranslate]').textContent = btnAlwaysTranslateText;
         } else {
-          $("option[data-i18n=btnAlwaysTranslate]").textContent = "✔ " + btnAlwaysTranslateText;
+          $('option[data-i18n=btnAlwaysTranslate]').textContent = '✔ ' + btnAlwaysTranslateText;
         }
 
         {
-          const text = twpI18n.getMessage("lblShowTranslateSelectedButton");
-          if (twpConfig.get("showTranslateSelectedButton") !== "yes") {
-            $("option[data-i18n=lblShowTranslateSelectedButton]").textContent = text;
+          const text = twpI18n.getMessage('lblShowTranslateSelectedButton');
+          if (twpConfig.get('showTranslateSelectedButton') !== 'yes') {
+            $('option[data-i18n=lblShowTranslateSelectedButton]').textContent = text;
           } else {
-            $("option[data-i18n=lblShowTranslateSelectedButton]").textContent = "✔ " + text;
+            $('option[data-i18n=lblShowTranslateSelectedButton]').textContent = '✔ ' + text;
           }
         }
         {
-          const text = twpI18n.getMessage("lblShowOriginalTextWhenHovering");
-          if (twpConfig.get("showOriginalTextWhenHovering") !== "yes") {
-            $("option[data-i18n=lblShowOriginalTextWhenHovering]").textContent = text;
+          const text = twpI18n.getMessage('lblShowOriginalTextWhenHovering');
+          if (twpConfig.get('showOriginalTextWhenHovering') !== 'yes') {
+            $('option[data-i18n=lblShowOriginalTextWhenHovering]').textContent = text;
           } else {
-            $("option[data-i18n=lblShowOriginalTextWhenHovering]").textContent = "✔ " + text;
+            $('option[data-i18n=lblShowOriginalTextWhenHovering]').textContent = '✔ ' + text;
           }
         }
         {
           const text = twpI18n.getMessage(
-            "lblShowTranslatedWhenHoveringThisSite",
+            'lblShowTranslatedWhenHoveringThisSite',
           );
           if (
-            twpConfig.get("sitesToTranslateWhenHovering").indexOf(hostname)
-              === -1
+            twpConfig.get('sitesToTranslateWhenHovering').indexOf(hostname) ===
+              -1
           ) {
             $(
-              "option[data-i18n=lblShowTranslatedWhenHoveringThisSite]",
+              'option[data-i18n=lblShowTranslatedWhenHoveringThisSite]',
             ).textContent = text;
           } else {
             $(
-              "option[data-i18n=lblShowTranslatedWhenHoveringThisSite]",
-            ).textContent = "✔ " + text;
+              'option[data-i18n=lblShowTranslatedWhenHoveringThisSite]',
+            ).textContent = '✔ ' + text;
           }
         }
       },

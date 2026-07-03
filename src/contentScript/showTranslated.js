@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
 var showTranslated = {};
 
 function getTabHostName() {
   return new Promise((resolve) =>
-    chrome.runtime.sendMessage({ action: "getTabHostName" }, (result) => {
+    chrome.runtime.sendMessage({ action: 'getTabHostName' }, (result) => {
       checkedLastError();
       resolve(result);
     })
@@ -13,105 +13,105 @@ function getTabHostName() {
 
 Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   const tabHostName = _[1];
-  if (platformInfo.isMobile.any) return;
+  if (platformInfo.isMobile.any) { return; }
 
-  let styleTextContent = "";
-  fetch(chrome.runtime.getURL("/contentScript/css/showTranslated.css"))
+  let styleTextContent = '';
+  fetch(chrome.runtime.getURL('/contentScript/css/showTranslated.css'))
     .then((response) => response.text())
     .then((response) => (styleTextContent = response))
     .catch((e) => console.error(e));
 
-  let pageLanguageState = "original";
-  let originalTabLanguage = "und";
-  let currentTargetLanguages = twpConfig.get("targetLanguages");
-  let currentTargetLanguage = twpConfig.get("targetLanguageTextTranslation");
-  let currentTextTranslatorService = twpConfig.get("textTranslatorService") === "deepl"
-    ? "google"
-    : twpConfig.get("textTranslatorService");
+  let pageLanguageState = 'original';
+  let originalTabLanguage = 'und';
+  let currentTargetLanguages = twpConfig.get('targetLanguages');
+  let currentTargetLanguage = twpConfig.get('targetLanguageTextTranslation');
+  let currentTextTranslatorService = twpConfig.get('textTranslatorService') === 'deepl' ?
+    'google' :
+    twpConfig.get('textTranslatorService');
   let showTranslatedTextWhenHoveringThisSite =
-    twpConfig.get("sitesToTranslateWhenHovering").indexOf(tabHostName) !== -1;
+    twpConfig.get('sitesToTranslateWhenHovering').indexOf(tabHostName) !== -1;
   let showTranslatedTextWhenHoveringThisLang = false;
   let translateTextOverMouseWhenPressTwice =
-    twpConfig.get("translateTextOverMouseWhenPressTwice") === "yes";
+    twpConfig.get('translateTextOverMouseWhenPressTwice') === 'yes';
   let fooCount = 0;
 
   twpConfig.onChanged(function(name, newValue) {
     switch (name) {
-      case "textTranslatorService":
-        currentTextTranslatorService = newValue === "deepl" ? "google" : newValue;
+      case 'textTranslatorService':
+        currentTextTranslatorService = newValue === 'deepl' ? 'google' : newValue;
         break;
-      case "targetLanguages":
+      case 'targetLanguages':
         currentTargetLanguages = newValue;
         break;
-      case "targetLanguageTextTranslation":
+      case 'targetLanguageTextTranslation':
         currentTargetLanguage = newValue;
         break;
-      case "sitesToTranslateWhenHovering":
+      case 'sitesToTranslateWhenHovering':
         showTranslatedTextWhenHoveringThisSite = newValue.indexOf(tabHostName) !== -1;
         updateEventListener();
         break;
-      case "langsToTranslateWhenHovering":
+      case 'langsToTranslateWhenHovering':
         showTranslatedTextWhenHoveringThisLang = newValue.indexOf(originalTabLanguage) !== -1;
         updateEventListener();
         break;
-      case "translateTextOverMouseWhenPressTwice":
+      case 'translateTextOverMouseWhenPressTwice':
         translateTextOverMouseWhenPressTwice =
-          twpConfig.get("translateTextOverMouseWhenPressTwice") === "yes";
+          twpConfig.get('translateTextOverMouseWhenPressTwice') === 'yes';
         updateEventListener();
         break;
     }
   });
 
   const htmlTagsInlineText = [
-    "#text",
-    "a",
-    "abbr",
-    "acronym",
-    "b",
-    "bdo",
-    "big",
-    "cite",
-    "dfn",
-    "em",
-    "i",
-    "label",
-    "q",
-    "s",
-    "small",
-    "span",
-    "strong",
-    "sub",
-    "sup",
-    "u",
-    "tt",
-    "var",
+    '#text',
+    'a',
+    'abbr',
+    'acronym',
+    'b',
+    'bdo',
+    'big',
+    'cite',
+    'dfn',
+    'em',
+    'i',
+    'label',
+    'q',
+    's',
+    'small',
+    'span',
+    'strong',
+    'sub',
+    'sup',
+    'u',
+    'tt',
+    'var',
   ];
-  const htmlTagsInlineIgnore = ["br", "code", "kbd", "wbr"]; // and input if type is submit or button, and <pre> depending on settings
+  const htmlTagsInlineIgnore = ['br', 'code', 'kbd', 'wbr']; // and input if type is submit or button, and <pre> depending on settings
   /* prettier-ignore */
   const htmlTagsNoTranslate = [
-    "title",
-    "script",
-    "style",
-    "textarea",
-    "svg",
-    "template",
-    "math",
-    "mjx-container",
-    "tex-math", // https://github.com/FilipePS/Traduzir-paginas-web/issues/704
+    'title',
+    'script',
+    'style',
+    'textarea',
+    'svg',
+    'template',
+    'math',
+    'mjx-container',
+    'tex-math', // https://github.com/FilipePS/Traduzir-paginas-web/issues/704
   ];
 
-  if (twpConfig.get("translateTag_pre") !== "yes") {
-    htmlTagsInlineIgnore.push("pre");
+  if (twpConfig.get('translateTag_pre') !== 'yes') {
+    htmlTagsInlineIgnore.push('pre');
   }
   twpConfig.onChanged((name, newvalue) => {
     switch (name) {
-      case "translateTag_pre":
-        const index = htmlTagsInlineIgnore.indexOf("pre");
+      case 'translateTag_pre':
+        const index = htmlTagsInlineIgnore.indexOf('pre');
         if (index !== -1) {
           htmlTagsInlineIgnore.splice(index, 1);
         }
-        if (newvalue !== "yes") {
-          htmlTagsInlineIgnore.push("pre");
+        if (newvalue !== 'yes') {
+          htmlTagsInlineIgnore.push('pre');
         }
         break;
     }
@@ -136,15 +136,15 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     mousePos.x = e.clientX;
     mousePos.y = e.clientY;
 
-    if (e.target === divElement) return;
+    if (e.target === divElement) { return; }
 
-    if (e.target === currentNodeOverMouse) return;
+    if (e.target === currentNodeOverMouse) { return; }
     currentNodeOverMouse = e.target;
 
     if (
       !(
-        !showTranslatedTextWhenHoveringThisSite
-        && !showTranslatedTextWhenHoveringThisLang
+        !showTranslatedTextWhenHoveringThisSite &&
+        !showTranslatedTextWhenHoveringThisLang
       )
     ) {
       destroy();
@@ -155,8 +155,8 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   }
 
   function onMouseDown(e) {
-    if (e.target === divElement) return;
-    if (divElement && divElement.contains(e.target)) return;
+    if (e.target === divElement) { return; }
+    if (divElement && divElement.contains(e.target)) { return; }
     destroy();
   }
 
@@ -166,7 +166,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     isPlayingAudio = true;
     chrome.runtime.sendMessage(
       {
-        action: "textToSpeech",
+        action: 'textToSpeech',
         text,
         targetLanguage,
       },
@@ -180,17 +180,17 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   }
 
   function stopAudio() {
-    if (!isPlayingAudio) return;
+    if (!isPlayingAudio) { return; }
     isPlayingAudio = false;
     chrome.runtime.sendMessage(
       {
-        action: "stopAudio",
+        action: 'stopAudio',
       },
       checkedLastError,
     );
   }
 
-  window.addEventListener("beforeunload", (e) => {
+  window.addEventListener('beforeunload', (e) => {
     destroy();
   });
 
@@ -208,9 +208,9 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     } else {
       // https://github.com/FilipePS/Traduzir-paginas-web/issues/654
       if (
-        nodeName === "script"
-        && node.getAttribute("data-spotim-module") === "spotim-launcher"
-        && [...node.childNodes].find((node) => node.nodeType === 1)
+        nodeName === 'script' &&
+        node.getAttribute('data-spotim-module') === 'spotim-launcher' &&
+        [...node.childNodes].find((node) => node.nodeType === 1)
       ) {
         return false;
       } else {
@@ -220,8 +220,8 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   }
 
   function isValidText(text) {
-    if (text.length < 2) return false;
-    if (/^[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?\s]*$/.test(text)) return false;
+    if (text.length < 2) { return false; }
+    if (/^[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?\s]*$/.test(text)) { return false; }
     return true;
   }
 
@@ -240,8 +240,8 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       let foo = function(node) {
         const nodeName = node.nodeName.toLowerCase();
         if (
-          htmlTagsInlineText.indexOf(nodeName) === -1
-          && htmlTagsInlineIgnore.indexOf(nodeName) === -1
+          htmlTagsInlineText.indexOf(nodeName) === -1 &&
+          htmlTagsInlineIgnore.indexOf(nodeName) === -1
         ) {
           return true;
         }
@@ -261,38 +261,38 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 
     const nodeName = node.nodeName.toLowerCase();
     if (
-      htmlTagsInlineText.indexOf(nodeName) === -1
-      && htmlTagsInlineIgnore.indexOf(nodeName) === -1
+      htmlTagsInlineText.indexOf(nodeName) === -1 &&
+      htmlTagsInlineIgnore.indexOf(nodeName) === -1
     ) {
-      if (hasChildNodeBlock(node)) return;
+      if (hasChildNodeBlock(node)) { return; }
     }
 
     let text;
-    if (nodeName === "input" || nodeName === "textarea") {
+    if (nodeName === 'input' || nodeName === 'textarea') {
       text = node.value.length > 0 ? node.value : node.placeholder;
       if (
-        nodeName === "input"
-        && !/^(?:text|search|button|submit)$/i.test(node.type)
+        nodeName === 'input' &&
+        !/^(?:text|search|button|submit)$/i.test(node.type)
       ) {
         text = null;
         return;
       }
       if (
-        nodeName === "input"
-        && (node.type === "button" || node.type === "submit")
+        nodeName === 'input' &&
+        (node.type === 'button' || node.type === 'submit')
       ) {
         text = node.value;
-        if (!text && node.type === "submit") {
-          text = "Submit Query";
+        if (!text && node.type === 'submit') {
+          text = 'Submit Query';
         }
       }
     } else {
       do {
         const nodeName = node.nodeName.toLowerCase();
-        if (isNoTranslateNode(node)) return;
+        if (isNoTranslateNode(node)) { return; }
         if (
-          htmlTagsInlineText.indexOf(nodeName) === -1
-          && htmlTagsInlineIgnore.indexOf(nodeName) === -1
+          htmlTagsInlineText.indexOf(nodeName) === -1 &&
+          htmlTagsInlineIgnore.indexOf(nodeName) === -1
         ) {
           break;
         } else {
@@ -300,37 +300,37 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
         }
       } while (node && node !== document.body);
 
-      if (!node) return;
-      if (node.textContent.length > 1000) return;
+      if (!node) { return; }
+      if (node.textContent.length > 1000) { return; }
       text = node.innerText;
     }
 
-    if (!text || text.length < 1 || text.length > 1000) return;
-    if (!isValidText(text)) return;
+    if (!text || text.length < 1 || text.length > 1000) { return; }
+    if (!isValidText(text)) { return; }
 
     backgroundTranslateSingleText(
       currentTextTranslatorService,
-      "auto",
+      'auto',
       currentTargetLanguage,
       text,
     )
       .then((result) => {
-        if (!result) return;
-        if (currentFooCount !== fooCount) return;
+        if (!result) { return; }
+        if (currentFooCount !== fooCount) { return; }
 
         if (!usePrevNode) {
           init();
         }
 
-        const eTextTranslated = shadowRoot.getElementById("eTextTranslated");
+        const eTextTranslated = shadowRoot.getElementById('eTextTranslated');
         if (twpLang.isRtlLanguage(currentTargetLanguage)) {
-          eTextTranslated.setAttribute("dir", "rtl");
+          eTextTranslated.setAttribute('dir', 'rtl');
         } else {
-          eTextTranslated.setAttribute("dir", "ltr");
+          eTextTranslated.setAttribute('dir', 'ltr');
         }
         eTextTranslated.textContent = result;
 
-        const eDivResult = shadowRoot.getElementById("eDivResult");
+        const eDivResult = shadowRoot.getElementById('eDivResult');
 
         const height = eDivResult.offsetHeight;
         let top = mousePos.y + 10;
@@ -343,8 +343,8 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
         left = Math.min(window.innerWidth - width, left);
 
         if (!usePrevNode) {
-          eDivResult.style.top = top + "px";
-          eDivResult.style.left = left + "px";
+          eDivResult.style.top = top + 'px';
+          eDivResult.style.left = left + 'px';
         }
       })
       .catch((e) => {
@@ -358,9 +358,9 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       pos3 = 0,
       pos4 = 0;
     if (elmnt2) {
-      elmnt2.addEventListener("mousedown", dragMouseDown);
+      elmnt2.addEventListener('mousedown', dragMouseDown);
     } else {
-      elmnt.addEventListener("mousedown", dragMouseDown);
+      elmnt.addEventListener('mousedown', dragMouseDown);
     }
 
     function dragMouseDown(e) {
@@ -369,9 +369,9 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       // get the mouse cursor position at startup:
       pos3 = e.clientX;
       pos4 = e.clientY;
-      document.addEventListener("mouseup", closeDragElement);
+      document.addEventListener('mouseup', closeDragElement);
       // call a function whenever the cursor moves:
-      document.addEventListener("mousemove", elementDrag);
+      document.addEventListener('mousemove', elementDrag);
     }
 
     function elementDrag(e) {
@@ -383,32 +383,32 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       pos3 = e.clientX;
       pos4 = e.clientY;
       // set the element's new position:
-      elmnt.style.top = elmnt.offsetTop - pos2 + "px";
-      elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+      elmnt.style.top = elmnt.offsetTop - pos2 + 'px';
+      elmnt.style.left = elmnt.offsetLeft - pos1 + 'px';
     }
 
     function closeDragElement() {
       // stop moving when mouse button is released:
-      document.removeEventListener("mouseup", closeDragElement);
-      document.removeEventListener("mousemove", elementDrag);
+      document.removeEventListener('mouseup', closeDragElement);
+      document.removeEventListener('mousemove', elementDrag);
     }
   }
 
   function init() {
     destroy();
-    if (window.isTranslatingSelected) return;
+    if (window.isTranslatingSelected) { return; }
 
-    divElement = document.createElement("div");
-    divElement.style = "all: initial";
-    divElement.classList.add("notranslate");
+    divElement = document.createElement('div');
+    divElement.style = 'all: initial';
+    divElement.classList.add('notranslate');
 
     shadowRoot = divElement.attachShadow({
-      mode: "closed",
+      mode: 'closed',
     });
     shadowRoot.innerHTML = `
         <link rel="stylesheet" href="${
       chrome.runtime.getURL(
-        "/contentScript/css/showTranslated.css",
+        '/contentScript/css/showTranslated.css',
       )
     }">
 
@@ -480,21 +480,21 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
         `;
 
     {
-      const style = document.createElement("style");
+      const style = document.createElement('style');
       style.textContent = styleTextContent;
-      shadowRoot.insertBefore(style, shadowRoot.getElementById("eDivResult"));
+      shadowRoot.insertBefore(style, shadowRoot.getElementById('eDivResult'));
     }
 
     dragElement(
-      shadowRoot.getElementById("eDivResult"),
-      shadowRoot.getElementById("drag"),
+      shadowRoot.getElementById('eDivResult'),
+      shadowRoot.getElementById('drag'),
     );
 
     function enableDarkMode() {
-      if (!shadowRoot.getElementById("darkModeElement")) {
-        const el = document.createElement("style");
-        el.setAttribute("id", "darkModeElement");
-        el.setAttribute("rel", "stylesheet");
+      if (!shadowRoot.getElementById('darkModeElement')) {
+        const el = document.createElement('style');
+        el.setAttribute('id', 'darkModeElement');
+        el.setAttribute('rel', 'stylesheet');
         el.textContent = `
                 * {
                     scrollbar-color: #202324 #454a4d;
@@ -515,96 +515,96 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
                 }
                 `;
         shadowRoot.appendChild(el);
-        shadowRoot.querySelector("#listen svg").style = "fill: rgb(231, 230, 228)";
+        shadowRoot.querySelector('#listen svg').style = 'fill: rgb(231, 230, 228)';
       }
     }
 
     function disableDarkMode() {
-      if (shadowRoot.getElementById("#darkModeElement")) {
-        shadowRoot.getElementById("#darkModeElement").remove();
-        shadowRoot.querySelector("#listen svg").style = "fill: black";
+      if (shadowRoot.getElementById('#darkModeElement')) {
+        shadowRoot.getElementById('#darkModeElement').remove();
+        shadowRoot.querySelector('#listen svg').style = 'fill: black';
       }
     }
 
-    switch (twpConfig.get("darkMode")) {
-      case "auto":
-        if (matchMedia("(prefers-color-scheme: dark)").matches) {
+    switch (twpConfig.get('darkMode')) {
+      case 'auto':
+        if (matchMedia('(prefers-color-scheme: dark)').matches) {
           enableDarkMode();
         } else {
           disableDarkMode();
         }
         break;
-      case "yes":
+      case 'yes':
         enableDarkMode();
         break;
-      case "no":
+      case 'no':
         disableDarkMode();
         break;
       default:
         break;
     }
 
-    eTextTranslated = shadowRoot.getElementById("eTextTranslated");
+    eTextTranslated = shadowRoot.getElementById('eTextTranslated');
 
-    const sGoogle = shadowRoot.getElementById("sGoogle");
-    const sYandex = shadowRoot.getElementById("sYandex");
-    const sBing = shadowRoot.getElementById("sBing");
-    const sDeepL = shadowRoot.getElementById("sDeepL");
+    const sGoogle = shadowRoot.getElementById('sGoogle');
+    const sYandex = shadowRoot.getElementById('sYandex');
+    const sBing = shadowRoot.getElementById('sBing');
+    const sDeepL = shadowRoot.getElementById('sDeepL');
 
     sGoogle.onclick = () => {
-      currentTextTranslatorService = "google";
-      twpConfig.set("textTranslatorService", "google");
+      currentTextTranslatorService = 'google';
+      twpConfig.set('textTranslatorService', 'google');
       translateThisNode(null, true);
 
-      sGoogle.classList.remove("selected");
-      sYandex.classList.remove("selected");
-      sBing.classList.remove("selected");
-      sDeepL.classList.remove("selected");
+      sGoogle.classList.remove('selected');
+      sYandex.classList.remove('selected');
+      sBing.classList.remove('selected');
+      sDeepL.classList.remove('selected');
 
-      sGoogle.classList.add("selected");
+      sGoogle.classList.add('selected');
     };
     sYandex.onclick = () => {
-      currentTextTranslatorService = "yandex";
-      twpConfig.set("textTranslatorService", "yandex");
+      currentTextTranslatorService = 'yandex';
+      twpConfig.set('textTranslatorService', 'yandex');
       translateThisNode(null, true);
 
-      sGoogle.classList.remove("selected");
-      sYandex.classList.remove("selected");
-      sBing.classList.remove("selected");
-      sDeepL.classList.remove("selected");
+      sGoogle.classList.remove('selected');
+      sYandex.classList.remove('selected');
+      sBing.classList.remove('selected');
+      sDeepL.classList.remove('selected');
 
-      sYandex.classList.add("selected");
+      sYandex.classList.add('selected');
     };
     sBing.onclick = () => {
-      currentTextTranslatorService = "bing";
-      twpConfig.set("textTranslatorService", "bing");
+      currentTextTranslatorService = 'bing';
+      twpConfig.set('textTranslatorService', 'bing');
       translateThisNode(null, true);
 
-      sGoogle.classList.remove("selected");
-      sYandex.classList.remove("selected");
-      sBing.classList.remove("selected");
-      sDeepL.classList.remove("selected");
+      sGoogle.classList.remove('selected');
+      sYandex.classList.remove('selected');
+      sBing.classList.remove('selected');
+      sDeepL.classList.remove('selected');
 
-      sBing.classList.add("selected");
+      sBing.classList.add('selected');
     };
     sDeepL.onclick = () => {
-      currentTextTranslatorService = "deepl";
-      twpConfig.set("textTranslatorService", "deepl");
+      currentTextTranslatorService = 'deepl';
+      twpConfig.set('textTranslatorService', 'deepl');
       translateThisNode(null, true);
 
-      sGoogle.classList.remove("selected");
-      sYandex.classList.remove("selected");
-      sBing.classList.remove("selected");
-      sDeepL.classList.remove("selected");
+      sGoogle.classList.remove('selected');
+      sYandex.classList.remove('selected');
+      sBing.classList.remove('selected');
+      sDeepL.classList.remove('selected');
 
-      sDeepL.classList.add("selected");
+      sDeepL.classList.add('selected');
     };
 
-    const setTargetLanguage = shadowRoot.getElementById("setTargetLanguage");
+    const setTargetLanguage = shadowRoot.getElementById('setTargetLanguage');
     setTargetLanguage.onclick = (e) => {
-      if (e.target.getAttribute("value")) {
+      if (e.target.getAttribute('value')) {
         const langCode = twpLang.fixTLanguageCode(
-          e.target.getAttribute("value"),
+          e.target.getAttribute('value'),
         );
         if (langCode) {
           currentTargetLanguage = langCode;
@@ -612,31 +612,31 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
           translateThisNode(null, true);
         }
 
-        shadowRoot.querySelectorAll("#setTargetLanguage li").forEach((li) => {
-          li.classList.remove("selected");
+        shadowRoot.querySelectorAll('#setTargetLanguage li').forEach((li) => {
+          li.classList.remove('selected');
         });
 
-        e.target.classList.add("selected");
+        e.target.classList.add('selected');
       }
     };
 
-    const eListen = shadowRoot.getElementById("listen");
+    const eListen = shadowRoot.getElementById('listen');
     eListen.onclick = () => {
-      const msgListen = twpI18n.getMessage("btnListen");
-      const msgStopListening = twpI18n.getMessage("btnStopListening");
+      const msgListen = twpI18n.getMessage('btnListen');
+      const msgStopListening = twpI18n.getMessage('btnStopListening');
 
-      eListen.classList.remove("selected");
-      eListen.setAttribute("title", msgStopListening);
+      eListen.classList.remove('selected');
+      eListen.setAttribute('title', msgStopListening);
 
       if (isPlayingAudio) {
         stopAudio();
-        eListen.classList.remove("selected");
+        eListen.classList.remove('selected');
       } else {
         playAudio(eTextTranslated.textContent, currentTargetLanguage, () => {
-          eListen.classList.remove("selected");
-          eListen.setAttribute("title", msgListen);
+          eListen.classList.remove('selected');
+          eListen.setAttribute('title', msgListen);
         });
-        eListen.classList.add("selected");
+        eListen.classList.add('selected');
       }
     };
 
@@ -645,29 +645,29 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     twpI18n.translateDocument(shadowRoot);
 
     const targetLanguageButtons = shadowRoot.querySelectorAll(
-      "#setTargetLanguage li",
+      '#setTargetLanguage li',
     );
 
     for (let i = 0; i < 3; i++) {
       if (currentTargetLanguages[i] == currentTargetLanguage) {
-        targetLanguageButtons[i].classList.add("selected");
+        targetLanguageButtons[i].classList.add('selected');
       }
       targetLanguageButtons[i].textContent = currentTargetLanguages[i];
-      targetLanguageButtons[i].setAttribute("value", currentTargetLanguages[i]);
+      targetLanguageButtons[i].setAttribute('value', currentTargetLanguages[i]);
       targetLanguageButtons[i].setAttribute(
-        "title",
+        'title',
         twpLang.codeToLanguage(currentTargetLanguages[i]),
       );
     }
 
-    if (currentTextTranslatorService === "yandex") {
-      sYandex.classList.add("selected");
-    } else if (currentTextTranslatorService == "deepl") {
-      sDeepL.classList.add("selected");
-    } else if (currentTextTranslatorService == "bing") {
-      sBing.classList.add("selected");
+    if (currentTextTranslatorService === 'yandex') {
+      sYandex.classList.add('selected');
+    } else if (currentTextTranslatorService == 'deepl') {
+      sDeepL.classList.add('selected');
+    } else if (currentTextTranslatorService == 'bing') {
+      sBing.classList.add('selected');
     } else {
-      sGoogle.classList.add("selected");
+      sGoogle.classList.add('selected');
     }
   }
 
@@ -687,21 +687,21 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     const activeEl = document.activeElement;
     const activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
     if (
-      activeElTagName == "textarea"
-      || (activeElTagName == "input"
-        && /^(?:text|search)$/i.test(activeEl.type)
-        && typeof activeEl.selectionStart == "number")
+      activeElTagName == 'textarea' ||
+      (activeElTagName == 'input' &&
+        /^(?:text|search)$/i.test(activeEl.type) &&
+        typeof activeEl.selectionStart == 'number')
     ) {
       const text = activeEl.value.slice(
         activeEl.selectionStart,
         activeEl.selectionEnd,
       );
-      if (text) return true;
+      if (text) { return true; }
     } else if (window.getSelection) {
       const selection = window.getSelection();
-      if (selection.type == "Range") {
+      if (selection.type == 'Range') {
         const text = selection.toString();
-        if (text) return true;
+        if (text) { return true; }
       }
     }
     return false;
@@ -710,21 +710,21 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   let lastTimePressedCtrl = null;
 
   function onKeyUp(e) {
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       destroy();
       return;
     }
 
-    if (!translateTextOverMouseWhenPressTwice) return;
-    if (e.key == "Control") {
+    if (!translateTextOverMouseWhenPressTwice) { return; }
+    if (e.key == 'Control') {
       if (
-        lastTimePressedCtrl
-        && performance.now() - lastTimePressedCtrl < 280
-        && !isSelectingText()
+        lastTimePressedCtrl &&
+        performance.now() - lastTimePressedCtrl < 280 &&
+        !isSelectingText()
       ) {
         lastTimePressedCtrl = performance.now();
 
-        const elements = document.querySelectorAll(":hover");
+        const elements = document.querySelectorAll(':hover');
         if (elements.length > 0) {
           destroy();
           translateThisNode(elements[elements.length - 1]);
@@ -736,35 +736,35 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 
   function updateEventListener() {
     if (
-      platformInfo.isMobile.any
-      || pageLanguageState == "translated"
-      || !(
-        showTranslatedTextWhenHoveringThisSite
-        || showTranslatedTextWhenHoveringThisLang
-        || translateTextOverMouseWhenPressTwice
+      platformInfo.isMobile.any ||
+      pageLanguageState == 'translated' ||
+      !(
+        showTranslatedTextWhenHoveringThisSite ||
+        showTranslatedTextWhenHoveringThisLang ||
+        translateTextOverMouseWhenPressTwice
       )
     ) {
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener('scroll', onScroll);
 
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mousedown', onMouseDown);
 
-      document.removeEventListener("blur", destroy);
-      document.removeEventListener("visibilitychange", destroy);
+      document.removeEventListener('blur', destroy);
+      document.removeEventListener('visibilitychange', destroy);
 
-      document.removeEventListener("keyup", onKeyUp);
+      document.removeEventListener('keyup', onKeyUp);
 
       destroy();
     } else {
-      window.addEventListener("scroll", onScroll);
+      window.addEventListener('scroll', onScroll);
 
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mousedown", onMouseDown);
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mousedown', onMouseDown);
 
-      document.addEventListener("blur", destroy);
-      document.addEventListener("visibilitychange", destroy);
+      document.addEventListener('blur', destroy);
+      document.addEventListener('visibilitychange', destroy);
 
-      document.addEventListener("keyup", onKeyUp);
+      document.addEventListener('keyup', onKeyUp);
     }
   }
   updateEventListener();
@@ -772,7 +772,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   pageTranslator.onGetOriginalTabLanguage(function(tabLanguage) {
     originalTabLanguage = tabLanguage;
     showTranslatedTextWhenHoveringThisLang = twpConfig
-      .get("langsToTranslateWhenHovering")
+      .get('langsToTranslateWhenHovering')
       .indexOf(originalTabLanguage) !== -1;
     updateEventListener();
   });

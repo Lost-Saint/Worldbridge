@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
 function getTabHostName() {
   return new Promise((resolve) =>
-    chrome.runtime.sendMessage({ action: "getTabHostName" }, (result) => {
+    chrome.runtime.sendMessage({ action: 'getTabHostName' }, (result) => {
       checkedLastError();
       resolve(result);
     })
@@ -12,47 +12,47 @@ function getTabHostName() {
 void (async function() {
   await twpConfig.onReady();
   if (
-    !platformInfo.isMobile.any
-    && twpConfig.get("showMobilePopupOnDesktop") !== "yes"
+    !platformInfo.isMobile.any &&
+    twpConfig.get('showMobilePopupOnDesktop') !== 'yes'
   ) {
     return;
   }
 
   const tabHostName = await getTabHostName();
-  let tabLanguage = "und";
-  let pageLanguageState = "original";
+  let tabLanguage = 'und';
+  let pageLanguageState = 'original';
 
   // load html and icons
   const htmlText = await fetch(
-    chrome.runtime.getURL("/contentScript/html/popupMobile.html"),
+    chrome.runtime.getURL('/contentScript/html/popupMobile.html'),
   ).then((response) => response.text());
   const googleIcon = await fetch(
-    chrome.runtime.getURL("/icons/google-translate-32.png"),
+    chrome.runtime.getURL('/icons/google-translate-32.png'),
   ).then((response) => response.blob());
   const yandexIcon = await fetch(
-    chrome.runtime.getURL("/icons/yandex-translate-32.png"),
+    chrome.runtime.getURL('/icons/yandex-translate-32.png'),
   ).then((response) => response.blob());
   const bingIcon = await fetch(
-    chrome.runtime.getURL("/icons/bing-translate-32.png"),
+    chrome.runtime.getURL('/icons/bing-translate-32.png'),
   ).then((response) => response.blob());
 
   // Load i18n messages based on your language preference
   await twpI18n.updateUiMessages();
 
   // creates shadow root, root element and append to document
-  const rootElement = document.createElement("div");
-  rootElement.style.cssText = "all: initial";
-  rootElement.classList.add("notranslate");
+  const rootElement = document.createElement('div');
+  rootElement.style.cssText = 'all: initial';
+  rootElement.classList.add('notranslate');
 
-  const shadowRoot = rootElement.attachShadow({ mode: "closed" });
+  const shadowRoot = rootElement.attachShadow({ mode: 'closed' });
   shadowRoot.innerHTML = htmlText;
 
   // update css property --popup-height
   setInterval(() => {
-    const popupElement = shadowRoot.getElementById("popup");
-    const menuOptions = shadowRoot.getElementById("menu-options");
+    const popupElement = shadowRoot.getElementById('popup');
+    const menuOptions = shadowRoot.getElementById('menu-options');
     menuOptions.style.setProperty(
-      "--popup-height",
+      '--popup-height',
       `${popupElement.clientHeight}px`,
     );
   }, 1000);
@@ -67,9 +67,9 @@ void (async function() {
     clearInterval(lastInteractionInterval);
 
     const updatePadding = () => {
-      if (twpConfig.get("addPaddingToPage") === "yes") {
-        const popupElement = shadowRoot.getElementById("popup");
-        let padding = popupElement.clientHeight + "px";
+      if (twpConfig.get('addPaddingToPage') === 'yes') {
+        const popupElement = shadowRoot.getElementById('popup');
+        let padding = popupElement.clientHeight + 'px';
 
         const scrollTop = document.documentElement.scrollTop;
 
@@ -77,8 +77,8 @@ void (async function() {
         document.documentElement.style.paddingTop = null;
         document.documentElement.style.paddingBottom = null;
 
-        document.documentElement.style.height = document.documentElement.scrollHeight + "px";
-        if (twpConfig.get("popupMobilePosition") === "top") {
+        document.documentElement.style.height = document.documentElement.scrollHeight + 'px';
+        if (twpConfig.get('popupMobilePosition') === 'top') {
           document.documentElement.style.paddingTop = padding;
           document.documentElement.style.paddingBottom = null;
         } else {
@@ -97,12 +97,12 @@ void (async function() {
       lastInteractionInterval = setInterval(() => {
         updatePadding();
 
-        const menuContainer = shadowRoot.getElementById("menu-container");
+        const menuContainer = shadowRoot.getElementById('menu-container');
         if (
-          Date.now() - lastInteraction > 1000 * 8
-          && menuContainer.style.display !== "block"
-          && serviceSelectorIsOpen === false
-          && twpConfig.get("popupMobileKeepOnScren") === "no"
+          Date.now() - lastInteraction > 1000 * 8 &&
+          menuContainer.style.display !== 'block' &&
+          serviceSelectorIsOpen === false &&
+          twpConfig.get('popupMobileKeepOnScren') === 'no'
         ) {
           hidePopup();
         }
@@ -115,15 +115,15 @@ void (async function() {
   function hidePopup(withoutAnimation = false) {
     clearInterval(lastInteractionInterval);
     if (rootElement.isConnected && !withoutAnimation) {
-      const mainElement = shadowRoot.querySelector("main");
+      const mainElement = shadowRoot.querySelector('main');
       const animation = mainElement.animate(
         [
-          { transform: "translateY(0px)", opacity: "1" },
+          { transform: 'translateY(0px)', opacity: '1' },
           {
             transform: `translateY(${
-              twpConfig.get("popupMobilePosition") === "top" ? "-50px" : "50px"
+              twpConfig.get('popupMobilePosition') === 'top' ? '-50px' : '50px'
             })`,
-            opacity: "0",
+            opacity: '0',
           },
         ],
         {
@@ -138,15 +138,15 @@ void (async function() {
         rootElement.remove();
         animation.onfinish = null;
       }, 300);
-      const menuContainer = shadowRoot.getElementById("menu-container");
-      menuContainer.style.display = "none";
+      const menuContainer = shadowRoot.getElementById('menu-container');
+      menuContainer.style.display = 'none';
     }
 
     if (withoutAnimation) {
       rootElement.remove();
     }
 
-    if (twpConfig.get("addPaddingToPage") === "yes") {
+    if (twpConfig.get('addPaddingToPage') === 'yes') {
       document.documentElement.style.height = null;
       document.documentElement.style.paddingTop = null;
       document.documentElement.style.paddingBottom = null;
@@ -156,20 +156,20 @@ void (async function() {
   // set text direction
   if (
     twpLang.isRtlLanguage(
-      twpConfig.get("uiLanguage")
-        || twpLang.fixUILanguageCode(chrome.i18n.getUILanguage()),
+      twpConfig.get('uiLanguage') ||
+        twpLang.fixUILanguageCode(chrome.i18n.getUILanguage()),
     )
   ) {
-    shadowRoot.querySelector("main").setAttribute("dir", "rtl");
+    shadowRoot.querySelector('main').setAttribute('dir', 'rtl');
   }
 
   // translate shadow root
   twpI18n.translateDocument(shadowRoot);
 
   // close popup
-  const popupElement = shadowRoot.getElementById("popup");
+  const popupElement = shadowRoot.getElementById('popup');
   popupElement.ontouchstart = (e) => {
-    if (e.target !== popupElement) return;
+    if (e.target !== popupElement) { return; }
     lastInteraction = Date.now();
 
     e.stopImmediatePropagation();
@@ -195,12 +195,12 @@ void (async function() {
         popupElement.ontransitionend = () => {
           hidePopup(true);
           popupElement.ontransitionend = null;
-          popupElement.style.cssText = "";
+          popupElement.style.cssText = '';
         };
         setTimeout(() => {
           hidePopup(true);
           popupElement.ontransitionend = null;
-          popupElement.style.cssText = "";
+          popupElement.style.cssText = '';
         }, 400);
       }
     };
@@ -221,15 +221,15 @@ void (async function() {
 
   // update service icon
   const serviceIconElement = /** @type {HTMLImageElement} */ (
-    shadowRoot.getElementById("serviceIcon")
+    shadowRoot.getElementById('serviceIcon')
   );
   const updateServiceIcon = () => {
-    const service = twpConfig.get("pageTranslatorService");
-    if (service === "google") {
+    const service = twpConfig.get('pageTranslatorService');
+    if (service === 'google') {
       serviceIconElement.src = URL.createObjectURL(googleIcon);
-    } else if (service === "yandex") {
+    } else if (service === 'yandex') {
       serviceIconElement.src = URL.createObjectURL(yandexIcon);
-    } else if (service === "bing") {
+    } else if (service === 'bing') {
       serviceIconElement.src = URL.createObjectURL(bingIcon);
     }
     serviceIconElement.onload = () => {
@@ -241,21 +241,21 @@ void (async function() {
 
   // select translation service
   const serviceSelector = /** @type {HTMLSelectElement} */ (
-    shadowRoot.getElementById("serviceSelector")
+    shadowRoot.getElementById('serviceSelector')
   );
   serviceSelector.onclick = () => {
     serviceSelectorIsOpen = true;
     lastInteraction = Date.now();
 
-    serviceIconElement.style.scale = "1.5";
-    serviceIconElement.style.rotate = "180deg";
+    serviceIconElement.style.scale = '1.5';
+    serviceIconElement.style.rotate = '180deg';
   };
   serviceSelector.onchange = () => {
     serviceSelectorIsOpen = false;
     lastInteraction = Date.now();
 
     const service = serviceSelector.value;
-    twpConfig.set("pageTranslatorService", service);
+    twpConfig.set('pageTranslatorService', service);
     updateServiceIcon();
 
     serviceIconElement.style.scale = null;
@@ -270,18 +270,18 @@ void (async function() {
     serviceIconElement.style.scale = null;
     serviceIconElement.style.rotate = null;
   };
-  serviceSelector.value = twpConfig.get("pageTranslatorService");
+  serviceSelector.value = twpConfig.get('pageTranslatorService');
 
   // gear button
-  const gearButton = shadowRoot.getElementById("gear");
+  const gearButton = shadowRoot.getElementById('gear');
   gearButton.onclick = () => {
     lastInteraction = Date.now();
 
-    gearButton.classList.add("rotate");
-    const menuContainer = shadowRoot.getElementById("menu-container");
-    menuContainer.style.display = "block";
+    gearButton.classList.add('rotate');
+    const menuContainer = shadowRoot.getElementById('menu-container');
+    menuContainer.style.display = 'block';
 
-    const menuBg = shadowRoot.getElementById("menu-bg");
+    const menuBg = shadowRoot.getElementById('menu-bg');
     menuBg.onclick = (e) => {
       lastInteraction = Date.now();
 
@@ -289,7 +289,7 @@ void (async function() {
       closeMenu();
     };
 
-    const menuOptions = shadowRoot.getElementById("menu-options");
+    const menuOptions = shadowRoot.getElementById('menu-options');
     menuOptions.onclick = (e) => {
       lastInteraction = Date.now();
 
@@ -301,14 +301,14 @@ void (async function() {
 
   // close menu
   function closeMenu() {
-    const gearButton = shadowRoot.getElementById("gear");
-    const menuContainer = shadowRoot.getElementById("menu-container");
+    const gearButton = shadowRoot.getElementById('gear');
+    const menuContainer = shadowRoot.getElementById('menu-container');
 
-    gearButton.classList.remove("rotate");
-    menuContainer.style.animation = "expand 0.3s ease-out reverse";
+    gearButton.classList.remove('rotate');
+    menuContainer.style.animation = 'expand 0.3s ease-out reverse';
     menuContainer.onanimationend = () => {
       menuContainer.onanimationend = null;
-      menuContainer.style.display = "none";
+      menuContainer.style.display = 'none';
       menuContainer.style.animation = null;
     };
   }
@@ -319,42 +319,42 @@ void (async function() {
    * @returns
    */
   function onMenuOptionClick(action) {
-    if (!action) return;
+    if (!action) { return; }
 
-    if (action === "choose-another-language") {
+    if (action === 'choose-another-language') {
       return;
-    } else if (action === "always-translate-from") {
+    } else if (action === 'always-translate-from') {
       tabLanguage = twpLang.fixTLanguageCode(tabLanguage);
-      if (twpConfig.get("alwaysTranslateLangs").indexOf(tabLanguage) === -1) {
+      if (twpConfig.get('alwaysTranslateLangs').indexOf(tabLanguage) === -1) {
         twpConfig.addLangToAlwaysTranslate(tabLanguage);
         pageTranslator.translatePage();
       } else {
         twpConfig.removeLangFromAlwaysTranslate(tabLanguage);
       }
-    } else if (action === "never-translate-from") {
+    } else if (action === 'never-translate-from') {
       tabLanguage = twpLang.fixTLanguageCode(tabLanguage);
-      if (twpConfig.get("neverTranslateLangs").indexOf(tabLanguage) === -1) {
+      if (twpConfig.get('neverTranslateLangs').indexOf(tabLanguage) === -1) {
         twpConfig.addLangToNeverTranslate(tabLanguage);
         pageTranslator.restorePage();
       } else {
         twpConfig.removeLangFromNeverTranslate(tabLanguage);
       }
-    } else if (action === "never-translate-this-site") {
-      if (twpConfig.get("neverTranslateSites").indexOf(tabHostName) === -1) {
+    } else if (action === 'never-translate-this-site') {
+      if (twpConfig.get('neverTranslateSites').indexOf(tabHostName) === -1) {
         twpConfig.addSiteToNeverTranslate(tabHostName);
         pageTranslator.restorePage();
       } else {
         twpConfig.removeSiteFromNeverTranslate(tabHostName);
       }
-    } else if (action === "show-translate-selected-button") {
+    } else if (action === 'show-translate-selected-button') {
       twpConfig.set(
-        "showTranslateSelectedButton",
-        twpConfig.get("showTranslateSelectedButton") === "yes" ? "no" : "yes",
+        'showTranslateSelectedButton',
+        twpConfig.get('showTranslateSelectedButton') === 'yes' ? 'no' : 'yes',
       );
-    } else if (action === "more-options") {
+    } else if (action === 'more-options') {
       const generateRandomHash = (length) => {
-        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let hash = "";
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let hash = '';
         for (let i = 0; i < length; i++) {
           hash += characters.charAt(
             Math.floor(Math.random() * characters.length),
@@ -364,23 +364,23 @@ void (async function() {
       };
       const authorizationToOpenOptions = generateRandomHash(32);
       chrome.runtime.sendMessage({
-        action: "authorizationToOpenOptions",
+        action: 'authorizationToOpenOptions',
         authorizationToOpenOptions,
       });
       window.open(
-        chrome.runtime.getURL("/options/open-options.html")
-          + `#!authorizationToOpenOptions=${authorizationToOpenOptions}`,
-        "blank",
+        chrome.runtime.getURL('/options/open-options.html') +
+          `#!authorizationToOpenOptions=${authorizationToOpenOptions}`,
+        'blank',
       );
-    } else if (action === "keep-on-screen") {
+    } else if (action === 'keep-on-screen') {
       twpConfig.set(
-        "popupMobileKeepOnScren",
-        twpConfig.get("popupMobileKeepOnScren") === "yes" ? "no" : "yes",
+        'popupMobileKeepOnScren',
+        twpConfig.get('popupMobileKeepOnScren') === 'yes' ? 'no' : 'yes',
       );
-    } else if (action === "change-position") {
+    } else if (action === 'change-position') {
       twpConfig.set(
-        "popupMobilePosition",
-        twpConfig.get("popupMobilePosition") === "top" ? "bottom" : "top",
+        'popupMobilePosition',
+        twpConfig.get('popupMobilePosition') === 'top' ? 'bottom' : 'top',
       );
     }
 
@@ -392,116 +392,116 @@ void (async function() {
   // update interface
   function updateInterface() {
     // update the question text
-    const questionElement = shadowRoot.getElementById("question");
-    const btnTranslate = shadowRoot.getElementById("btnTranslate");
-    if (pageLanguageState === "original") {
-      questionElement.textContent = twpI18n.getMessage("msgTranslatePage");
-      btnTranslate.textContent = twpI18n.getMessage("btnTranslate");
+    const questionElement = shadowRoot.getElementById('question');
+    const btnTranslate = shadowRoot.getElementById('btnTranslate');
+    if (pageLanguageState === 'original') {
+      questionElement.textContent = twpI18n.getMessage('msgTranslatePage');
+      btnTranslate.textContent = twpI18n.getMessage('btnTranslate');
     } else {
-      questionElement.textContent = twpI18n.getMessage("msgPageTranslated");
-      btnTranslate.textContent = twpI18n.getMessage("btnUndoTranslation");
+      questionElement.textContent = twpI18n.getMessage('msgPageTranslated');
+      btnTranslate.textContent = twpI18n.getMessage('btnUndoTranslation');
     }
 
     // update show-translate-selected-button checkicon
-    if (twpConfig.get("showTranslateSelectedButton") === "yes") {
+    if (twpConfig.get('showTranslateSelectedButton') === 'yes') {
       shadowRoot.querySelector(
         `#menu-options [data-value="show-translate-selected-button"] [checkicon]`,
-      ).textContent = "✔";
+      ).textContent = '✔';
     } else {
       shadowRoot.querySelector(
         `#menu-options [data-value="show-translate-selected-button"] [checkicon]`,
-      ).textContent = "";
+      ).textContent = '';
     }
 
     // update never-translate-this-site checkicon
-    if (twpConfig.get("neverTranslateSites").indexOf(tabHostName) !== -1) {
+    if (twpConfig.get('neverTranslateSites').indexOf(tabHostName) !== -1) {
       shadowRoot.querySelector(
         `#menu-options [data-value="never-translate-this-site"] [checkicon]`,
-      ).textContent = "✔";
+      ).textContent = '✔';
     } else {
       shadowRoot.querySelector(
         `#menu-options [data-value="never-translate-this-site"] [checkicon]`,
-      ).textContent = "";
+      ).textContent = '';
     }
 
-    tabLanguage = twpLang.fixTLanguageCode(tabLanguage) || "und";
+    tabLanguage = twpLang.fixTLanguageCode(tabLanguage) || 'und';
 
     // update from-to text when original tab is detected
-    const from_to_element = shadowRoot.getElementById("from-to");
-    from_to_element.textContent = twpI18n.getMessage("msgTranslateFromTo", [
+    const from_to_element = shadowRoot.getElementById('from-to');
+    from_to_element.textContent = twpI18n.getMessage('msgTranslateFromTo', [
       twpLang.codeToLanguage(tabLanguage),
-      twpLang.codeToLanguage(twpConfig.get("targetLanguage")),
+      twpLang.codeToLanguage(twpConfig.get('targetLanguage')),
     ]);
 
     // show or hide always-translate-from and never-translate-from
     if (
-      tabLanguage === "und"
-      || tabLanguage == twpConfig.get("targetLanguage")
+      tabLanguage === 'und' ||
+      tabLanguage == twpConfig.get('targetLanguage')
     ) {
       shadowRoot.querySelector(
         `#menu-options [data-value="always-translate-from"]`,
-      ).style.display = "none";
+      ).style.display = 'none';
       shadowRoot.querySelector(
         `#menu-options [data-value="never-translate-from"]`,
-      ).style.display = "none";
+      ).style.display = 'none';
     } else {
       shadowRoot.querySelector(
         `#menu-options [data-value="always-translate-from"]`,
-      ).style.display = "flex";
+      ).style.display = 'flex';
       shadowRoot.querySelector(
         `#menu-options [data-value="never-translate-from"]`,
-      ).style.display = "flex";
+      ).style.display = 'flex';
     }
 
     // update always-translate-from text
     shadowRoot.querySelector(
       `#menu-options [data-value="always-translate-from"] [data-i18n]`,
-    ).textContent = twpI18n.getMessage("lblAlwaysTranslate", [
+    ).textContent = twpI18n.getMessage('lblAlwaysTranslate', [
       twpLang.codeToLanguage(tabLanguage),
     ]);
 
     // update always-translate-from checkicon
-    if (twpConfig.get("alwaysTranslateLangs").indexOf(tabLanguage) !== -1) {
+    if (twpConfig.get('alwaysTranslateLangs').indexOf(tabLanguage) !== -1) {
       shadowRoot.querySelector(
         `#menu-options [data-value="always-translate-from"] [checkicon]`,
-      ).textContent = "✔";
+      ).textContent = '✔';
     } else {
       shadowRoot.querySelector(
         `#menu-options [data-value="always-translate-from"] [checkicon]`,
-      ).textContent = "";
+      ).textContent = '';
     }
 
     // update never-translate-from checkicon
-    if (twpConfig.get("neverTranslateLangs").indexOf(tabLanguage) !== -1) {
+    if (twpConfig.get('neverTranslateLangs').indexOf(tabLanguage) !== -1) {
       shadowRoot.querySelector(
         `#menu-options [data-value="never-translate-from"] [checkicon]`,
-      ).textContent = "✔";
+      ).textContent = '✔';
     } else {
       shadowRoot.querySelector(
         `#menu-options [data-value="never-translate-from"] [checkicon]`,
-      ).textContent = "";
+      ).textContent = '';
     }
 
     // update keep-on-screen checkicon
-    if (twpConfig.get("popupMobileKeepOnScren") === "yes") {
+    if (twpConfig.get('popupMobileKeepOnScren') === 'yes') {
       shadowRoot.querySelector(
         `#menu-options [data-value="keep-on-screen"] [checkicon]`,
-      ).textContent = "✔";
+      ).textContent = '✔';
     } else {
       shadowRoot.querySelector(
         `#menu-options [data-value="keep-on-screen"] [checkicon]`,
-      ).textContent = "";
+      ).textContent = '';
     }
 
     // update change-position
-    if (twpConfig.get("popupMobilePosition") === "top") {
-      const bottomStyle = shadowRoot.getElementById("bottom-style");
-      if (bottomStyle) bottomStyle.remove();
+    if (twpConfig.get('popupMobilePosition') === 'top') {
+      const bottomStyle = shadowRoot.getElementById('bottom-style');
+      if (bottomStyle) { bottomStyle.remove(); }
     } else {
-      const bottomStyle = shadowRoot.getElementById("bottom-style");
+      const bottomStyle = shadowRoot.getElementById('bottom-style');
       if (!bottomStyle) {
-        const bottomStyle = document.createElement("style");
-        bottomStyle.id = "bottom-style";
+        const bottomStyle = document.createElement('style');
+        bottomStyle.id = 'bottom-style';
         bottomStyle.textContent = `
           main {
             top: unset;
@@ -553,11 +553,11 @@ void (async function() {
   });
 
   // translate or restore page
-  const btnTranslate = shadowRoot.getElementById("btnTranslate");
+  const btnTranslate = shadowRoot.getElementById('btnTranslate');
   btnTranslate.onclick = () => {
     lastInteraction = Date.now();
 
-    if (pageLanguageState === "original") {
+    if (pageLanguageState === 'original') {
       pageTranslator.translatePage();
     } else {
       pageTranslator.restorePage();
@@ -579,28 +579,28 @@ void (async function() {
     });
 
     const menuSelectLanguage = /** @type {HTMLSelectElement} */ (
-      shadowRoot.getElementById("language-selector")
+      shadowRoot.getElementById('language-selector')
     );
 
-    const eAllLangs = menuSelectLanguage.querySelector("[name=\"all\"]");
+    const eAllLangs = menuSelectLanguage.querySelector('[name="all"]');
     langsSorted.forEach((value) => {
-      const option = document.createElement("option");
+      const option = document.createElement('option');
       option.value = value[0];
       option.textContent = value[1];
       eAllLangs.appendChild(option);
     });
 
-    const eRecentsLangs = menuSelectLanguage.querySelector("[name=\"targets\"]");
+    const eRecentsLangs = menuSelectLanguage.querySelector('[name="targets"]');
 
     const buildRecentsLanguages = () => {
-      eRecentsLangs.innerHTML = "";
-      for (const value of twpConfig.get("targetLanguages")) {
-        const option = document.createElement("option");
+      eRecentsLangs.innerHTML = '';
+      for (const value of twpConfig.get('targetLanguages')) {
+        const option = document.createElement('option');
         option.value = value;
         option.textContent = langs[value];
         eRecentsLangs.appendChild(option);
       }
-      menuSelectLanguage.value = twpConfig.get("targetLanguages")[0];
+      menuSelectLanguage.value = twpConfig.get('targetLanguages')[0];
     };
     buildRecentsLanguages();
 
@@ -615,7 +615,7 @@ void (async function() {
   })();
 
   // show/hide popup on 3 finger tap
-  window.addEventListener("touchstart", (e) => {
+  window.addEventListener('touchstart', (e) => {
     if (e.touches.length == 3) {
       if (rootElement.isConnected) {
         hidePopup();
@@ -627,25 +627,25 @@ void (async function() {
 
   // show popup when clicked on the extension icon on the extension manager
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "showPopupMobile") {
+    if (request.action === 'showPopupMobile') {
       showPopup();
     }
   });
 
   pageTranslator.onGetOriginalTabLanguage(function(_tabLanguage) {
-    tabLanguage = _tabLanguage || "und";
-    if (tabLanguage !== "und") {
+    tabLanguage = _tabLanguage || 'und';
+    if (tabLanguage !== 'und') {
       tabLanguage = twpLang.fixTLanguageCode(tabLanguage);
     }
     if (
-      twpConfig.get("whenShowMobilePopup") !== "only-when-i-touch"
-      && tabLanguage !== "und"
-      && twpConfig.get("neverTranslateLangs").indexOf(tabLanguage) === -1
-      && twpConfig.get("neverTranslateSites").indexOf(tabHostName) === -1
-      && twpConfig.get("targetLanguage") !== tabLanguage
+      twpConfig.get('whenShowMobilePopup') !== 'only-when-i-touch' &&
+      tabLanguage !== 'und' &&
+      twpConfig.get('neverTranslateLangs').indexOf(tabLanguage) === -1 &&
+      twpConfig.get('neverTranslateSites').indexOf(tabHostName) === -1 &&
+      twpConfig.get('targetLanguage') !== tabLanguage
     ) {
       showPopup();
-    } else if (twpConfig.get("whenShowMobilePopup") === "always-show") {
+    } else if (twpConfig.get('whenShowMobilePopup') === 'always-show') {
       showPopup();
     }
   });
@@ -653,22 +653,22 @@ void (async function() {
   // dark/light mode
   function updateTheme() {
     let darkMode = false;
-    if (twpConfig.get("darkMode") === "auto") {
-      darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? true
-        : false;
+    if (twpConfig.get('darkMode') === 'auto') {
+      darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches ?
+        true :
+        false;
     } else {
-      darkMode = twpConfig.get("darkMode") === "yes" ? true : false;
+      darkMode = twpConfig.get('darkMode') === 'yes' ? true : false;
     }
 
     if (darkMode) {
-      const lightModeElement = shadowRoot.getElementById("light-mode");
-      if (lightModeElement) lightModeElement.remove();
+      const lightModeElement = shadowRoot.getElementById('light-mode');
+      if (lightModeElement) { lightModeElement.remove(); }
     } else {
-      let lightModeElement = shadowRoot.getElementById("light-mode");
+      let lightModeElement = shadowRoot.getElementById('light-mode');
       if (!lightModeElement) {
-        lightModeElement = document.createElement("style");
-        lightModeElement.id = "light-mode";
+        lightModeElement = document.createElement('style');
+        lightModeElement.id = 'light-mode';
         lightModeElement.textContent = `
           * {
             --primary-text-color: rgb(36, 34, 34);
@@ -685,12 +685,12 @@ void (async function() {
   }
   updateTheme();
 
-  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
     updateTheme();
   });
 
   twpConfig.onChanged((name, newValue) => {
-    if (name == "darkMode") {
+    if (name == 'darkMode') {
       updateTheme();
     }
   });

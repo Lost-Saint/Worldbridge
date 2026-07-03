@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 // TODO especificar o parametro HL para aprimorar a detecção de idioma
 // TODO desativar o botão caso a pagina esteja traduzida
@@ -7,7 +7,7 @@ var translateSelected = {};
 
 function getTabHostName() {
   return new Promise((resolve) =>
-    chrome.runtime.sendMessage({ action: "getTabHostName" }, (result) => {
+    chrome.runtime.sendMessage({ action: 'getTabHostName' }, (result) => {
       checkedLastError();
 
       resolve(result);
@@ -28,45 +28,45 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   let eOrigText;
   let origTextContainer;
 
-  let originalTabLanguage = "und";
-  let currentTargetLanguages = twpConfig.get("targetLanguages");
-  let currentTargetLanguage = twpConfig.get("targetLanguageTextTranslation");
-  let currentTextTranslatorService = twpConfig.get("textTranslatorService");
-  let awaysTranslateThisSite = twpConfig.get("alwaysTranslateSites").indexOf(tabHostName) !== -1;
-  let translateThisSite = twpConfig.get("neverTranslateSites").indexOf(tabHostName) === -1;
+  let originalTabLanguage = 'und';
+  let currentTargetLanguages = twpConfig.get('targetLanguages');
+  let currentTargetLanguage = twpConfig.get('targetLanguageTextTranslation');
+  let currentTextTranslatorService = twpConfig.get('textTranslatorService');
+  let awaysTranslateThisSite = twpConfig.get('alwaysTranslateSites').indexOf(tabHostName) !== -1;
+  let translateThisSite = twpConfig.get('neverTranslateSites').indexOf(tabHostName) === -1;
   let translateThisLanguage =
-    twpConfig.get("neverTranslateLangs").indexOf(originalTabLanguage) === -1;
+    twpConfig.get('neverTranslateLangs').indexOf(originalTabLanguage) === -1;
   let showTranslateSelectedButton = twpConfig.get(
-    "showTranslateSelectedButton",
+    'showTranslateSelectedButton',
   );
-  let dontShowIfIsNotValidText = twpConfig.get("dontShowIfIsNotValidText");
+  let dontShowIfIsNotValidText = twpConfig.get('dontShowIfIsNotValidText');
   let dontShowIfPageLangIsTargetLang = twpConfig.get(
-    "dontShowIfPageLangIsTargetLang",
+    'dontShowIfPageLangIsTargetLang',
   );
   let dontShowIfPageLangIsUnknown = twpConfig.get(
-    "dontShowIfPageLangIsUnknown",
+    'dontShowIfPageLangIsUnknown',
   );
   let dontShowIfSelectedTextIsTargetLang = twpConfig.get(
-    "dontShowIfSelectedTextIsTargetLang",
+    'dontShowIfSelectedTextIsTargetLang',
   );
   let dontShowIfSelectedTextIsUnknown = twpConfig.get(
-    "dontShowIfSelectedTextIsUnknown",
+    'dontShowIfSelectedTextIsUnknown',
   );
   let fooCount = 0;
 
   pageTranslator.onGetOriginalTabLanguage(function(tabLanguage) {
     originalTabLanguage = tabLanguage;
     translateThisLanguage =
-      twpConfig.get("neverTranslateLangs").indexOf(originalTabLanguage) === -1;
+      twpConfig.get('neverTranslateLangs').indexOf(originalTabLanguage) === -1;
     updateEventListener();
   });
 
   async function detectTextLanguage(text) {
-    if (!chrome.i18n.detectLanguage) return "und";
+    if (!chrome.i18n.detectLanguage) { return 'und'; }
 
     return await new Promise((resolve) => {
       chrome.i18n.detectLanguage(text, (result) => {
-        if (!result) return resolve({ lang: "und", isReliable: false });
+        if (!result) { return resolve({ lang: 'und', isReliable: false }); }
 
         for (const langInfo of result.languages) {
           const langCode = twpLang.fixTLanguageCode(langInfo.language);
@@ -75,7 +75,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
           }
         }
 
-        return resolve({ lang: "und", isReliable: false });
+        return resolve({ lang: 'und', isReliable: false });
       });
     });
   }
@@ -86,7 +86,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     isPlayingAudio = true;
     chrome.runtime.sendMessage(
       {
-        action: "textToSpeech",
+        action: 'textToSpeech',
         text,
         targetLanguage,
       },
@@ -100,11 +100,11 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   }
 
   function stopAudio() {
-    if (!isPlayingAudio) return;
+    if (!isPlayingAudio) { return; }
     isPlayingAudio = false;
     chrome.runtime.sendMessage(
       {
-        action: "stopAudio",
+        action: 'stopAudio',
       },
       checkedLastError,
     );
@@ -116,9 +116,9 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       pos3 = 0,
       pos4 = 0;
     if (elmnt2) {
-      elmnt2.addEventListener("mousedown", dragMouseDown);
+      elmnt2.addEventListener('mousedown', dragMouseDown);
     } else {
-      elmnt.addEventListener("mousedown", dragMouseDown);
+      elmnt.addEventListener('mousedown', dragMouseDown);
     }
 
     function dragMouseDown(e) {
@@ -127,9 +127,9 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       // get the mouse cursor position at startup:
       pos3 = e.clientX;
       pos4 = e.clientY;
-      document.addEventListener("mouseup", closeDragElement);
+      document.addEventListener('mouseup', closeDragElement);
       // call a function whenever the cursor moves:
-      document.addEventListener("mousemove", elementDrag);
+      document.addEventListener('mousemove', elementDrag);
     }
 
     function elementDrag(e) {
@@ -144,14 +144,14 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       elmnt.style.top = Math.min(
         window.innerHeight - parseInt(getComputedStyle(elmnt).height),
         Math.max(0, elmnt.offsetTop - pos2),
-      ) + "px";
-      elmnt.style.left = Math.max(0, elmnt.offsetLeft - pos1) + "px";
+      ) + 'px';
+      elmnt.style.left = Math.max(0, elmnt.offsetLeft - pos1) + 'px';
     }
 
     function closeDragElement() {
       // stop moving when mouse button is released:
-      document.removeEventListener("mouseup", closeDragElement);
-      document.removeEventListener("mousemove", elementDrag);
+      document.removeEventListener('mouseup', closeDragElement);
+      document.removeEventListener('mousemove', elementDrag);
     }
   }
 
@@ -174,12 +174,12 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 
     window.isTranslatingSelected = true;
 
-    divElement = document.createElement("div");
-    divElement.style = "all: initial";
-    divElement.classList.add("notranslate");
+    divElement = document.createElement('div');
+    divElement.style = 'all: initial';
+    divElement.classList.add('notranslate');
 
     const shadowRoot = divElement.attachShadow({
-      mode: "closed",
+      mode: 'closed',
     });
 
     shadowRoot.innerHTML = `
@@ -267,20 +267,20 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 		</div>
         `;
 
-    const link = document.createElement("link");
-    link.setAttribute("rel", "stylesheet");
+    const link = document.createElement('link');
+    link.setAttribute('rel', 'stylesheet');
     link.setAttribute(
-      "href",
-      chrome.runtime.getURL("/contentScript/css/translateSelected.css"),
+      'href',
+      chrome.runtime.getURL('/contentScript/css/translateSelected.css'),
     );
     isCSSLoaded = false;
     link.onload = (e) => {
       isCSSLoaded = true;
-      if (onCSSLoad) onCSSLoad();
+      if (onCSSLoad) { onCSSLoad(); }
     };
     shadowRoot.appendChild(link);
 
-    const styleFix = document.createElement("style");
+    const styleFix = document.createElement('style');
     styleFix.textContent = `
 		#eSelTextTrans,#eOrigText {
 			margin-right: 22px;
@@ -289,16 +289,16 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     shadowRoot.appendChild(styleFix);
 
     dragElement(
-      shadowRoot.getElementById("eDivResult"),
-      shadowRoot.getElementById("drag"),
+      shadowRoot.getElementById('eDivResult'),
+      shadowRoot.getElementById('drag'),
     );
 
-    const isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
-    if (CSS.supports("backdrop-filter: blur(5px)") && !isFirefox && false) {
-      const el = document.createElement("style");
-      el.setAttribute("id", "backdropFilterElement");
-      el.setAttribute("rel", "stylesheet");
+    if (CSS.supports('backdrop-filter: blur(5px)') && !isFirefox && false) {
+      const el = document.createElement('style');
+      el.setAttribute('id', 'backdropFilterElement');
+      el.setAttribute('rel', 'stylesheet');
       el.textContent = `
                     #eDivResult {
                         backdrop-filter: blur(3px);
@@ -322,17 +322,17 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
                 `;
       shadowRoot.appendChild(el);
     } else {
-      const el = document.createElement("style");
-      el.setAttribute("id", "backdropFilterElement");
-      el.setAttribute("rel", "stylesheet");
+      const el = document.createElement('style');
+      el.setAttribute('id', 'backdropFilterElement');
+      el.setAttribute('rel', 'stylesheet');
       let darkMode = false;
-      switch (twpConfig.get("darkMode")) {
-        case "auto":
-          if (matchMedia("(prefers-color-scheme: dark)").matches) {
+      switch (twpConfig.get('darkMode')) {
+        case 'auto':
+          if (matchMedia('(prefers-color-scheme: dark)').matches) {
             darkMode = true;
           }
           break;
-        case "yes":
+        case 'yes':
           darkMode = true;
           break;
       }
@@ -380,34 +380,34 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       shadowRoot.appendChild(el);
     }
 
-    eButtonTransSelText = shadowRoot.getElementById("eButtonTransSelText");
-    eDivResult = shadowRoot.getElementById("eDivResult");
-    eSelTextTrans = shadowRoot.getElementById("eSelTextTrans");
-    eOrigText = shadowRoot.getElementById("eOrigText");
-    origTextContainer = shadowRoot.getElementById("origTextContainer");
+    eButtonTransSelText = shadowRoot.getElementById('eButtonTransSelText');
+    eDivResult = shadowRoot.getElementById('eDivResult');
+    eSelTextTrans = shadowRoot.getElementById('eSelTextTrans');
+    eOrigText = shadowRoot.getElementById('eOrigText');
+    origTextContainer = shadowRoot.getElementById('origTextContainer');
 
-    const eMoreOrLess = shadowRoot.getElementById("moreOrLess");
-    const eMore = shadowRoot.getElementById("more");
-    const eLess = shadowRoot.getElementById("less");
+    const eMoreOrLess = shadowRoot.getElementById('moreOrLess');
+    const eMore = shadowRoot.getElementById('more');
+    const eLess = shadowRoot.getElementById('less');
 
-    const sGoogle = shadowRoot.getElementById("sGoogle");
-    const sYandex = shadowRoot.getElementById("sYandex");
-    const sBing = shadowRoot.getElementById("sBing");
-    const sDeepL = shadowRoot.getElementById("sDeepL");
-    const sLibre = shadowRoot.getElementById("sLibre");
-    const eCopy = shadowRoot.getElementById("copy");
-    const eReplace = shadowRoot.getElementById("replace");
-    const eListenOriginal = shadowRoot.getElementById("listenOriginal");
-    const eListenTranslated = shadowRoot.getElementById("listenTranslated");
+    const sGoogle = shadowRoot.getElementById('sGoogle');
+    const sYandex = shadowRoot.getElementById('sYandex');
+    const sBing = shadowRoot.getElementById('sBing');
+    const sDeepL = shadowRoot.getElementById('sDeepL');
+    const sLibre = shadowRoot.getElementById('sLibre');
+    const eCopy = shadowRoot.getElementById('copy');
+    const eReplace = shadowRoot.getElementById('replace');
+    const eListenOriginal = shadowRoot.getElementById('listenOriginal');
+    const eListenTranslated = shadowRoot.getElementById('listenTranslated');
 
     if (
-      gSelectionInfo
-      && (gSelectionInfo.isInputElement || gSelectionInfo.isContentEditable)
+      gSelectionInfo &&
+      (gSelectionInfo.isInputElement || gSelectionInfo.isContentEditable)
     ) {
-      eReplace.style.display = "block";
-      eSelTextTrans.style.minHeight = "55px";
+      eReplace.style.display = 'block';
+      eSelTextTrans.style.minHeight = '55px';
     } else {
-      eReplace.style.display = "none";
+      eReplace.style.display = 'none';
       eSelTextTrans.style.minHeight = null;
     }
 
@@ -419,7 +419,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       } else {
         prevSelInfo.element.focus();
       }
-      document.execCommand("selectAll", false);
+      document.execCommand('selectAll', false);
       if (prevSelInfo.isInputElement) {
         prevSelInfo.element.setSelectionRange(
           prevSelInfo.selStart,
@@ -430,13 +430,13 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
         selection.removeAllRanges();
         selection.addRange(prevSelInfo.range);
       }
-      document.execCommand("insertText", false, eSelTextTrans.textContent);
+      document.execCommand('insertText', false, eSelTextTrans.textContent);
     }
 
     eCopy.onclick = () => {
       navigator.clipboard.writeText(eSelTextTrans.textContent).then(() => {
         const oldBackgroundColor = eCopy.style.backgroundColor;
-        eCopy.style.backgroundColor = "rgba(0, 255, 0, 0.4)";
+        eCopy.style.backgroundColor = 'rgba(0, 255, 0, 0.4)';
         setTimeout(() => {
           eCopy.style.backgroundColor = oldBackgroundColor;
         }, 500);
@@ -458,18 +458,18 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     eOrigText.onkeyup = (e) => {
       e.stopPropagation();
 
-      if (twpConfig.get("translateSelectedWhenPressTwice") !== "yes") return;
+      if (twpConfig.get('translateSelectedWhenPressTwice') !== 'yes') { return; }
       // https://github.com/FilipePS/Traduzir-paginas-web/issues/577
       if (isSelectingText()) {
         return onKeyUp(e);
       } else {
-        if (eReplace.hasAttribute("hidden")) return;
+        if (eReplace.hasAttribute('hidden')) { return; }
       }
 
-      if (e.key == "Control") {
+      if (e.key == 'Control') {
         if (
-          lastTimePressedCtrl
-          && performance.now() - lastTimePressedCtrl < 250
+          lastTimePressedCtrl &&
+          performance.now() - lastTimePressedCtrl < 250
         ) {
           lastTimePressedCtrl = performance.now();
           replaceText();
@@ -485,93 +485,93 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     };
 
     eMoreOrLess.onclick = () => {
-      if (twpConfig.get("expandPanelTranslateSelectedText") === "no") {
-        twpConfig.set("expandPanelTranslateSelectedText", "yes");
+      if (twpConfig.get('expandPanelTranslateSelectedText') === 'no') {
+        twpConfig.set('expandPanelTranslateSelectedText', 'yes');
       } else {
-        twpConfig.set("expandPanelTranslateSelectedText", "no");
+        twpConfig.set('expandPanelTranslateSelectedText', 'no');
       }
 
       setCaretAtEnd();
     };
 
     sGoogle.onclick = () => {
-      currentTextTranslatorService = "google";
-      twpConfig.set("textTranslatorService", "google");
+      currentTextTranslatorService = 'google';
+      twpConfig.set('textTranslatorService', 'google');
       translateNewInput();
 
-      sGoogle.classList.remove("selected");
-      sYandex.classList.remove("selected");
-      sBing.classList.remove("selected");
-      sDeepL.classList.remove("selected");
-      sLibre.classList.remove("selected");
+      sGoogle.classList.remove('selected');
+      sYandex.classList.remove('selected');
+      sBing.classList.remove('selected');
+      sDeepL.classList.remove('selected');
+      sLibre.classList.remove('selected');
 
-      sGoogle.classList.add("selected");
+      sGoogle.classList.add('selected');
     };
     sYandex.onclick = () => {
-      currentTextTranslatorService = "yandex";
-      twpConfig.set("textTranslatorService", "yandex");
+      currentTextTranslatorService = 'yandex';
+      twpConfig.set('textTranslatorService', 'yandex');
       translateNewInput();
 
-      sGoogle.classList.remove("selected");
-      sYandex.classList.remove("selected");
-      sBing.classList.remove("selected");
-      sDeepL.classList.remove("selected");
-      sLibre.classList.remove("selected");
+      sGoogle.classList.remove('selected');
+      sYandex.classList.remove('selected');
+      sBing.classList.remove('selected');
+      sDeepL.classList.remove('selected');
+      sLibre.classList.remove('selected');
 
-      sYandex.classList.add("selected");
+      sYandex.classList.add('selected');
     };
     sBing.onclick = () => {
-      currentTextTranslatorService = "bing";
-      twpConfig.set("textTranslatorService", "bing");
+      currentTextTranslatorService = 'bing';
+      twpConfig.set('textTranslatorService', 'bing');
       translateNewInput();
 
-      sGoogle.classList.remove("selected");
-      sYandex.classList.remove("selected");
-      sBing.classList.remove("selected");
-      sDeepL.classList.remove("selected");
-      sLibre.classList.remove("selected");
+      sGoogle.classList.remove('selected');
+      sYandex.classList.remove('selected');
+      sBing.classList.remove('selected');
+      sDeepL.classList.remove('selected');
+      sLibre.classList.remove('selected');
 
-      sBing.classList.add("selected");
+      sBing.classList.add('selected');
     };
     sDeepL.onclick = () => {
       if (
-        twpConfig.get("deepl_confirmed") === "yes"
-        || confirm(twpI18n.getMessage("msgSetDeepLAlert"))
+        twpConfig.get('deepl_confirmed') === 'yes' ||
+        confirm(twpI18n.getMessage('msgSetDeepLAlert'))
       ) {
-        twpConfig.set("deepl_confirmed", "yes");
+        twpConfig.set('deepl_confirmed', 'yes');
 
-        currentTextTranslatorService = "deepl";
-        twpConfig.set("textTranslatorService", "deepl");
+        currentTextTranslatorService = 'deepl';
+        twpConfig.set('textTranslatorService', 'deepl');
         translateNewInput();
 
-        sGoogle.classList.remove("selected");
-        sYandex.classList.remove("selected");
-        sBing.classList.remove("selected");
-        sDeepL.classList.remove("selected");
-        sLibre.classList.remove("selected");
+        sGoogle.classList.remove('selected');
+        sYandex.classList.remove('selected');
+        sBing.classList.remove('selected');
+        sDeepL.classList.remove('selected');
+        sLibre.classList.remove('selected');
 
-        sDeepL.classList.add("selected");
+        sDeepL.classList.add('selected');
       }
     };
     sLibre.onclick = () => {
-      currentTextTranslatorService = "libre";
-      twpConfig.set("textTranslatorService", "libre");
+      currentTextTranslatorService = 'libre';
+      twpConfig.set('textTranslatorService', 'libre');
       translateNewInput();
 
-      sGoogle.classList.remove("selected");
-      sYandex.classList.remove("selected");
-      sBing.classList.remove("selected");
-      sDeepL.classList.remove("selected");
-      sLibre.classList.remove("selected");
+      sGoogle.classList.remove('selected');
+      sYandex.classList.remove('selected');
+      sBing.classList.remove('selected');
+      sDeepL.classList.remove('selected');
+      sLibre.classList.remove('selected');
 
-      sLibre.classList.add("selected");
+      sLibre.classList.add('selected');
     };
 
-    const setTargetLanguage = shadowRoot.getElementById("setTargetLanguage");
+    const setTargetLanguage = shadowRoot.getElementById('setTargetLanguage');
     setTargetLanguage.onclick = (e) => {
-      if (e.target.getAttribute("value")) {
+      if (e.target.getAttribute('value')) {
         const langCode = twpLang.fixTLanguageCode(
-          e.target.getAttribute("value"),
+          e.target.getAttribute('value'),
         );
         if (langCode) {
           currentTargetLanguage = langCode;
@@ -579,32 +579,32 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
           translateNewInput();
         }
 
-        shadowRoot.querySelectorAll("#setTargetLanguage li").forEach((li) => {
-          li.classList.remove("selected");
+        shadowRoot.querySelectorAll('#setTargetLanguage li').forEach((li) => {
+          li.classList.remove('selected');
         });
 
-        e.target.classList.add("selected");
+        e.target.classList.add('selected');
       }
     };
 
     function onListenClick(type, element, text, language) {
-      const msgListen = twpI18n.getMessage("btnListen");
-      const msgStopListening = twpI18n.getMessage("btnStopListening");
+      const msgListen = twpI18n.getMessage('btnListen');
+      const msgStopListening = twpI18n.getMessage('btnStopListening');
 
-      eListenOriginal.classList.remove("selected");
-      eListenTranslated.classList.remove("selected");
-      eListenOriginal.setAttribute("title", msgStopListening);
-      eListenTranslated.setAttribute("title", msgStopListening);
+      eListenOriginal.classList.remove('selected');
+      eListenTranslated.classList.remove('selected');
+      eListenOriginal.setAttribute('title', msgStopListening);
+      eListenTranslated.setAttribute('title', msgStopListening);
 
       if (isPlayingAudio) {
         stopAudio();
-        element.classList.remove("selected");
+        element.classList.remove('selected');
       } else {
         playAudio(text, language, () => {
-          element.classList.remove("selected");
-          element.setAttribute("title", msgListen);
+          element.classList.remove('selected');
+          element.setAttribute('title', msgListen);
         });
-        element.classList.add("selected");
+        element.classList.add('selected');
       }
     }
 
@@ -613,23 +613,23 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       let { lang, isReliable } = await detectTextLanguage(
         eOrigText.textContent,
       );
-      if (!isReliable && originalTabLanguage !== "und") {
+      if (!isReliable && originalTabLanguage !== 'und') {
         lang = originalTabLanguage;
       }
-      if (lastListenAudioType !== "original") {
+      if (lastListenAudioType !== 'original') {
         stopAudio();
       }
-      lastListenAudioType = "original";
-      onListenClick("original", eListenOriginal, eOrigText.textContent, lang);
+      lastListenAudioType = 'original';
+      onListenClick('original', eListenOriginal, eOrigText.textContent, lang);
     };
 
     eListenTranslated.onclick = () => {
-      if (lastListenAudioType !== "translated") {
+      if (lastListenAudioType !== 'translated') {
         stopAudio();
       }
-      lastListenAudioType = "translated";
+      lastListenAudioType = 'translated';
       onListenClick(
-        "translated",
+        'translated',
         eListenTranslated,
         eSelTextTrans.textContent,
         currentTargetLanguage,
@@ -641,138 +641,138 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     twpI18n.translateDocument(shadowRoot);
 
     if (platformInfo.isMobile.any) {
-      eButtonTransSelText.style.width = "30px";
-      eButtonTransSelText.style.height = "30px";
-      document.addEventListener("touchstart", onTouchstart);
+      eButtonTransSelText.style.width = '30px';
+      eButtonTransSelText.style.height = '30px';
+      document.addEventListener('touchstart', onTouchstart);
     }
 
-    eButtonTransSelText.addEventListener("click", onClick);
-    document.addEventListener("mousedown", onDown);
+    eButtonTransSelText.addEventListener('click', onClick);
+    document.addEventListener('mousedown', onDown);
 
     const targetLanguageButtons = shadowRoot.querySelectorAll(
-      "#setTargetLanguage li",
+      '#setTargetLanguage li',
     );
 
     for (let i = 0; i < 3; i++) {
       if (currentTargetLanguages[i] == currentTargetLanguage) {
-        targetLanguageButtons[i].classList.add("selected");
+        targetLanguageButtons[i].classList.add('selected');
       }
       targetLanguageButtons[i].textContent = currentTargetLanguages[i];
-      targetLanguageButtons[i].setAttribute("value", currentTargetLanguages[i]);
+      targetLanguageButtons[i].setAttribute('value', currentTargetLanguages[i]);
       targetLanguageButtons[i].setAttribute(
-        "title",
+        'title',
         twpLang.codeToLanguage(currentTargetLanguages[i]),
       );
     }
 
-    if (currentTextTranslatorService === "yandex") {
-      sYandex.classList.add("selected");
-    } else if (currentTextTranslatorService == "deepl") {
-      sDeepL.classList.add("selected");
-    } else if (currentTextTranslatorService == "bing") {
-      sBing.classList.add("selected");
-    } else if (currentTextTranslatorService == "libre") {
-      sLibre.classList.add("selected");
+    if (currentTextTranslatorService === 'yandex') {
+      sYandex.classList.add('selected');
+    } else if (currentTextTranslatorService == 'deepl') {
+      sDeepL.classList.add('selected');
+    } else if (currentTextTranslatorService == 'bing') {
+      sBing.classList.add('selected');
+    } else if (currentTextTranslatorService == 'libre') {
+      sLibre.classList.add('selected');
     } else {
-      sGoogle.classList.add("selected");
+      sGoogle.classList.add('selected');
     }
 
-    const enabledServices = twpConfig.get("enabledServices");
-    if (enabledServices.includes("google")) {
-      sGoogle.removeAttribute("hidden");
+    const enabledServices = twpConfig.get('enabledServices');
+    if (enabledServices.includes('google')) {
+      sGoogle.removeAttribute('hidden');
     } else {
-      sGoogle.setAttribute("hidden", "");
+      sGoogle.setAttribute('hidden', '');
     }
-    if (enabledServices.includes("bing")) {
-      sBing.removeAttribute("hidden");
+    if (enabledServices.includes('bing')) {
+      sBing.removeAttribute('hidden');
     } else {
-      sBing.setAttribute("hidden", "");
+      sBing.setAttribute('hidden', '');
     }
-    if (enabledServices.includes("yandex")) {
-      sYandex.removeAttribute("hidden");
+    if (enabledServices.includes('yandex')) {
+      sYandex.removeAttribute('hidden');
     } else {
-      sYandex.setAttribute("hidden", "");
+      sYandex.setAttribute('hidden', '');
     }
-    if (enabledServices.includes("deepl")) {
-      sDeepL.removeAttribute("hidden");
+    if (enabledServices.includes('deepl')) {
+      sDeepL.removeAttribute('hidden');
     } else {
-      sDeepL.setAttribute("hidden", "");
+      sDeepL.setAttribute('hidden', '');
     }
-    if (twpConfig.get("customServices").find((cs) => cs.name === "libre")) {
-      sLibre.removeAttribute("hidden");
+    if (twpConfig.get('customServices').find((cs) => cs.name === 'libre')) {
+      sLibre.removeAttribute('hidden');
     } else {
-      sLibre.setAttribute("hidden", "");
+      sLibre.setAttribute('hidden', '');
     }
 
     if (
-      twpConfig.get("expandPanelTranslateSelectedText") === "yes"
-      || (prevSelectionInfo
-        && (prevSelectionInfo.isContentEditable
-          || prevSelectionInfo.isInputElement))
+      twpConfig.get('expandPanelTranslateSelectedText') === 'yes' ||
+      (prevSelectionInfo &&
+        (prevSelectionInfo.isContentEditable ||
+          prevSelectionInfo.isInputElement))
     ) {
-      origTextContainer.style.display = "block";
-      eMore.style.display = "none";
-      eLess.style.display = "block";
-      eMoreOrLess.setAttribute("title", twpI18n.getMessage("less"));
+      origTextContainer.style.display = 'block';
+      eMore.style.display = 'none';
+      eLess.style.display = 'block';
+      eMoreOrLess.setAttribute('title', twpI18n.getMessage('less'));
     } else {
-      origTextContainer.style.display = "none";
-      eMore.style.display = "block";
-      eLess.style.display = "none";
-      eMoreOrLess.setAttribute("title", twpI18n.getMessage("more"));
+      origTextContainer.style.display = 'none';
+      eMore.style.display = 'block';
+      eLess.style.display = 'none';
+      eMoreOrLess.setAttribute('title', twpI18n.getMessage('more'));
     }
 
     twpConfig.onChanged((name, newvalue) => {
       switch (name) {
-        case "enabledServices": {
+        case 'enabledServices': {
           const enabledServices = newvalue;
-          if (enabledServices.includes("google")) {
-            sGoogle.removeAttribute("hidden");
+          if (enabledServices.includes('google')) {
+            sGoogle.removeAttribute('hidden');
           } else {
-            sGoogle.setAttribute("hidden", "");
+            sGoogle.setAttribute('hidden', '');
           }
-          if (enabledServices.includes("bing")) {
-            sBing.removeAttribute("hidden");
+          if (enabledServices.includes('bing')) {
+            sBing.removeAttribute('hidden');
           } else {
-            sBing.setAttribute("hidden", "");
+            sBing.setAttribute('hidden', '');
           }
-          if (enabledServices.includes("yandex")) {
-            sYandex.removeAttribute("hidden");
+          if (enabledServices.includes('yandex')) {
+            sYandex.removeAttribute('hidden');
           } else {
-            sYandex.setAttribute("hidden", "");
+            sYandex.setAttribute('hidden', '');
           }
-          if (enabledServices.includes("deepl")) {
-            sDeepL.removeAttribute("hidden");
+          if (enabledServices.includes('deepl')) {
+            sDeepL.removeAttribute('hidden');
           } else {
-            sDeepL.setAttribute("hidden", "");
-          }
-          break;
-        }
-        case "customServices": {
-          if (newvalue.find((cs) => cs.name === "libre")) {
-            sLibre.removeAttribute("hidden");
-          } else {
-            sLibre.setAttribute("hidden", "");
+            sDeepL.setAttribute('hidden', '');
           }
           break;
         }
-        case "expandPanelTranslateSelectedText":
+        case 'customServices': {
+          if (newvalue.find((cs) => cs.name === 'libre')) {
+            sLibre.removeAttribute('hidden');
+          } else {
+            sLibre.setAttribute('hidden', '');
+          }
+          break;
+        }
+        case 'expandPanelTranslateSelectedText':
           const prevHeight = parseInt(getComputedStyle(eDivResult).height);
-          if (newvalue === "yes") {
-            origTextContainer.style.display = "block";
-            eMore.style.display = "none";
-            eLess.style.display = "block";
-            eMoreOrLess.setAttribute("title", twpI18n.getMessage("less"));
-            eDivResult.style.top = parseInt(eDivResult.style.top)
-              + (prevHeight - parseInt(getComputedStyle(eDivResult).height))
-              + "px";
+          if (newvalue === 'yes') {
+            origTextContainer.style.display = 'block';
+            eMore.style.display = 'none';
+            eLess.style.display = 'block';
+            eMoreOrLess.setAttribute('title', twpI18n.getMessage('less'));
+            eDivResult.style.top = parseInt(eDivResult.style.top) +
+              (prevHeight - parseInt(getComputedStyle(eDivResult).height)) +
+              'px';
           } else {
-            origTextContainer.style.display = "none";
-            eMore.style.display = "block";
-            eLess.style.display = "none";
-            eMoreOrLess.setAttribute("title", twpI18n.getMessage("more"));
-            eDivResult.style.top = parseInt(eDivResult.style.top)
-              + (prevHeight - parseInt(getComputedStyle(eDivResult).height))
-              + "px";
+            origTextContainer.style.display = 'none';
+            eMore.style.display = 'block';
+            eLess.style.display = 'none';
+            eMoreOrLess.setAttribute('title', twpI18n.getMessage('more'));
+            eDivResult.style.top = parseInt(eDivResult.style.top) +
+              (prevHeight - parseInt(getComputedStyle(eDivResult).height)) +
+              'px';
           }
           break;
       }
@@ -783,12 +783,12 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     window.isTranslatingSelected = false;
     fooCount++;
     stopAudio();
-    if (!divElement) return;
+    if (!divElement) { return; }
 
-    eButtonTransSelText.removeEventListener("click", onClick);
-    document.removeEventListener("mousedown", onDown);
+    eButtonTransSelText.removeEventListener('click', onClick);
+    document.removeEventListener('mousedown', onDown);
     if (platformInfo.isMobile.any) {
-      document.removeEventListener("touchstart", onTouchstart);
+      document.removeEventListener('touchstart', onTouchstart);
     }
     divElement.remove();
     divElement = eButtonTransSelText = eDivResult = null;
@@ -796,9 +796,9 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 
   function destroyIfButtonIsShowing(e) {
     if (
-      eButtonTransSelText
-      && e.target !== divElement
-      && eButtonTransSelText.style.display === "block"
+      eButtonTransSelText &&
+      e.target !== divElement &&
+      eButtonTransSelText.style.display === 'block'
     ) {
       destroy();
     }
@@ -806,53 +806,53 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 
   twpConfig.onChanged(function(name, newValue) {
     switch (name) {
-      case "textTranslatorService":
+      case 'textTranslatorService':
         currentTextTranslatorService = newValue;
         break;
-      case "targetLanguages":
+      case 'targetLanguages':
         currentTargetLanguages = newValue;
         break;
-      case "targetLanguageTextTranslation":
+      case 'targetLanguageTextTranslation':
         currentTargetLanguage = newValue;
         break;
-      case "alwaysTranslateSites":
+      case 'alwaysTranslateSites':
         awaysTranslateThisSite = newValue.indexOf(tabHostName) !== -1;
         updateEventListener();
         break;
-      case "neverTranslateSites":
+      case 'neverTranslateSites':
         translateThisSite = newValue.indexOf(tabHostName) === -1;
         updateEventListener();
         break;
-      case "neverTranslateLangs":
+      case 'neverTranslateLangs':
         translateThisLanguage = newValue.indexOf(originalTabLanguage) === -1;
         updateEventListener();
         break;
-      case "showTranslateSelectedButton":
+      case 'showTranslateSelectedButton':
         showTranslateSelectedButton = newValue;
         updateEventListener();
         break;
-      case "dontShowIfIsNotValidText":
+      case 'dontShowIfIsNotValidText':
         dontShowIfIsNotValidText = newValue;
         break;
-      case "dontShowIfPageLangIsTargetLang":
+      case 'dontShowIfPageLangIsTargetLang':
         dontShowIfPageLangIsTargetLang = newValue;
         updateEventListener();
         break;
-      case "dontShowIfPageLangIsUnknown":
+      case 'dontShowIfPageLangIsUnknown':
         dontShowIfPageLangIsUnknown = newValue;
         updateEventListener();
         break;
-      case "dontShowIfSelectedTextIsTargetLang":
+      case 'dontShowIfSelectedTextIsTargetLang':
         dontShowIfSelectedTextIsTargetLang = newValue;
         break;
-      case "dontShowIfSelectedTextIsUnknown":
+      case 'dontShowIfSelectedTextIsUnknown':
         dontShowIfSelectedTextIsUnknown = newValue;
         break;
     }
   });
 
-  function update_eDivResult(result = "") {
-    if (eDivResult.style.display !== "block") {
+  function update_eDivResult(result = '') {
+    if (eDivResult.style.display !== 'block') {
       init();
     }
 
@@ -861,17 +861,17 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       const eLeft = prevSelectionInfo.left;
 
       if (twpLang.isRtlLanguage(currentTargetLanguage)) {
-        eSelTextTrans.setAttribute("dir", "rtl");
+        eSelTextTrans.setAttribute('dir', 'rtl');
       } else {
-        eSelTextTrans.setAttribute("dir", "ltr");
+        eSelTextTrans.setAttribute('dir', 'ltr');
       }
       eSelTextTrans.textContent = result;
       let top = parseInt(eDivResult.style.top) || 0,
         left = parseInt(eDivResult.style.left) || 0;
-      if (eDivResult.style.display !== "block") {
-        eDivResult.style.display = "block";
-        eDivResult.style.top = "0px";
-        eDivResult.style.left = "0px";
+      if (eDivResult.style.display !== 'block') {
+        eDivResult.style.display = 'block';
+        eDivResult.style.top = '0px';
+        eDivResult.style.left = '0px';
         eOrigText.textContent = prevSelectionInfo.text;
 
         setCaretAtEnd();
@@ -890,11 +890,11 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       eDivResult.style.top = Math.min(
         window.innerHeight - parseInt(getComputedStyle(eDivResult).height),
         top,
-      ) + "px";
+      ) + 'px';
       eDivResult.style.left = Math.min(
         window.innerWidth - parseInt(getComputedStyle(eDivResult).width),
         left,
-      ) + "px";
+      ) + 'px';
     }
 
     if (isCSSLoaded) {
@@ -903,7 +903,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       const currentFooCount = fooCount;
       onCSSLoad = () => {
         onCSSLoad = null;
-        if (currentFooCount !== fooCount) return;
+        if (currentFooCount !== fooCount) { return; }
         onloaded();
       };
     }
@@ -916,11 +916,11 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 
     backgroundTranslateSingleText(
       currentTextTranslatorService,
-      "auto",
+      'auto',
       currentTargetLanguage,
       eOrigText.textContent,
     ).then((result) => {
-      if (currentFooCount !== fooCount) return;
+      if (currentFooCount !== fooCount) { return; }
 
       update_eDivResult(result);
     });
@@ -938,7 +938,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     translateNewInput();
     const currentFooCount = fooCount;
     setTimeout(() => {
-      if (currentFooCount !== fooCount) return;
+      if (currentFooCount !== fooCount) { return; }
       update_eDivResult(eSelTextTrans.textContent);
       fooCount = currentFooCount;
     }, 1000);
@@ -946,13 +946,13 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 
   function onClick(e) {
     translateSelText();
-    eButtonTransSelText.style.display = "none";
+    eButtonTransSelText.style.display = 'none';
   }
 
   function onDown(e) {
     if (e.target != divElement) {
-      eDivResult.style.display = "none";
-      eButtonTransSelText.style.display = "none";
+      eDivResult.style.display = 'none';
+      eButtonTransSelText.style.display = 'none';
       destroy();
     }
   }
@@ -965,14 +965,14 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   }
 
   function getSelectionText() {
-    let text = "";
+    let text = '';
     const activeEl = document.activeElement;
     const activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
     if (
-      activeElTagName == "textarea"
-      || (activeElTagName == "input"
-        && /^(?:text|search)$/i.test(activeEl.type)
-        && typeof activeEl.selectionStart == "number")
+      activeElTagName == 'textarea' ||
+      (activeElTagName == 'input' &&
+        /^(?:text|search)$/i.test(activeEl.type) &&
+        typeof activeEl.selectionStart == 'number')
     ) {
       text = activeEl.value.slice(
         activeEl.selectionStart,
@@ -990,10 +990,10 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     const activeEl = document.activeElement;
     const activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
     if (
-      activeElTagName == "textarea"
-      || (activeElTagName == "input"
-        && /^(?:text|search)$/i.test(activeEl.type)
-        && typeof activeEl.selectionStart == "number")
+      activeElTagName == 'textarea' ||
+      (activeElTagName == 'input' &&
+        /^(?:text|search)$/i.test(activeEl.type) &&
+        typeof activeEl.selectionStart == 'number')
     ) {
       const text = activeEl.value.slice(
         activeEl.selectionStart,
@@ -1014,14 +1014,14 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
       };
     } else if (window.getSelection) {
       const selection = window.getSelection();
-      if (selection.type == "Range") {
+      if (selection.type == 'Range') {
         const text = selection.toString();
         const rect = selection.getRangeAt(0).getBoundingClientRect();
         newSelectionInfo = {
           isInputElement: false,
-          isContentEditable: selection.focusNode.nodeType === 3
-            ? selection.focusNode.parentNode.isContentEditable
-            : selection.focusNode.isContentEditable,
+          isContentEditable: selection.focusNode.nodeType === 3 ?
+            selection.focusNode.parentNode.isContentEditable :
+            selection.focusNode.isContentEditable,
           element: selection.focusNode,
           selStart: selection.getRangeAt(0).startOffset,
           selEnd: selection.getRangeAt(0).endOffset,
@@ -1036,10 +1036,10 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     }
 
     if (
-      dontReadIfSelectionDontChange
-      && gSelectionInfo
-      && newSelectionInfo
-      && gSelectionInfo.text === newSelectionInfo.text
+      dontReadIfSelectionDontChange &&
+      gSelectionInfo &&
+      newSelectionInfo &&
+      gSelectionInfo.text === newSelectionInfo.text
     ) {
       gSelectionInfo = newSelectionInfo;
       return false;
@@ -1049,55 +1049,55 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   }
 
   function isValidText(text) {
-    if (text.length < 2) return false;
-    if (/^[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?\s]*$/.test(text)) return false;
+    if (text.length < 2) { return false; }
+    if (/^[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?\s]*$/.test(text)) { return false; }
     return true;
   }
 
   async function onUp(e) {
-    if (e.target == divElement) return;
+    if (e.target == divElement) { return; }
 
     const clientX = Math.max(
-      typeof e.clientX === "undefined" ? 0 : e.clientX,
-      typeof e.changedTouches === "undefined" ? 0 : e.changedTouches[0].clientX,
+      typeof e.clientX === 'undefined' ? 0 : e.clientX,
+      typeof e.changedTouches === 'undefined' ? 0 : e.changedTouches[0].clientX,
     );
     const clientY = Math.max(
-      typeof e.clientY === "undefined" ? 0 : e.clientY,
-      typeof e.changedTouches === "undefined" ? 0 : e.changedTouches[0].clientY,
+      typeof e.clientY === 'undefined' ? 0 : e.clientY,
+      typeof e.changedTouches === 'undefined' ? 0 : e.changedTouches[0].clientY,
     );
 
     const selectedText = getSelectionText().trim();
-    if (!selectedText || selectedText.length < 1) return;
+    if (!selectedText || selectedText.length < 1) { return; }
     let detectedLanguage = (await detectTextLanguage(selectedText)).lang;
-    if (!detectedLanguage) detectedLanguage = "und";
+    if (!detectedLanguage) { detectedLanguage = 'und'; }
 
     if (
-      ((dontShowIfSelectedTextIsTargetLang == "yes"
-        && detectedLanguage !== currentTargetLanguage)
-        || dontShowIfSelectedTextIsTargetLang != "yes")
-      && ((dontShowIfSelectedTextIsUnknown == "yes"
-        && detectedLanguage !== "und")
-        || dontShowIfSelectedTextIsUnknown != "yes")
-      && (dontShowIfIsNotValidText != "yes" || isValidText(selectedText))
+      ((dontShowIfSelectedTextIsTargetLang == 'yes' &&
+        detectedLanguage !== currentTargetLanguage) ||
+        dontShowIfSelectedTextIsTargetLang != 'yes') &&
+      ((dontShowIfSelectedTextIsUnknown == 'yes' &&
+        detectedLanguage !== 'und') ||
+        dontShowIfSelectedTextIsUnknown != 'yes') &&
+      (dontShowIfIsNotValidText != 'yes' || isValidText(selectedText))
     ) {
       init();
       if (platformInfo.isMobile.any) {
-        eButtonTransSelText.style.left = window.innerWidth - 45 + "px";
-        eButtonTransSelText.style.top = clientY + "px";
+        eButtonTransSelText.style.left = window.innerWidth - 45 + 'px';
+        eButtonTransSelText.style.top = clientY + 'px';
       } else {
-        eButtonTransSelText.style.left = Math.min(window.innerWidth - 40, clientX + 25) + "px";
-        eButtonTransSelText.style.top = Math.max(2, clientY - 35) + "px";
+        eButtonTransSelText.style.left = Math.min(window.innerWidth - 40, clientX + 25) + 'px';
+        eButtonTransSelText.style.top = Math.max(2, clientY - 35) + 'px';
       }
 
-      eButtonTransSelText.style.display = "block";
+      eButtonTransSelText.style.display = 'block';
     }
   }
 
   let showButtonTimerHandler = null;
 
   function onMouseup(e) {
-    if (e.button != 0) return;
-    if (e.target == divElement) return;
+    if (e.button != 0) { return; }
+    if (e.target == divElement) { return; }
     if (readSelection(true)) {
       clearTimeout(showButtonTimerHandler);
       showButtonTimerHandler = setTimeout(() => onUp(e), 150);
@@ -1105,7 +1105,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   }
 
   function onTouchend(e) {
-    if (e.target == divElement) return;
+    if (e.target == divElement) { return; }
     readSelection();
     clearTimeout(showButtonTimerHandler);
     showButtonTimerHandler = setTimeout(() => onUp(e), 150);
@@ -1121,21 +1121,21 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     const activeEl = document.activeElement;
     const activeElTagName = activeEl ? activeEl.tagName.toLowerCase() : null;
     if (
-      activeElTagName == "textarea"
-      || (activeElTagName == "input"
-        && /^(?:text|search)$/i.test(activeEl.type)
-        && typeof activeEl.selectionStart == "number")
+      activeElTagName == 'textarea' ||
+      (activeElTagName == 'input' &&
+        /^(?:text|search)$/i.test(activeEl.type) &&
+        typeof activeEl.selectionStart == 'number')
     ) {
       const text = activeEl.value.slice(
         activeEl.selectionStart,
         activeEl.selectionEnd,
       );
-      if (text) return true;
+      if (text) { return true; }
     } else if (window.getSelection) {
       const selection = window.getSelection();
-      if (selection.type == "Range") {
+      if (selection.type == 'Range') {
         const text = selection.toString();
-        if (text) return true;
+        if (text) { return true; }
       }
     }
     return false;
@@ -1144,17 +1144,17 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   let lastTimePressedCtrl = null;
 
   function onKeyUp(e) {
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       destroy();
       return;
     }
 
-    if (twpConfig.get("translateSelectedWhenPressTwice") !== "yes") return;
-    if (e.key == "Control") {
+    if (twpConfig.get('translateSelectedWhenPressTwice') !== 'yes') { return; }
+    if (e.key == 'Control') {
       if (
-        lastTimePressedCtrl
-        && performance.now() - lastTimePressedCtrl < 280
-        && isSelectingText()
+        lastTimePressedCtrl &&
+        performance.now() - lastTimePressedCtrl < 280 &&
+        isSelectingText()
       ) {
         lastTimePressedCtrl = performance.now();
         readSelection();
@@ -1165,65 +1165,65 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     }
   }
 
-  document.addEventListener("keyup", onKeyUp, true);
+  document.addEventListener('keyup', onKeyUp, true);
 
   let windowIsInFocus = true;
-  window.addEventListener("focus", function(e) {
+  window.addEventListener('focus', function(e) {
     windowIsInFocus = true;
     chrome.runtime.sendMessage(
-      { action: "thisFrameIsInFocus" },
+      { action: 'thisFrameIsInFocus' },
       checkedLastError,
     );
   });
-  window.addEventListener("blur", function(e) {
+  window.addEventListener('blur', function(e) {
     windowIsInFocus = false;
   });
 
-  window.addEventListener("beforeunload", function(e) {
+  window.addEventListener('beforeunload', function(e) {
     destroy();
   });
 
   function updateEventListener() {
     if (
-      showTranslateSelectedButton == "yes"
-      && (awaysTranslateThisSite
-        || (translateThisSite && translateThisLanguage))
-      && ((dontShowIfPageLangIsTargetLang == "yes"
-        && originalTabLanguage !== currentTargetLanguage)
-        || dontShowIfPageLangIsTargetLang != "yes")
-      && ((dontShowIfPageLangIsUnknown == "yes"
-        && originalTabLanguage !== "und")
-        || dontShowIfPageLangIsUnknown != "yes")
+      showTranslateSelectedButton == 'yes' &&
+      (awaysTranslateThisSite ||
+        (translateThisSite && translateThisLanguage)) &&
+      ((dontShowIfPageLangIsTargetLang == 'yes' &&
+        originalTabLanguage !== currentTargetLanguage) ||
+        dontShowIfPageLangIsTargetLang != 'yes') &&
+      ((dontShowIfPageLangIsUnknown == 'yes' &&
+        originalTabLanguage !== 'und') ||
+        dontShowIfPageLangIsUnknown != 'yes')
     ) {
-      document.addEventListener("mouseup", onMouseup);
+      document.addEventListener('mouseup', onMouseup);
 
-      document.addEventListener("blur", destroyIfButtonIsShowing);
-      document.addEventListener("visibilitychange", destroyIfButtonIsShowing);
+      document.addEventListener('blur', destroyIfButtonIsShowing);
+      document.addEventListener('visibilitychange', destroyIfButtonIsShowing);
 
-      document.addEventListener("keydown", destroyIfButtonIsShowing);
-      document.addEventListener("mousedown", destroyIfButtonIsShowing);
-      document.addEventListener("wheel", destroyIfButtonIsShowing);
+      document.addEventListener('keydown', destroyIfButtonIsShowing);
+      document.addEventListener('mousedown', destroyIfButtonIsShowing);
+      document.addEventListener('wheel', destroyIfButtonIsShowing);
 
       if (platformInfo.isMobile.any) {
-        document.addEventListener("touchend", onTouchend);
-        document.addEventListener("selectionchange", onSelectionchange);
+        document.addEventListener('touchend', onTouchend);
+        document.addEventListener('selectionchange', onSelectionchange);
       }
     } else {
-      document.removeEventListener("mouseup", onMouseup);
+      document.removeEventListener('mouseup', onMouseup);
 
-      document.removeEventListener("blur", destroyIfButtonIsShowing);
+      document.removeEventListener('blur', destroyIfButtonIsShowing);
       document.removeEventListener(
-        "visibilitychange",
+        'visibilitychange',
         destroyIfButtonIsShowing,
       );
 
-      document.removeEventListener("keydown", destroyIfButtonIsShowing);
-      document.removeEventListener("mousedown", destroyIfButtonIsShowing);
-      document.removeEventListener("wheel", destroyIfButtonIsShowing);
+      document.removeEventListener('keydown', destroyIfButtonIsShowing);
+      document.removeEventListener('mousedown', destroyIfButtonIsShowing);
+      document.removeEventListener('wheel', destroyIfButtonIsShowing);
 
       if (platformInfo.isMobile.any) {
-        document.removeEventListener("touchend", onTouchend);
-        document.removeEventListener("selectionchange", onSelectionchange);
+        document.removeEventListener('touchend', onTouchend);
+        document.removeEventListener('selectionchange', onSelectionchange);
       }
     }
   }
@@ -1231,39 +1231,39 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   updateEventListener();
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "TranslateSelectedText") {
+    if (request.action === 'TranslateSelectedText') {
       readSelection();
       init();
       translateSelText();
-    } else if (request.action === "anotherFrameIsInFocus") {
+    } else if (request.action === 'anotherFrameIsInFocus') {
       if (!windowIsInFocus) {
         destroy();
       }
-    } else if (request.action === "hotTranslateSelectedText") {
+    } else if (request.action === 'hotTranslateSelectedText') {
       readSelection();
       const prevSelInfo = gSelectionInfo;
       if (
-        !prevSelInfo?.element?.focus
-        && !prevSelInfo?.element?.parentNode?.focus
+        !prevSelInfo?.element?.focus &&
+        !prevSelInfo?.element?.parentNode?.focus
       ) {
         return;
       }
-      if (prevSelInfo.isInputElement && prevSelInfo.readOnly) return;
+      if (prevSelInfo.isInputElement && prevSelInfo.readOnly) { return; }
       if (prevSelInfo.text) {
         backgroundTranslateSingleText(
           currentTextTranslatorService,
-          "auto",
+          'auto',
           currentTargetLanguage,
           prevSelInfo.text,
         ).then((result) => {
-          if (!result) return;
+          if (!result) { return; }
           destroy();
           if (prevSelInfo.element.nodeType === 3) {
             prevSelInfo.element.parentNode.focus();
           } else {
             prevSelInfo.element.focus();
           }
-          document.execCommand("selectAll", false);
+          document.execCommand('selectAll', false);
           if (prevSelInfo.isInputElement) {
             prevSelInfo.element.setSelectionRange(
               prevSelInfo.selStart,
@@ -1274,7 +1274,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
             selection.removeAllRanges();
             selection.addRange(prevSelInfo.range);
           }
-          document.execCommand("insertText", false, result);
+          document.execCommand('insertText', false, result);
         });
       }
     }

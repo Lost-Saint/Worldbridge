@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const twpI18n = (function() {
   const twpI18n = {};
@@ -20,7 +20,7 @@ const twpI18n = (function() {
       if (messages) {
         messageName = messageName.toLowerCase();
         const message = messages.find((m) => m.name === messageName);
-        if (!message) return chrome.i18n.getMessage(messageName, substitutions);
+        if (!message) { return chrome.i18n.getMessage(messageName, substitutions); }
 
         /** @type {string} */
         let finalMessage = message.message;
@@ -34,19 +34,19 @@ const twpI18n = (function() {
             if (index) {
               if (substitutions instanceof Array) {
                 content = content.replaceAll(
-                  "$" + index,
+                  '$' + index,
                   String(substitutions[index - 1]),
                 );
               } else if (index === 1) {
                 content = content.replaceAll(
-                  "$" + index,
+                  '$' + index,
                   String(substitutions),
                 );
               } else {
-                content = content.replaceAll("$" + index, "");
+                content = content.replaceAll('$' + index, '');
               }
             }
-            finalMessage = finalMessage.replaceAll("$" + key + "$", content);
+            finalMessage = finalMessage.replaceAll('$' + key + '$', content);
           }
         }
 
@@ -73,7 +73,7 @@ const twpI18n = (function() {
     ) {
       let text = twpI18n.getMessage(
         element.getAttribute(`data-i18n-${attributeName}`),
-        element.getAttribute("data-i18n-ph-value"),
+        element.getAttribute('data-i18n-ph-value'),
       );
       if (!text) {
         continue;
@@ -88,10 +88,10 @@ const twpI18n = (function() {
    * @param {Document | HTMLElement | ShadowRoot} root
    */
   twpI18n.translateDocument = function(root = document) {
-    for (const element of root.querySelectorAll("[data-i18n]")) {
+    for (const element of root.querySelectorAll('[data-i18n]')) {
       let text = twpI18n.getMessage(
-        element.getAttribute("data-i18n"),
-        element.getAttribute("data-i18n-ph-value"),
+        element.getAttribute('data-i18n'),
+        element.getAttribute('data-i18n-ph-value'),
       );
       if (!text) {
         continue;
@@ -99,9 +99,9 @@ const twpI18n = (function() {
       element.textContent = text;
     }
 
-    translateAttributes(root, "title");
-    translateAttributes(root, "placeholder");
-    translateAttributes(root, "label");
+    translateAttributes(root, 'title');
+    translateAttributes(root, 'placeholder');
+    translateAttributes(root, 'label');
   };
 
   /**
@@ -109,9 +109,9 @@ const twpI18n = (function() {
    * @returns {Promise<void>}
    */
   twpI18n.updateUiMessages = async (temporaryLanguage = null) => {
-    let uiLanguage = temporaryLanguage || twpConfig.get("uiLanguage");
-    uiLanguage = uiLanguage.replace("-", "_");
-    if (uiLanguage === "default") {
+    let uiLanguage = temporaryLanguage || twpConfig.get('uiLanguage');
+    uiLanguage = uiLanguage.replace('-', '_');
+    if (uiLanguage === 'default') {
       messages = null;
     } else {
       return await fetch(
@@ -136,7 +136,7 @@ const twpI18n = (function() {
     twpI18n.updateUiMessages();
 
     twpConfig.onChanged(function(name, newValue) {
-      if (name === "uiLanguage") {
+      if (name === 'uiLanguage') {
         twpI18n.updateUiMessages();
       }
     });

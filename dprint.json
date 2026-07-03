@@ -2,9 +2,18 @@
   "lineWidth": 100,
   "indentWidth": 2,
   "useTabs": false,
-  "includes": [
-    "**/*.{css,html,js,json,md,svg,xml,yaml,yml}"
-  ],
+  "includes": ["**/*.{css,html,js,json,md,svg,xml,yaml,yml}"],
+  "typescript": {
+    "semiColons": "always",
+    "quoteStyle": "preferSingle",
+    "quoteProps": "asNeeded",
+    "operatorPosition": "sameLine",
+    "useBraces": "always",
+    "arrowFunction.useParentheses": "force"
+  },
+  "markdown": {
+    "textWrap": "always"
+  },
   "excludes": [
     "**/build",
     "**/dist",

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const translationCache = (function() {
   const translationCache = {};
@@ -20,7 +20,7 @@ const translationCache = (function() {
      */
     static async getTableSize(db, storageName) {
       return await new Promise((resolve, reject) => {
-        if (db == null) return reject();
+        if (db == null) { return reject(); }
         let size = 0;
         const transaction = db
           .transaction([storageName])
@@ -38,7 +38,7 @@ const translationCache = (function() {
             resolve(size);
           }
         };
-        transaction.onerror = (err) => reject("error in " + storageName + ": " + err);
+        transaction.onerror = (err) => reject('error in ' + storageName + ': ' + err);
       });
     }
 
@@ -92,15 +92,15 @@ const translationCache = (function() {
     static humanReadableSize(bytes) {
       const thresh = 1024;
       if (Math.abs(bytes) < thresh) {
-        return bytes + " B";
+        return bytes + ' B';
       }
-      const units = ["KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+      const units = ['KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
       let u = -1;
       do {
         bytes /= thresh;
         ++u;
       } while (Math.abs(bytes) >= thresh && u < units.length - 1);
-      return bytes.toFixed(1) + " " + units[u];
+      return bytes.toFixed(1) + ' ' + units[u];
     }
 
     /**
@@ -113,9 +113,9 @@ const translationCache = (function() {
      */
     static async stringToSHA1String(message) {
       const msgUint8 = new TextEncoder().encode(message); // encode as (utf-8) Uint8Array
-      const hashBuffer = await crypto.subtle.digest("SHA-1", msgUint8); // hash the message
+      const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8); // hash the message
       const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
-      return hashArray.map((b) => b.toString(16).padStart(2, "0")).join(""); // convert bytes to hex string
+      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
     }
   }
 
@@ -144,7 +144,7 @@ const translationCache = (function() {
      * @returns {Promise<boolean>}
      */
     async start() {
-      if (this.promiseStartingCache) return await this.promiseStartingCache;
+      if (this.promiseStartingCache) { return await this.promiseStartingCache; }
       this.promiseStartingCache = new Promise((resolve) => {
         Cache.openDataBaseCache(
           this.translationService,
@@ -172,7 +172,7 @@ const translationCache = (function() {
      * Closes the database.
      */
     close() {
-      if (this.db) this.db.close();
+      if (this.db) { this.db.close(); }
       this.db = null;
     }
 
@@ -183,11 +183,11 @@ const translationCache = (function() {
      */
     async #queryInDB(origTextHash) {
       return await new Promise((resolve, reject) => {
-        if (!this.db) return reject();
+        if (!this.db) { return reject(); }
 
         const storageName = Cache.getCacheStorageName();
         const objectStore = this.db
-          .transaction([storageName], "readonly")
+          .transaction([storageName], 'readonly')
           .objectStore(storageName);
         const request = objectStore.get(origTextHash);
 
@@ -212,10 +212,10 @@ const translationCache = (function() {
       const hash = await Utils.stringToSHA1String(originalText);
 
       let translation = this.cache.get(hash);
-      if (translation) return translation;
+      if (translation) { return translation; }
 
       translation = await this.#queryInDB(hash);
-      if (translation) this.cache.set(hash, translation);
+      if (translation) { this.cache.set(hash, translation); }
 
       return translation;
     }
@@ -227,11 +227,11 @@ const translationCache = (function() {
      */
     async #addInDb(data) {
       return await new Promise((resolve) => {
-        if (!this.db) return resolve(false);
+        if (!this.db) { return resolve(false); }
 
         const storageName = Cache.getCacheStorageName();
         const objectStore = this.db
-          .transaction([storageName], "readwrite")
+          .transaction([storageName], 'readwrite')
           .objectStore(storageName);
         const request = objectStore.put(data);
 
@@ -253,7 +253,7 @@ const translationCache = (function() {
      * @param {string} detectedLanguage
      * @returns {Promise<boolean>}
      */
-    async add(originalText, translatedText, detectedLanguage = "und") {
+    async add(originalText, translatedText, detectedLanguage = 'und') {
       const hash = await Utils.stringToSHA1String(originalText);
       return await this.#addInDb({
         originalText,
@@ -285,7 +285,7 @@ const translationCache = (function() {
      * @returns {string} storageName
      */
     static getCacheStorageName() {
-      return "cache";
+      return 'cache';
     }
 
     /**
@@ -306,7 +306,7 @@ const translationCache = (function() {
 
         request.onerror = request.onblocked = (event) => {
           console.error(
-            "Error opening the database, switching to non-database mode",
+            'Error opening the database, switching to non-database mode',
             event,
           );
           reject();
@@ -317,7 +317,7 @@ const translationCache = (function() {
 
           for (const storageName of objectStorageNames) {
             db.createObjectStore(storageName, {
-              keyPath: "key",
+              keyPath: 'key',
             });
           }
         };
@@ -401,7 +401,7 @@ const translationCache = (function() {
      * Starts the connection to the database cacheList.
      */
     #openCacheList() {
-      const request = indexedDB.open("cacheList", 1);
+      const request = indexedDB.open('cacheList', 1);
 
       request.onsuccess = (event) => {
         this.dbCacheList = request.result;
@@ -414,15 +414,15 @@ const translationCache = (function() {
       };
 
       request.onerror = request.onblocked = (event) => {
-        console.error("Error opening the database", event);
+        console.error('Error opening the database', event);
         this.dbCacheList = null;
       };
 
       request.onupgradeneeded = (event) => {
         const db = request.result;
 
-        db.createObjectStore("cache_list", {
-          keyPath: "dbName",
+        db.createObjectStore('cache_list', {
+          keyPath: 'dbName',
         });
       };
     }
@@ -432,11 +432,11 @@ const translationCache = (function() {
      * @param {string} dbName
      */
     #addCacheList(dbName) {
-      if (!this.dbCacheList) return;
+      if (!this.dbCacheList) { return; }
 
-      const storageName = "cache_list";
+      const storageName = 'cache_list';
       const objectStore = this.dbCacheList
-        .transaction([storageName], "readwrite")
+        .transaction([storageName], 'readwrite')
         .objectStore(storageName);
       const request = objectStore.put({ dbName });
 
@@ -523,11 +523,11 @@ const translationCache = (function() {
      * @returns {Promise<string[]>}
      */
     async #getAllDBNames() {
-      if (!this.dbCacheList) return [];
+      if (!this.dbCacheList) { return []; }
       return await new Promise((resolve) => {
-        const storageName = "cache_list";
+        const storageName = 'cache_list';
         const objectStore = this.dbCacheList
-          .transaction([storageName], "readonly")
+          .transaction([storageName], 'readonly')
           .objectStore(storageName);
         const request = objectStore.getAllKeys();
 
@@ -554,7 +554,7 @@ const translationCache = (function() {
         /** @type {Array<Promise>} */
         const promises = [];
         this.list.forEach((cache, key) => {
-          if (cache) cache.close();
+          if (cache) { cache.close(); }
           promises.push(CacheList.deleteDatabase(key));
         });
         this.list.clear();
@@ -579,12 +579,12 @@ const translationCache = (function() {
         const DBDeleteRequest = indexedDB.deleteDatabase(dbName);
 
         DBDeleteRequest.onsuccess = () => {
-          console.info("Database deleted successfully");
+          console.info('Database deleted successfully');
           resolve(true);
         };
 
         DBDeleteRequest.onerror = () => {
-          console.warn("Error deleting database.");
+          console.warn('Error deleting database.');
           resolve(false);
         };
       });
@@ -684,22 +684,22 @@ const translationCache = (function() {
     try {
       // Deletes old translation cache.
       if (indexedDB && indexedDB.deleteDatabase) {
-        indexedDB.deleteDatabase("googleCache");
-        indexedDB.deleteDatabase("yandexCache");
-        indexedDB.deleteDatabase("bingCache");
+        indexedDB.deleteDatabase('googleCache');
+        indexedDB.deleteDatabase('yandexCache');
+        indexedDB.deleteDatabase('bingCache');
       }
       // Delete the new translation cache.
       await cacheList.deleteAll();
     } catch (e) {
       console.error(e);
     } finally {
-      if (reload) chrome.runtime.reload();
+      if (reload) { chrome.runtime.reload(); }
     }
   };
 
   let promiseCalculatingStorage = null;
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "getCacheSize") {
+    if (request.action === 'getCacheSize') {
       if (!promiseCalculatingStorage) {
         promiseCalculatingStorage = cacheList.calculateSize();
       }
@@ -713,11 +713,11 @@ const translationCache = (function() {
         .catch((e) => {
           console.error(e);
           promiseCalculatingStorage = null;
-          sendResponse("0B");
-          return "0B";
+          sendResponse('0B');
+          return '0B';
         });
       return true;
-    } else if (request.action === "deleteTranslationCache") {
+    } else if (request.action === 'deleteTranslationCache') {
       translationCache.deleteTranslationCache(request.reload);
     }
   });

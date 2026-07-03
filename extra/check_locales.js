@@ -1,13 +1,13 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 function getDirectories(path) {
   return fs.readdirSync(path).filter(function(file) {
-    return fs.statSync(path + "/" + file).isDirectory();
+    return fs.statSync(path + '/' + file).isDirectory();
   });
 }
 
-const langs = getDirectories(path.join(__dirname, "./result"));
+const langs = getDirectories(path.join(__dirname, './result'));
 
 const en_messages = require(path.join(
   __dirname,
@@ -52,7 +52,7 @@ for (const code of langs) {
           const placeHolderInMessage = messages[en_key].message.match(/\$\w+\$/g);
           if (placeHolderInMessage) {
             for (const placeHolder of en_vars) {
-              if (!placeHolderInMessage.includes("$" + placeHolder + "$")) {
+              if (!placeHolderInMessage.includes('$' + placeHolder + '$')) {
                 console.log(
                   `Placeholder "${placeHolder}" not found in "${en_key}" in "${code}"`,
                 );
@@ -66,5 +66,5 @@ for (const code of langs) {
     }
   }
 
-  console.log("=====================================");
+  console.log('=====================================');
 }

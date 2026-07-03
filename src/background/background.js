@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 // get mimetype
 var tabToMimeType = {};
@@ -7,27 +7,27 @@ chrome.webRequest.onHeadersReceived.addListener(
     if (details.tabId !== -1) {
       let contentTypeHeader = null;
       for (const header of details.responseHeaders) {
-        if (header.name.toLowerCase() === "content-type") {
+        if (header.name.toLowerCase() === 'content-type') {
           contentTypeHeader = header;
           break;
         }
       }
-      tabToMimeType[details.tabId] = contentTypeHeader && contentTypeHeader.value.split(";", 1)[0];
+      tabToMimeType[details.tabId] = contentTypeHeader && contentTypeHeader.value.split(';', 1)[0];
     }
   },
   {
-    urls: ["*://*/*"],
-    types: ["main_frame"],
+    urls: ['*://*/*'],
+    types: ['main_frame'],
   },
-  ["responseHeaders"],
+  ['responseHeaders'],
 );
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "getMainFramePageLanguageState") {
+  if (request.action === 'getMainFramePageLanguageState') {
     chrome.tabs.sendMessage(
       sender.tab.id,
       {
-        action: "getCurrentPageLanguageState",
+        action: 'getCurrentPageLanguageState',
       },
       {
         frameId: 0,
@@ -39,11 +39,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     );
 
     return true;
-  } else if (request.action === "getMainFrameTabLanguage") {
+  } else if (request.action === 'getMainFrameTabLanguage') {
     chrome.tabs.sendMessage(
       sender.tab.id,
       {
-        action: "getOriginalTabLanguage",
+        action: 'getOriginalTabLanguage',
       },
       {
         frameId: 0,
@@ -55,26 +55,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     );
 
     return true;
-  } else if (request.action === "setPageLanguageState") {
+  } else if (request.action === 'setPageLanguageState') {
     updateContextMenu(request.pageLanguageState);
-  } else if (request.action === "openOptionsPage") {
-    tabsCreate(chrome.runtime.getURL("/options/options.html"));
-  } else if (request.action === "openDonationPage") {
-    tabsCreate(chrome.runtime.getURL("/options/options.html#donation"));
-  } else if (request.action === "detectTabLanguage") {
+  } else if (request.action === 'openOptionsPage') {
+    tabsCreate(chrome.runtime.getURL('/options/options.html'));
+  } else if (request.action === 'openDonationPage') {
+    tabsCreate(chrome.runtime.getURL('/options/options.html#donation'));
+  } else if (request.action === 'detectTabLanguage') {
     if (!sender.tab) {
       // https://github.com/FilipePS/Traduzir-paginas-web/issues/478
-      sendResponse("und");
+      sendResponse('und');
       return;
     }
     try {
       if (
-        (platformInfo.isMobile.any && !platformInfo.isFirefox)
-        || (platformInfo.isDesktop.any && platformInfo.isOpera)
+        (platformInfo.isMobile.any && !platformInfo.isFirefox) ||
+        (platformInfo.isDesktop.any && platformInfo.isOpera)
       ) {
         chrome.tabs.sendMessage(
           sender.tab.id,
-          { action: "detectLanguageUsingTextContent" },
+          { action: 'detectLanguageUsingTextContent' },
           { frameId: 0 },
           (result) => sendResponse(result),
         );
@@ -86,30 +86,30 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     } catch (e) {
       console.error(e);
-      sendResponse("und");
+      sendResponse('und');
     }
 
     return true;
-  } else if (request.action === "getTabHostName") {
+  } else if (request.action === 'getTabHostName') {
     sendResponse(new URL(sender.tab.url).hostname);
-  } else if (request.action === "thisFrameIsInFocus") {
+  } else if (request.action === 'thisFrameIsInFocus') {
     chrome.tabs.sendMessage(
       sender.tab.id,
-      { action: "anotherFrameIsInFocus" },
+      { action: 'anotherFrameIsInFocus' },
       checkedLastError,
     );
-  } else if (request.action === "getTabMimeType") {
+  } else if (request.action === 'getTabMimeType') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       sendResponse(tabToMimeType[tabs[0].id]);
     });
     return true;
-  } else if (request.action === "restorePagesWithServiceNames") {
+  } else if (request.action === 'restorePagesWithServiceNames') {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
         chrome.tabs.sendMessage(tab.id, request, checkedLastError);
       });
     });
-  } else if (request.action == "authorizationToOpenOptions") {
+  } else if (request.action == 'authorizationToOpenOptions') {
     chrome.storage.local.set({
       authorizationToOpenOptions: request.authorizationToOpenOptions,
     });
@@ -117,101 +117,101 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 function updateTranslateSelectedContextMenu() {
-  if (typeof chrome.contextMenus !== "undefined") {
-    chrome.contextMenus.remove("translate-selected-text", checkedLastError);
-    if (twpConfig.get("showTranslateSelectedContextMenu") === "yes") {
+  if (typeof chrome.contextMenus !== 'undefined') {
+    chrome.contextMenus.remove('translate-selected-text', checkedLastError);
+    if (twpConfig.get('showTranslateSelectedContextMenu') === 'yes') {
       chrome.contextMenus.create({
-        id: "translate-selected-text",
-        title: twpI18n.getMessage("msgTranslateSelectedText"),
-        contexts: ["selection"],
+        id: 'translate-selected-text',
+        title: twpI18n.getMessage('msgTranslateSelectedText'),
+        contexts: ['selection'],
       });
     }
   }
 }
 
-function updateContextMenu(pageLanguageState = "original") {
+function updateContextMenu(pageLanguageState = 'original') {
   let contextMenuTitle;
-  if (pageLanguageState === "translated") {
-    contextMenuTitle = twpI18n.getMessage("btnRestore");
+  if (pageLanguageState === 'translated') {
+    contextMenuTitle = twpI18n.getMessage('btnRestore');
   } else {
-    const targetLanguage = twpConfig.get("targetLanguage");
+    const targetLanguage = twpConfig.get('targetLanguage');
     contextMenuTitle = twpI18n.getMessage(
-      "msgTranslateFor",
+      'msgTranslateFor',
       twpLang.codeToLanguage(targetLanguage),
     );
   }
-  if (typeof chrome.contextMenus != "undefined") {
-    chrome.contextMenus.remove("translate-web-page", checkedLastError);
+  if (typeof chrome.contextMenus != 'undefined') {
+    chrome.contextMenus.remove('translate-web-page', checkedLastError);
     chrome.contextMenus.remove(
-      "translate-restore-this-frame",
+      'translate-restore-this-frame',
       checkedLastError,
     );
 
-    if (twpConfig.get("enableIframePageTranslation") === "yes") {
-      if (twpConfig.get("showTranslatePageContextMenu") == "yes") {
+    if (twpConfig.get('enableIframePageTranslation') === 'yes') {
+      if (twpConfig.get('showTranslatePageContextMenu') == 'yes') {
         chrome.contextMenus.create({
-          id: "translate-web-page",
+          id: 'translate-web-page',
           title: contextMenuTitle,
-          contexts: ["page", "frame"],
+          contexts: ['page', 'frame'],
           documentUrlPatterns: [
-            "http://*/*",
-            "https://*/*",
-            "file://*/*",
-            "ftp://*/*",
+            'http://*/*',
+            'https://*/*',
+            'file://*/*',
+            'ftp://*/*',
           ],
         });
       }
     } else {
-      if (twpConfig.get("showTranslatePageContextMenu") == "yes") {
+      if (twpConfig.get('showTranslatePageContextMenu') == 'yes') {
         chrome.contextMenus.create({
-          id: "translate-web-page",
+          id: 'translate-web-page',
           title: contextMenuTitle,
-          contexts: ["page"],
+          contexts: ['page'],
           documentUrlPatterns: [
-            "http://*/*",
-            "https://*/*",
-            "file://*/*",
-            "ftp://*/*",
+            'http://*/*',
+            'https://*/*',
+            'file://*/*',
+            'ftp://*/*',
           ],
         });
       }
 
       chrome.contextMenus.create({
-        id: "translate-restore-this-frame",
-        title: twpI18n.getMessage("btnTranslateRestoreThisFrame"),
-        contexts: ["frame"],
-        documentUrlPatterns: ["http://*/*", "https://*/*"],
+        id: 'translate-restore-this-frame',
+        title: twpI18n.getMessage('btnTranslateRestoreThisFrame'),
+        contexts: ['frame'],
+        documentUrlPatterns: ['http://*/*', 'https://*/*'],
       });
     }
   }
 }
 
 chrome.runtime.onInstalled.addListener((details) => {
-  if (details.reason == "install") {
-    tabsCreate(chrome.runtime.getURL("/options/options.html"));
+  if (details.reason == 'install') {
+    tabsCreate(chrome.runtime.getURL('/options/options.html'));
     twpConfig.onReady(async () => {
-      if (chrome.i18n.getUILanguage() === "zh-CN") {
-        twpConfig.set("pageTranslatorService", "bing");
-        twpConfig.set("textTranslatorService", "bing");
+      if (chrome.i18n.getUILanguage() === 'zh-CN') {
+        twpConfig.set('pageTranslatorService', 'bing');
+        twpConfig.set('textTranslatorService', 'bing');
       }
     });
   } else if (
-    details.reason == "update"
-    && chrome.runtime.getManifest().version != details.previousVersion
+    details.reason == 'update' &&
+    chrome.runtime.getManifest().version != details.previousVersion
   ) {
     twpConfig.onReady(async () => {
       if (platformInfo.isMobile.any) {
-        if (details.previousVersion.split(".")[0] === "9") {
-          twpConfig.set("neverTranslateLangs", []);
-          twpConfig.set("neverTranslateSites", []);
-          twpConfig.set("alwaysTranslateLangs", []);
-          twpConfig.set("alwaysTranslateSites", []);
+        if (details.previousVersion.split('.')[0] === '9') {
+          twpConfig.set('neverTranslateLangs', []);
+          twpConfig.set('neverTranslateSites', []);
+          twpConfig.set('alwaysTranslateLangs', []);
+          twpConfig.set('alwaysTranslateSites', []);
         }
         return;
       }
-      if (twpConfig.get("showReleaseNotes") !== "yes") return;
+      if (twpConfig.get('showReleaseNotes') !== 'yes') { return; }
       let lastTimeShowingReleaseNotes = twpConfig.get(
-        "lastTimeShowingReleaseNotes",
+        'lastTimeShowingReleaseNotes',
       );
       let showReleaseNotes = false;
       if (lastTimeShowingReleaseNotes) {
@@ -221,7 +221,7 @@ chrome.runtime.onInstalled.addListener((details) => {
           showReleaseNotes = true;
           lastTimeShowingReleaseNotes = Date.now();
           twpConfig.set(
-            "lastTimeShowingReleaseNotes",
+            'lastTimeShowingReleaseNotes',
             lastTimeShowingReleaseNotes,
           );
         }
@@ -229,13 +229,13 @@ chrome.runtime.onInstalled.addListener((details) => {
         showReleaseNotes = true;
         lastTimeShowingReleaseNotes = Date.now();
         twpConfig.set(
-          "lastTimeShowingReleaseNotes",
+          'lastTimeShowingReleaseNotes',
           lastTimeShowingReleaseNotes,
         );
       }
       if (showReleaseNotes) {
         tabsCreate(
-          chrome.runtime.getURL("/options/options.html#release_notes"),
+          chrome.runtime.getURL('/options/options.html#release_notes'),
         );
       }
     });
@@ -244,43 +244,43 @@ chrome.runtime.onInstalled.addListener((details) => {
     });
     twpConfig.onReady(async () => {
       twpConfig.set(
-        "textTranslatorService",
-        twpConfig.get("enabledServices")[0],
+        'textTranslatorService',
+        twpConfig.get('enabledServices')[0],
       );
     });
     twpConfig.onReady(async () => {
-      twpConfig.set("proxyServers", {});
+      twpConfig.set('proxyServers', {});
     });
   }
 
   twpConfig.onReady(async () => {
     if (platformInfo.isMobile.any) {
-      const enabledServices = twpConfig.get("enabledServices");
-      const index = enabledServices.indexOf("deepl");
+      const enabledServices = twpConfig.get('enabledServices');
+      const index = enabledServices.indexOf('deepl');
       if (index !== -1) {
         enabledServices.splice(index, 1);
-        twpConfig.set("enabledServices", enabledServices);
+        twpConfig.set('enabledServices', enabledServices);
       }
     }
   });
 });
 
 function resetPageAction(tabId, forceShow = false) {
-  if (!chrome.pageAction) return;
-  if (twpConfig.get("translateClickingOnce") === "yes" && !forceShow) {
+  if (!chrome.pageAction) { return; }
+  if (twpConfig.get('translateClickingOnce') === 'yes' && !forceShow) {
     chrome.pageAction.setPopup({
-      popup: "",
+      popup: '',
       tabId,
     });
   } else {
-    if (twpConfig.get("useOldPopup") === "yes") {
+    if (twpConfig.get('useOldPopup') === 'yes') {
       chrome.pageAction.setPopup({
-        popup: "popup/old-popup.html",
+        popup: 'popup/old-popup.html',
         tabId,
       });
     } else {
       chrome.pageAction.setPopup({
-        popup: "popup/popup.html",
+        popup: 'popup/popup.html',
         tabId,
       });
     }
@@ -288,29 +288,29 @@ function resetPageAction(tabId, forceShow = false) {
 }
 
 function resetBrowserAction(forceShow = false) {
-  if (twpConfig.get("translateClickingOnce") === "yes" && !forceShow) {
+  if (twpConfig.get('translateClickingOnce') === 'yes' && !forceShow) {
     chrome.browserAction.setPopup({
-      popup: "",
+      popup: '',
     });
   } else {
-    if (twpConfig.get("useOldPopup") === "yes") {
+    if (twpConfig.get('useOldPopup') === 'yes') {
       chrome.browserAction.setPopup({
-        popup: "popup/old-popup.html",
+        popup: 'popup/old-popup.html',
       });
     } else {
       chrome.browserAction.setPopup({
-        popup: "popup/popup.html",
+        popup: 'popup/popup.html',
       });
     }
   }
 }
 
 function sendToggleTranslationMessage(tabId) {
-  if (twpConfig.get("enableIframePageTranslation") === "yes") {
+  if (twpConfig.get('enableIframePageTranslation') === 'yes') {
     chrome.tabs.sendMessage(
       tabId,
       {
-        action: "toggle-translation",
+        action: 'toggle-translation',
       },
       checkedLastError,
     );
@@ -318,7 +318,7 @@ function sendToggleTranslationMessage(tabId) {
     chrome.tabs.sendMessage(
       tabId,
       {
-        action: "toggle-translation",
+        action: 'toggle-translation',
       },
       { frameId: 0 },
       checkedLastError,
@@ -327,11 +327,11 @@ function sendToggleTranslationMessage(tabId) {
 }
 
 function sendTranslatePageMessage(tabId, targetLanguage) {
-  if (twpConfig.get("enableIframePageTranslation") === "yes") {
+  if (twpConfig.get('enableIframePageTranslation') === 'yes') {
     chrome.tabs.sendMessage(
       tabId,
       {
-        action: "translatePage",
+        action: 'translatePage',
         targetLanguage,
       },
       checkedLastError,
@@ -340,7 +340,7 @@ function sendTranslatePageMessage(tabId, targetLanguage) {
     chrome.tabs.sendMessage(
       tabId,
       {
-        action: "translatePage",
+        action: 'translatePage',
         targetLanguage,
       },
       { frameId: 0 },
@@ -349,44 +349,44 @@ function sendTranslatePageMessage(tabId, targetLanguage) {
   }
 }
 
-if (typeof chrome.contextMenus !== "undefined") {
+if (typeof chrome.contextMenus !== 'undefined') {
   const updateActionContextMenu = () => {
-    chrome.contextMenus.remove("browserAction-showPopup", checkedLastError);
-    chrome.contextMenus.remove("pageAction-showPopup", checkedLastError);
-    chrome.contextMenus.remove("never-translate", checkedLastError);
-    chrome.contextMenus.remove("more-options", checkedLastError);
-    chrome.contextMenus.remove("browserAction-translate-pdf", checkedLastError);
-    chrome.contextMenus.remove("pageAction-translate-pdf", checkedLastError);
+    chrome.contextMenus.remove('browserAction-showPopup', checkedLastError);
+    chrome.contextMenus.remove('pageAction-showPopup', checkedLastError);
+    chrome.contextMenus.remove('never-translate', checkedLastError);
+    chrome.contextMenus.remove('more-options', checkedLastError);
+    chrome.contextMenus.remove('browserAction-translate-pdf', checkedLastError);
+    chrome.contextMenus.remove('pageAction-translate-pdf', checkedLastError);
 
     chrome.contextMenus.create({
-      id: "browserAction-showPopup",
-      title: twpI18n.getMessage("btnShowPopup"),
-      contexts: ["browser_action"],
+      id: 'browserAction-showPopup',
+      title: twpI18n.getMessage('btnShowPopup'),
+      contexts: ['browser_action'],
     });
     chrome.contextMenus.create({
-      id: "pageAction-showPopup",
-      title: twpI18n.getMessage("btnShowPopup"),
-      contexts: ["page_action"],
+      id: 'pageAction-showPopup',
+      title: twpI18n.getMessage('btnShowPopup'),
+      contexts: ['page_action'],
     });
     chrome.contextMenus.create({
-      id: "never-translate",
-      title: twpI18n.getMessage("btnNeverTranslate"),
-      contexts: ["browser_action", "page_action"],
+      id: 'never-translate',
+      title: twpI18n.getMessage('btnNeverTranslate'),
+      contexts: ['browser_action', 'page_action'],
     });
     chrome.contextMenus.create({
-      id: "more-options",
-      title: twpI18n.getMessage("btnMoreOptions"),
-      contexts: ["browser_action", "page_action"],
+      id: 'more-options',
+      title: twpI18n.getMessage('btnMoreOptions'),
+      contexts: ['browser_action', 'page_action'],
     });
     chrome.contextMenus.create({
-      id: "browserAction-translate-pdf",
-      title: twpI18n.getMessage("msgTranslatePDF"),
-      contexts: ["browser_action"],
+      id: 'browserAction-translate-pdf',
+      title: twpI18n.getMessage('msgTranslatePDF'),
+      contexts: ['browser_action'],
     });
     chrome.contextMenus.create({
-      id: "pageAction-translate-pdf",
-      title: twpI18n.getMessage("msgTranslatePDF"),
-      contexts: ["page_action"],
+      id: 'pageAction-translate-pdf',
+      title: twpI18n.getMessage('msgTranslatePDF'),
+      contexts: ['page_action'],
     });
   };
   updateActionContextMenu();
@@ -399,38 +399,38 @@ if (typeof chrome.contextMenus !== "undefined") {
   });
 
   chrome.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId == "translate-web-page") {
+    if (info.menuItemId == 'translate-web-page') {
       const mimeType = tabToMimeType[tab.id];
       if (
-        mimeType
-        && mimeType.toLowerCase() === "application/pdf"
-        && chrome.pageAction
-        && chrome.pageAction.openPopup
+        mimeType &&
+        mimeType.toLowerCase() === 'application/pdf' &&
+        chrome.pageAction &&
+        chrome.pageAction.openPopup
       ) {
         chrome.pageAction.openPopup();
       } else {
         sendToggleTranslationMessage(tab.id);
       }
-    } else if (info.menuItemId == "translate-restore-this-frame") {
+    } else if (info.menuItemId == 'translate-restore-this-frame') {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.tabs.sendMessage(
           tab.id,
           {
-            action: "toggle-translation",
+            action: 'toggle-translation',
           },
           { frameId: info.frameId },
           checkedLastError,
         );
       });
-    } else if (info.menuItemId == "translate-selected-text") {
+    } else if (info.menuItemId == 'translate-selected-text') {
       if (
-        chrome.pageAction
-        && chrome.pageAction.openPopup
-        && (!tab || !tabHasContentScript[tab.id] || tab.isInReaderMode)
+        chrome.pageAction &&
+        chrome.pageAction.openPopup &&
+        (!tab || !tabHasContentScript[tab.id] || tab.isInReaderMode)
       ) {
         chrome.pageAction.setPopup({
-          popup: "popup/popup-translate-text.html#text="
-            + encodeURIComponent(info.selectionText),
+          popup: 'popup/popup-translate-text.html#text=' +
+            encodeURIComponent(info.selectionText),
           tabId: tab?.id || currentTabId,
         });
         chrome.pageAction.openPopup();
@@ -441,13 +441,13 @@ if (typeof chrome.contextMenus !== "undefined") {
         chrome.tabs.sendMessage(
           tab.id,
           {
-            action: "TranslateSelectedText",
+            action: 'TranslateSelectedText',
             selectionText: info.selectionText,
           },
           checkedLastError,
         );
       }
-    } else if (info.menuItemId == "browserAction-showPopup") {
+    } else if (info.menuItemId == 'browserAction-showPopup') {
       resetBrowserAction(true);
 
       if (chrome.browserAction.openPopup) {
@@ -455,7 +455,7 @@ if (typeof chrome.contextMenus !== "undefined") {
       }
 
       resetBrowserAction();
-    } else if (info.menuItemId == "pageAction-showPopup") {
+    } else if (info.menuItemId == 'pageAction-showPopup') {
       resetPageAction(tab.id, true);
 
       if (chrome.pageAction) {
@@ -463,32 +463,32 @@ if (typeof chrome.contextMenus !== "undefined") {
       }
 
       resetPageAction(tab.id);
-    } else if (info.menuItemId == "never-translate") {
+    } else if (info.menuItemId == 'never-translate') {
       const hostname = new URL(tab.url).hostname;
       twpConfig.addSiteToNeverTranslate(hostname);
-    } else if (info.menuItemId == "more-options") {
-      tabsCreate(chrome.runtime.getURL("/options/options.html"));
-    } else if (info.menuItemId == "browserAction-translate-pdf") {
+    } else if (info.menuItemId == 'more-options') {
+      tabsCreate(chrome.runtime.getURL('/options/options.html'));
+    } else if (info.menuItemId == 'browserAction-translate-pdf') {
       const mimeType = tabToMimeType[tab.id];
       if (
-        mimeType
-        && mimeType.toLowerCase() === "application/pdf"
-        && typeof chrome.browserAction.openPopup !== "undefined"
+        mimeType &&
+        mimeType.toLowerCase() === 'application/pdf' &&
+        typeof chrome.browserAction.openPopup !== 'undefined'
       ) {
         chrome.browserAction.openPopup();
       } else {
-        tabsCreate("https://pdf.translatewebpages.org/");
+        tabsCreate('https://pdf.translatewebpages.org/');
       }
-    } else if (info.menuItemId == "pageAction-translate-pdf") {
+    } else if (info.menuItemId == 'pageAction-translate-pdf') {
       const mimeType = tabToMimeType[tab.id];
       if (
-        mimeType
-        && mimeType.toLowerCase() === "application/pdf"
-        && typeof chrome.pageAction.openPopup !== "undefined"
+        mimeType &&
+        mimeType.toLowerCase() === 'application/pdf' &&
+        typeof chrome.pageAction.openPopup !== 'undefined'
       ) {
         chrome.pageAction.openPopup();
       } else {
-        tabsCreate("https://pdf.translatewebpages.org/");
+        tabsCreate('https://pdf.translatewebpages.org/');
       }
     }
   });
@@ -501,7 +501,7 @@ if (typeof chrome.contextMenus !== "undefined") {
     chrome.tabs.sendMessage(
       activeInfo.tabId,
       {
-        action: "getCurrentPageLanguageState",
+        action: 'getCurrentPageLanguageState',
       },
       {
         frameId: 0,
@@ -516,13 +516,13 @@ if (typeof chrome.contextMenus !== "undefined") {
   });
 
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (tab.active && changeInfo.status == "loading") {
+    if (tab.active && changeInfo.status == 'loading') {
       twpConfig.onReady(() => updateContextMenu());
-    } else if (changeInfo.status == "complete") {
+    } else if (changeInfo.status == 'complete') {
       chrome.tabs.sendMessage(
         tabId,
         {
-          action: "contentScriptIsInjected",
+          action: 'contentScriptIsInjected',
         },
         {
           frameId: 0,
@@ -544,7 +544,7 @@ if (typeof chrome.contextMenus !== "undefined") {
       chrome.tabs.sendMessage(
         tab.id,
         {
-          action: "contentScriptIsInjected",
+          action: 'contentScriptIsInjected',
         },
         {
           frameId: 0,
@@ -569,7 +569,7 @@ twpConfig.onReady(() => {
       }));
 
     chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-      if (changeInfo.status == "loading" && chrome.pageAction) {
+      if (changeInfo.status == 'loading' && chrome.pageAction) {
         chrome.pageAction.hide(tabId);
       }
     });
@@ -578,7 +578,7 @@ twpConfig.onReady(() => {
       chrome.tabs.sendMessage(
         tab.id,
         {
-          action: "showPopupMobile",
+          action: 'showPopupMobile',
         },
         {
           frameId: 0,
@@ -589,13 +589,13 @@ twpConfig.onReady(() => {
   } else {
     if (chrome.pageAction) {
       chrome.pageAction.onClicked.addListener((tab) => {
-        if (twpConfig.get("translateClickingOnce") === "yes") {
+        if (twpConfig.get('translateClickingOnce') === 'yes') {
           sendToggleTranslationMessage(tab.id);
         }
       });
     }
     chrome.browserAction.onClicked.addListener((tab) => {
-      if (twpConfig.get("translateClickingOnce") === "yes") {
+      if (twpConfig.get('translateClickingOnce') === 'yes') {
         sendToggleTranslationMessage(tab.id);
       }
     });
@@ -604,10 +604,10 @@ twpConfig.onReady(() => {
 
     twpConfig.onChanged((name, newvalue) => {
       switch (name) {
-        case "useOldPopup":
+        case 'useOldPopup':
           resetBrowserAction();
           break;
-        case "translateClickingOnce":
+        case 'translateClickingOnce':
           resetBrowserAction();
           chrome.tabs.query(
             {
@@ -623,7 +623,7 @@ twpConfig.onReady(() => {
     });
 
     {
-      let pageLanguageState = "original";
+      let pageLanguageState = 'original';
 
       // https://github.com/FilipePS/Traduzir-paginas-web/issues/548
       const isFirefoxAlpenglow = function(theme) {
@@ -631,12 +631,12 @@ twpConfig.onReady(() => {
         try {
           if (
             [
-              "{\"additional_backgrounds_alignment\":[\"right top\",\"left top\",\"right top\"],\"additional_backgrounds_tiling\":[\"no-repeat\",\"no-repeat\",\"repeat-x\"],\"color_scheme\":null,\"content_color_scheme\":null,\"zap_gradient\":\"linear-gradient(90deg, #9059FF 0%, #FF4AA2 52.08%, #FFBD4F 100%)\"}",
-              "{\"additional_backgrounds_alignment\":[\"right top\",\"left top\",\"right top\"],\"additional_backgrounds_tiling\":[\"no-repeat\",\"no-repeat\",\"repeat-x\"],\"color_scheme\":null,\"content_color_scheme\":null}",
-            ].includes(JSON.stringify(theme.properties))
-            && [
-              "{\"accentcolor\":null,\"bookmark_text\":\"hsla(261, 53%, 15%, 1)\",\"button_background_active\":\"hsla(240, 26%, 11%, .16)\",\"button_background_hover\":\"hsla(240, 26%, 11%, .08)\",\"frame\":\"hsla(240, 20%, 98%, 1)\",\"frame_inactive\":null,\"icons\":\"hsla(258, 66%, 48%, 1)\",\"icons_attention\":\"hsla(180, 100%, 32%, 1)\",\"ntp_background\":\"#F9F9FB\",\"ntp_card_background\":null,\"ntp_text\":\"hsla(261, 53%, 15%, 1)\",\"popup\":\"hsla(254, 46%, 21%, 1)\",\"popup_border\":\"hsla(255, 100%, 94%, .32)\",\"popup_highlight\":\"hsla(255, 100%, 94%, .12)\",\"popup_highlight_text\":\"hsla(0, 0%, 100%, 1)\",\"popup_text\":\"hsla(255, 100%, 94%, 1)\",\"sidebar\":\"hsla(240, 15%, 95%, 1)\",\"sidebar_border\":\"hsla(261, 53%, 15%, .24)\",\"sidebar_highlight\":\"hsla(265, 100%, 72%, 1)\",\"sidebar_highlight_text\":\"hsla(0, 0%, 100%, 1)\",\"sidebar_text\":\"hsla(261, 53%, 15%, 1)\",\"tab_background_separator\":\"hsla(261, 53%, 15%, 1)\",\"tab_background_text\":\"hsla(261, 53%, 15%, 1)\",\"tab_line\":\"hsla(265, 100%, 72%, 1)\",\"tab_loading\":\"hsla(265, 100%, 72%, 1)\",\"tab_selected\":null,\"tab_text\":\"hsla(261, 53%, 15%, 1)\",\"textcolor\":null,\"toolbar\":\"hsla(0, 0%, 100%, .76)\",\"toolbar_bottom_separator\":\"hsla(261, 53%, 15%, .32)\",\"toolbar_field\":\"hsla(0, 0%, 100%, .8)\",\"toolbar_field_border\":\"transparent\",\"toolbar_field_border_focus\":\"hsla(265, 100%, 72%, 1)\",\"toolbar_field_focus\":\"hsla(261, 53%, 15%, .96)\",\"toolbar_field_highlight\":\"hsla(265, 100%, 72%, .32)\",\"toolbar_field_highlight_text\":null,\"toolbar_field_separator\":null,\"toolbar_field_text\":\"hsla(261, 53%, 15%, 1)\",\"toolbar_field_text_focus\":\"hsla(255, 100%, 94%, 1)\",\"toolbar_text\":\"hsla(261, 53%, 15%, 1)\",\"toolbar_top_separator\":\"transparent\",\"toolbar_vertical_separator\":\"hsla(261, 53%, 15%, .2)\",\"focus_outline\":\"hsla(258, 65%, 48%, 1)\"}",
-              "{\"accentcolor\":null,\"bookmark_text\":\"hsla(261, 53%, 15%, 1)\",\"button_background_active\":\"hsla(240, 26%, 11%, .16)\",\"button_background_hover\":\"hsla(240, 26%, 11%, .08)\",\"frame\":\"hsla(240, 20%, 98%, 1)\",\"frame_inactive\":null,\"icons\":\"hsla(258, 66%, 48%, 1)\",\"icons_attention\":\"hsla(180, 100%, 32%, 1)\",\"ntp_background\":\"hsla(0, 0%, 100%, 1)\",\"ntp_card_background\":null,\"ntp_text\":\"hsla(261, 53%, 15%, 1)\",\"popup\":\"hsla(254, 46%, 21%, 1)\",\"popup_border\":\"hsla(255, 100%, 94%, .32)\",\"popup_highlight\":\"hsla(255, 100%, 94%, .12)\",\"popup_highlight_text\":null,\"popup_text\":\"hsla(255, 100%, 94%, 1)\",\"sidebar\":\"hsla(240, 15%, 95%, 1)\",\"sidebar_border\":\"hsla(261, 53%, 15%, .24)\",\"sidebar_highlight\":\"hsla(265, 100%, 72%, 1)\",\"sidebar_highlight_text\":\"hsla(0, 0%, 100%, 1)\",\"sidebar_text\":\"hsla(261, 53%, 15%, 1)\",\"tab_background_separator\":\"hsla(261, 53%, 15%, 1)\",\"tab_background_text\":\"hsla(261, 53%, 15%, 1)\",\"tab_line\":\"hsla(265, 100%, 72%, 1)\",\"tab_loading\":\"hsla(265, 100%, 72%, 1)\",\"tab_selected\":null,\"tab_text\":\"hsla(261, 53%, 15%, 1)\",\"textcolor\":null,\"toolbar\":\"hsla(0, 0%, 100%, .76)\",\"toolbar_bottom_separator\":\"hsla(261, 53%, 15%, .32)\",\"toolbar_field\":\"hsla(0, 0%, 100%, .8)\",\"toolbar_field_border\":\"hsla(261, 53%, 15%, .32)\",\"toolbar_field_border_focus\":\"hsla(265, 100%, 72%, 1)\",\"toolbar_field_focus\":\"hsla(261, 53%, 15%, .96)\",\"toolbar_field_highlight\":\"hsla(265, 100%, 72%, .32)\",\"toolbar_field_highlight_text\":null,\"toolbar_field_separator\":\"hsla(261, 53%, 15%, .32)\",\"toolbar_field_text\":\"hsla(261, 53%, 15%, 1)\",\"toolbar_field_text_focus\":\"hsla(255, 100%, 94%, 1)\",\"toolbar_text\":\"hsla(261, 53%, 15%, 1)\",\"toolbar_top_separator\":\"hsla(261, 53%, 15%, 1)\",\"toolbar_vertical_separator\":\"hsla(261, 53%, 15%, .08)\"}",
+              '{"additional_backgrounds_alignment":["right top","left top","right top"],"additional_backgrounds_tiling":["no-repeat","no-repeat","repeat-x"],"color_scheme":null,"content_color_scheme":null,"zap_gradient":"linear-gradient(90deg, #9059FF 0%, #FF4AA2 52.08%, #FFBD4F 100%)"}',
+              '{"additional_backgrounds_alignment":["right top","left top","right top"],"additional_backgrounds_tiling":["no-repeat","no-repeat","repeat-x"],"color_scheme":null,"content_color_scheme":null}',
+            ].includes(JSON.stringify(theme.properties)) &&
+            [
+              '{"accentcolor":null,"bookmark_text":"hsla(261, 53%, 15%, 1)","button_background_active":"hsla(240, 26%, 11%, .16)","button_background_hover":"hsla(240, 26%, 11%, .08)","frame":"hsla(240, 20%, 98%, 1)","frame_inactive":null,"icons":"hsla(258, 66%, 48%, 1)","icons_attention":"hsla(180, 100%, 32%, 1)","ntp_background":"#F9F9FB","ntp_card_background":null,"ntp_text":"hsla(261, 53%, 15%, 1)","popup":"hsla(254, 46%, 21%, 1)","popup_border":"hsla(255, 100%, 94%, .32)","popup_highlight":"hsla(255, 100%, 94%, .12)","popup_highlight_text":"hsla(0, 0%, 100%, 1)","popup_text":"hsla(255, 100%, 94%, 1)","sidebar":"hsla(240, 15%, 95%, 1)","sidebar_border":"hsla(261, 53%, 15%, .24)","sidebar_highlight":"hsla(265, 100%, 72%, 1)","sidebar_highlight_text":"hsla(0, 0%, 100%, 1)","sidebar_text":"hsla(261, 53%, 15%, 1)","tab_background_separator":"hsla(261, 53%, 15%, 1)","tab_background_text":"hsla(261, 53%, 15%, 1)","tab_line":"hsla(265, 100%, 72%, 1)","tab_loading":"hsla(265, 100%, 72%, 1)","tab_selected":null,"tab_text":"hsla(261, 53%, 15%, 1)","textcolor":null,"toolbar":"hsla(0, 0%, 100%, .76)","toolbar_bottom_separator":"hsla(261, 53%, 15%, .32)","toolbar_field":"hsla(0, 0%, 100%, .8)","toolbar_field_border":"transparent","toolbar_field_border_focus":"hsla(265, 100%, 72%, 1)","toolbar_field_focus":"hsla(261, 53%, 15%, .96)","toolbar_field_highlight":"hsla(265, 100%, 72%, .32)","toolbar_field_highlight_text":null,"toolbar_field_separator":null,"toolbar_field_text":"hsla(261, 53%, 15%, 1)","toolbar_field_text_focus":"hsla(255, 100%, 94%, 1)","toolbar_text":"hsla(261, 53%, 15%, 1)","toolbar_top_separator":"transparent","toolbar_vertical_separator":"hsla(261, 53%, 15%, .2)","focus_outline":"hsla(258, 65%, 48%, 1)"}',
+              '{"accentcolor":null,"bookmark_text":"hsla(261, 53%, 15%, 1)","button_background_active":"hsla(240, 26%, 11%, .16)","button_background_hover":"hsla(240, 26%, 11%, .08)","frame":"hsla(240, 20%, 98%, 1)","frame_inactive":null,"icons":"hsla(258, 66%, 48%, 1)","icons_attention":"hsla(180, 100%, 32%, 1)","ntp_background":"hsla(0, 0%, 100%, 1)","ntp_card_background":null,"ntp_text":"hsla(261, 53%, 15%, 1)","popup":"hsla(254, 46%, 21%, 1)","popup_border":"hsla(255, 100%, 94%, .32)","popup_highlight":"hsla(255, 100%, 94%, .12)","popup_highlight_text":null,"popup_text":"hsla(255, 100%, 94%, 1)","sidebar":"hsla(240, 15%, 95%, 1)","sidebar_border":"hsla(261, 53%, 15%, .24)","sidebar_highlight":"hsla(265, 100%, 72%, 1)","sidebar_highlight_text":"hsla(0, 0%, 100%, 1)","sidebar_text":"hsla(261, 53%, 15%, 1)","tab_background_separator":"hsla(261, 53%, 15%, 1)","tab_background_text":"hsla(261, 53%, 15%, 1)","tab_line":"hsla(265, 100%, 72%, 1)","tab_loading":"hsla(265, 100%, 72%, 1)","tab_selected":null,"tab_text":"hsla(261, 53%, 15%, 1)","textcolor":null,"toolbar":"hsla(0, 0%, 100%, .76)","toolbar_bottom_separator":"hsla(261, 53%, 15%, .32)","toolbar_field":"hsla(0, 0%, 100%, .8)","toolbar_field_border":"hsla(261, 53%, 15%, .32)","toolbar_field_border_focus":"hsla(265, 100%, 72%, 1)","toolbar_field_focus":"hsla(261, 53%, 15%, .96)","toolbar_field_highlight":"hsla(265, 100%, 72%, .32)","toolbar_field_highlight_text":null,"toolbar_field_separator":"hsla(261, 53%, 15%, .32)","toolbar_field_text":"hsla(261, 53%, 15%, 1)","toolbar_field_text_focus":"hsla(255, 100%, 94%, 1)","toolbar_text":"hsla(261, 53%, 15%, 1)","toolbar_top_separator":"hsla(261, 53%, 15%, 1)","toolbar_vertical_separator":"hsla(261, 53%, 15%, .08)"}',
             ].includes(JSON.stringify(theme.colors))
           ) {
             isFirefoxAlpenglowTheme = true;
@@ -652,7 +652,7 @@ twpConfig.onReady(() => {
       let themeColorAttention = null;
       let isUsingTheme = false;
       let isFirefoxAlpenglowTheme = false;
-      if (typeof browser != "undefined" && browser.theme) {
+      if (typeof browser != 'undefined' && browser.theme) {
         function onThemeUpdated() {
           browser.theme.getCurrent().then((theme) => {
             themeColorFrame = null;
@@ -691,13 +691,13 @@ twpConfig.onReady(() => {
       }
 
       let darkMode = false;
-      darkMode = matchMedia("(prefers-color-scheme: dark)").matches;
+      darkMode = matchMedia('(prefers-color-scheme: dark)').matches;
       updateIconInAllTabs();
 
-      matchMedia("(prefers-color-scheme: dark)").addEventListener(
-        "change",
+      matchMedia('(prefers-color-scheme: dark)').addEventListener(
+        'change',
         () => {
-          darkMode = matchMedia("(prefers-color-scheme: dark)").matches;
+          darkMode = matchMedia('(prefers-color-scheme: dark)').matches;
           updateIconInAllTabs();
         },
       );
@@ -715,25 +715,25 @@ twpConfig.onReady(() => {
 
         let svg64;
         if (
-          pageLanguageState === "translated"
-          && twpConfig.get("popupBlueWhenSiteIsTranslated") === "yes"
+          pageLanguageState === 'translated' &&
+          twpConfig.get('popupBlueWhenSiteIsTranslated') === 'yes'
         ) {
-          svg64 = svgXml.replace(/\$\(fill\-opacity\)\;/g, "1.0");
+          svg64 = svgXml.replace(/\$\(fill\-opacity\)\;/g, '1.0');
           if (isFirefoxAlpenglowTheme) {
             if (darkMode || incognito) {
               svg64 = btoa(
-                svg64.replace(/\$\(fill\)\;/g, "hsla(157, 100%, 66%, 1)"),
+                svg64.replace(/\$\(fill\)\;/g, 'hsla(157, 100%, 66%, 1)'),
               );
             } else {
               svg64 = btoa(
-                svg64.replace(/\$\(fill\)\;/g, "hsla(180, 100%, 32%, 1)"),
+                svg64.replace(/\$\(fill\)\;/g, 'hsla(180, 100%, 32%, 1)'),
               );
             }
           } else {
             if (
-              themeColorFrame
-              && themeColorToolbar
-              && themeColorToolbarField
+              themeColorFrame &&
+              themeColorToolbar &&
+              themeColorToolbarField
             ) {
               try {
                 darkMode = isDarkColor(
@@ -763,29 +763,29 @@ twpConfig.onReady(() => {
             if (themeColorAttention) {
               svg64 = btoa(svg64.replace(/\$\(fill\)\;/g, themeColorAttention));
             } else if (!isUsingTheme && (darkMode || incognito)) {
-              svg64 = btoa(svg64.replace(/\$\(fill\)\;/g, "rgb(0, 221, 255)"));
+              svg64 = btoa(svg64.replace(/\$\(fill\)\;/g, 'rgb(0, 221, 255)'));
             } else if (isUsingTheme && darkMode) {
-              svg64 = btoa(svg64.replace(/\$\(fill\)\;/g, "rgb(0, 221, 255)"));
+              svg64 = btoa(svg64.replace(/\$\(fill\)\;/g, 'rgb(0, 221, 255)'));
             } else {
-              svg64 = btoa(svg64.replace(/\$\(fill\)\;/g, "rgb(0, 97, 224)"));
+              svg64 = btoa(svg64.replace(/\$\(fill\)\;/g, 'rgb(0, 97, 224)'));
             }
           }
         } else {
           if (isUsingTheme) {
-            svg64 = svgXml.replace(/\$\(fill\-opacity\)\;/g, "0.9");
+            svg64 = svgXml.replace(/\$\(fill\-opacity\)\;/g, '0.9');
           } else if (darkMode || incognito) {
-            svg64 = svgXml.replace(/\$\(fill\-opacity\)\;/g, "1");
+            svg64 = svgXml.replace(/\$\(fill\-opacity\)\;/g, '1');
           } else {
-            svg64 = svgXml.replace(/\$\(fill\-opacity\)\;/g, "0.72");
+            svg64 = svgXml.replace(/\$\(fill\-opacity\)\;/g, '0.72');
           }
           if (isFirefoxAlpenglowTheme) {
             if (darkMode || incognito) {
               svg64 = btoa(
-                svg64.replace(/\$\(fill\)\;/g, "hsla(255, 100%, 94%, 1)"),
+                svg64.replace(/\$\(fill\)\;/g, 'hsla(255, 100%, 94%, 1)'),
               );
             } else {
               svg64 = btoa(
-                svg64.replace(/\$\(fill\)\;/g, "hsla(261, 53%, 15%, 1)"),
+                svg64.replace(/\$\(fill\)\;/g, 'hsla(261, 53%, 15%, 1)'),
               );
             }
           } else {
@@ -793,20 +793,20 @@ twpConfig.onReady(() => {
               svg64 = btoa(svg64.replace(/\$\(fill\)\;/g, themeColorFieldText));
             } else if (!isUsingTheme && (darkMode || incognito)) {
               svg64 = btoa(
-                svg64.replace(/\$\(fill\)\;/g, "rgb(251, 251, 254)"),
+                svg64.replace(/\$\(fill\)\;/g, 'rgb(251, 251, 254)'),
               );
             } else {
-              svg64 = btoa(svg64.replace(/\$\(fill\)\;/g, "rgb(21, 20, 26)"));
+              svg64 = btoa(svg64.replace(/\$\(fill\)\;/g, 'rgb(21, 20, 26)'));
             }
           }
         }
 
-        const b64Start = "data:image/svg+xml;base64,";
+        const b64Start = 'data:image/svg+xml;base64,';
         return b64Start + svg64;
       }
 
       function standardize_color(str1, str2, str3) {
-        var ctx = new OffscreenCanvas(1, 1).getContext("2d");
+        var ctx = new OffscreenCanvas(1, 1).getContext('2d');
         ctx.imageSmoothingEnabled = false;
         ctx.fillStyle = str1;
         ctx.fillRect(0, 0, 1, 1);
@@ -816,19 +816,19 @@ twpConfig.onReady(() => {
         ctx.fillRect(0, 0, 1, 1);
         var data = ctx.getImageData(0, 0, 1, 1).data;
         var rgb = [data[0], data[1], data[2]];
-        ctx.fillStyle = "rgb(" + rgb.join(",") + ")";
+        ctx.fillStyle = 'rgb(' + rgb.join(',') + ')';
         return ctx.fillStyle;
       }
 
       function hexToRgb(hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result
-          ? {
+        return result ?
+          {
             r: parseInt(result[1], 16),
             g: parseInt(result[2], 16),
             b: parseInt(result[3], 16),
-          }
-          : null;
+          } :
+          null;
       }
 
       function isDarkColor(hexColor) {
@@ -857,7 +857,7 @@ twpConfig.onReady(() => {
               path: getSVGIcon(incognito),
             });
 
-            if (twpConfig.get("showButtonInTheAddressBar") == "no") {
+            if (twpConfig.get('showButtonInTheAddressBar') == 'no') {
               chrome.pageAction.hide(tabId);
             } else {
               chrome.pageAction.show(tabId);
@@ -866,17 +866,17 @@ twpConfig.onReady(() => {
 
           if (chrome.browserAction) {
             if (
-              pageLanguageState === "translated"
-              && twpConfig.get("popupBlueWhenSiteIsTranslated") === "yes"
+              pageLanguageState === 'translated' &&
+              twpConfig.get('popupBlueWhenSiteIsTranslated') === 'yes'
             ) {
               chrome.browserAction.setIcon({
                 tabId: tabId,
-                path: "/icons/icon-32-translated.png",
+                path: '/icons/icon-32-translated.png',
               });
             } else {
               chrome.browserAction.setIcon({
                 tabId: tabId,
-                path: "/icons/icon-32.png",
+                path: '/icons/icon-32.png',
               });
             }
           }
@@ -888,14 +888,14 @@ twpConfig.onReady(() => {
       }
 
       chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-        if (changeInfo.status == "loading") {
-          pageLanguageState = "original";
+        if (changeInfo.status == 'loading') {
+          pageLanguageState = 'original';
           updateIcon(tabId);
-        } else if (changeInfo.status == "complete") {
+        } else if (changeInfo.status == 'complete') {
           chrome.tabs.sendMessage(
             tabId,
             {
-              action: "getCurrentPageLanguageState",
+              action: 'getCurrentPageLanguageState',
             },
             {
               frameId: 0,
@@ -912,12 +912,12 @@ twpConfig.onReady(() => {
       });
 
       chrome.tabs.onActivated.addListener((activeInfo) => {
-        pageLanguageState = "original";
+        pageLanguageState = 'original';
         updateIcon(activeInfo.tabId);
         chrome.tabs.sendMessage(
           activeInfo.tabId,
           {
-            action: "getCurrentPageLanguageState",
+            action: 'getCurrentPageLanguageState',
           },
           {
             frameId: 0,
@@ -933,7 +933,7 @@ twpConfig.onReady(() => {
       });
 
       chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-        if (request.action === "setPageLanguageState") {
+        if (request.action === 'setPageLanguageState') {
           pageLanguageState = request.pageLanguageState;
           updateIcon(sender.tab.id);
         }
@@ -941,10 +941,10 @@ twpConfig.onReady(() => {
 
       twpConfig.onChanged((name, newvalue) => {
         switch (name) {
-          case "useOldPopup":
+          case 'useOldPopup':
             updateIconInAllTabs();
             break;
-          case "showButtonInTheAddressBar":
+          case 'showButtonInTheAddressBar':
             updateIconInAllTabs();
             break;
         }
@@ -953,9 +953,9 @@ twpConfig.onReady(() => {
   }
 });
 
-if (typeof chrome.commands !== "undefined") {
+if (typeof chrome.commands !== 'undefined') {
   chrome.commands.onCommand.addListener((command) => {
-    if (command === "hotkey-toggle-translation") {
+    if (command === 'hotkey-toggle-translation') {
       chrome.tabs.query(
         {
           currentWindow: true,
@@ -963,7 +963,7 @@ if (typeof chrome.commands !== "undefined") {
         },
         (tabs) => sendToggleTranslationMessage(tabs[0].id),
       );
-    } else if (command === "hotkey-translate-selected-text") {
+    } else if (command === 'hotkey-translate-selected-text') {
       chrome.tabs.query(
         {
           currentWindow: true,
@@ -973,12 +973,12 @@ if (typeof chrome.commands !== "undefined") {
           chrome.tabs.sendMessage(
             tabs[0].id,
             {
-              action: "TranslateSelectedText",
+              action: 'TranslateSelectedText',
             },
             checkedLastError,
           ),
       );
-    } else if (command === "hotkey-swap-page-translation-service") {
+    } else if (command === 'hotkey-swap-page-translation-service') {
       chrome.tabs.query(
         {
           active: true,
@@ -988,13 +988,13 @@ if (typeof chrome.commands !== "undefined") {
           chrome.tabs.sendMessage(
             tabs[0].id,
             {
-              action: "swapTranslationService",
+              action: 'swapTranslationService',
               newServiceName: twpConfig.swapPageTranslationService(),
             },
             checkedLastError,
           ),
       );
-    } else if (command === "hotkey-show-original") {
+    } else if (command === 'hotkey-show-original') {
       chrome.tabs.query(
         {
           active: true,
@@ -1004,55 +1004,55 @@ if (typeof chrome.commands !== "undefined") {
           chrome.tabs.sendMessage(
             tabs[0].id,
             {
-              action: "translatePage",
-              targetLanguage: "original",
+              action: 'translatePage',
+              targetLanguage: 'original',
             },
             checkedLastError,
           ),
       );
-    } else if (command === "hotkey-translate-page-1") {
+    } else if (command === 'hotkey-translate-page-1') {
       chrome.tabs.query(
         {
           active: true,
           currentWindow: true,
         },
         (tabs) => {
-          twpConfig.setTargetLanguage(twpConfig.get("targetLanguages")[0]);
+          twpConfig.setTargetLanguage(twpConfig.get('targetLanguages')[0]);
           sendTranslatePageMessage(
             tabs[0].id,
-            twpConfig.get("targetLanguages")[0],
+            twpConfig.get('targetLanguages')[0],
           );
         },
       );
-    } else if (command === "hotkey-translate-page-2") {
+    } else if (command === 'hotkey-translate-page-2') {
       chrome.tabs.query(
         {
           active: true,
           currentWindow: true,
         },
         (tabs) => {
-          twpConfig.setTargetLanguage(twpConfig.get("targetLanguages")[1]);
+          twpConfig.setTargetLanguage(twpConfig.get('targetLanguages')[1]);
           sendTranslatePageMessage(
             tabs[0].id,
-            twpConfig.get("targetLanguages")[1],
+            twpConfig.get('targetLanguages')[1],
           );
         },
       );
-    } else if (command === "hotkey-translate-page-3") {
+    } else if (command === 'hotkey-translate-page-3') {
       chrome.tabs.query(
         {
           active: true,
           currentWindow: true,
         },
         (tabs) => {
-          twpConfig.setTargetLanguage(twpConfig.get("targetLanguages")[2]);
+          twpConfig.setTargetLanguage(twpConfig.get('targetLanguages')[2]);
           sendTranslatePageMessage(
             tabs[0].id,
-            twpConfig.get("targetLanguages")[2],
+            twpConfig.get('targetLanguages')[2],
           );
         },
       );
-    } else if (command === "hotkey-hot-translate-selected-text") {
+    } else if (command === 'hotkey-hot-translate-selected-text') {
       chrome.tabs.query(
         {
           active: true,
@@ -1062,7 +1062,7 @@ if (typeof chrome.commands !== "undefined") {
           chrome.tabs.sendMessage(
             tabs[0].id,
             {
-              action: "hotTranslateSelectedText",
+              action: 'hotTranslateSelectedText',
             },
             checkedLastError,
           );
@@ -1077,13 +1077,13 @@ twpConfig.onReady(async () => {
   updateTranslateSelectedContextMenu();
 
   twpConfig.onChanged((name, newvalue) => {
-    if (name === "showTranslateSelectedContextMenu") {
+    if (name === 'showTranslateSelectedContextMenu') {
       updateTranslateSelectedContextMenu();
     }
   });
 
-  if (!twpConfig.get("installDateTime")) {
-    twpConfig.set("installDateTime", Date.now());
+  if (!twpConfig.get('installDateTime')) {
+    twpConfig.set('installDateTime', Date.now());
   }
 });
 
@@ -1097,7 +1097,7 @@ twpConfig.onReady(async () => {
   }
 
   function runtimeOnMessage(request, sender, sendResponse) {
-    if (request.action === "setPageLanguageState") {
+    if (request.action === 'setPageLanguageState') {
       tabsInfo[sender.tab.id] = {
         pageLanguageState: request.pageLanguageState,
         host: new URL(sender.tab.url).host,
@@ -1114,7 +1114,7 @@ twpConfig.onReady(async () => {
   }
 
   function webNavigationOnBeforeNavigate(details) {
-    if (details.frameId !== 0) return;
+    if (details.frameId !== 0) { return; }
 
     const navInfo = navigationsInfo[details.tabId] || {
       sourceTabId: details.tabId,
@@ -1132,7 +1132,7 @@ twpConfig.onReady(async () => {
   }
 
   async function webNavigationOnCommitted(details) {
-    if (details.frameId !== 0) return;
+    if (details.frameId !== 0) { return; }
 
     const navInfo = navigationsInfo[details.tabId] || {
       sourceTabId: details.tabId,
@@ -1146,23 +1146,23 @@ twpConfig.onReady(async () => {
   }
 
   function webNavigationOnDOMContentLoaded(details) {
-    if (details.frameId !== 0) return;
+    if (details.frameId !== 0) { return; }
 
     const navInfo = navigationsInfo[details.tabId];
 
     if (navInfo && navInfo.sourceHost) {
       const host = new URL(details.url).host;
       if (
-        navInfo.transitionType === "link"
-        && navInfo.sourcePageLanguageState === "translated"
-        && navInfo.sourceHost === host
+        navInfo.transitionType === 'link' &&
+        navInfo.sourcePageLanguageState === 'translated' &&
+        navInfo.sourceHost === host
       ) {
         setTimeout(
           () =>
             chrome.tabs.sendMessage(
               details.tabId,
               {
-                action: "autoTranslateBecauseClickedALink",
+                action: 'autoTranslateBecauseClickedALink',
               },
               {
                 frameId: 0,
@@ -1179,7 +1179,7 @@ twpConfig.onReady(async () => {
 
   function enableTranslationOnClickingALink() {
     disableTranslationOnClickingALink();
-    if (!chrome.webNavigation) return;
+    if (!chrome.webNavigation) { return; }
 
     chrome.tabs.onRemoved.addListener(tabsOnRemoved);
     chrome.runtime.onMessage.addListener(runtimeOnMessage);
@@ -1214,13 +1214,13 @@ twpConfig.onReady(async () => {
         webNavigationOnDOMContentLoaded,
       );
     } else {
-      console.info("No webNavigation permission");
+      console.info('No webNavigation permission');
     }
   }
 
   twpConfig.onChanged((name, newvalue) => {
-    if (name === "autoTranslateWhenClickingALink") {
-      if (newvalue == "yes") {
+    if (name === 'autoTranslateWhenClickingALink') {
+      if (newvalue == 'yes') {
         enableTranslationOnClickingALink();
       } else {
         disableTranslationOnClickingALink();
@@ -1230,24 +1230,24 @@ twpConfig.onReady(async () => {
 
   if (chrome.permissions.onRemoved) {
     chrome.permissions.onRemoved.addListener((permissions) => {
-      if (permissions.permissions.indexOf("webNavigation") !== -1) {
-        twpConfig.set("autoTranslateWhenClickingALink", "no");
+      if (permissions.permissions.indexOf('webNavigation') !== -1) {
+        twpConfig.set('autoTranslateWhenClickingALink', 'no');
       }
     });
   }
 
   chrome.permissions.contains(
     {
-      permissions: ["webNavigation"],
+      permissions: ['webNavigation'],
     },
     (hasPermissions) => {
       if (
-        hasPermissions
-        && twpConfig.get("autoTranslateWhenClickingALink") === "yes"
+        hasPermissions &&
+        twpConfig.get('autoTranslateWhenClickingALink') === 'yes'
       ) {
         enableTranslationOnClickingALink();
       } else {
-        twpConfig.set("autoTranslateWhenClickingALink", "no");
+        twpConfig.set('autoTranslateWhenClickingALink', 'no');
       }
     },
   );
@@ -1270,7 +1270,7 @@ chrome.runtime.onUpdateAvailable.addListener((details) => {
     tabs.forEach((tab) => {
       cleanUpsPromises.push(
         new Promise((resolve) => {
-          chrome.tabs.sendMessage(tab.id, { action: "cleanUp" }, resolve);
+          chrome.tabs.sendMessage(tab.id, { action: 'cleanUp' }, resolve);
         }),
       );
     });

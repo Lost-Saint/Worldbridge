@@ -2,13 +2,13 @@ var $ = document.querySelector.bind(document);
 
 function enableDarkMode() {
   if (sessionStorage !== null) {
-    sessionStorage.setItem("darkModeIsEnabled", "yes");
+    sessionStorage.setItem('darkModeIsEnabled', 'yes');
   }
 
-  if (!$("#darkModeElement")) {
-    const el = document.createElement("style");
-    el.setAttribute("id", "darkModeElement");
-    el.setAttribute("rel", "stylesheet");
+  if (!$('#darkModeElement')) {
+    const el = document.createElement('style');
+    el.setAttribute('id', 'darkModeElement');
+    el.setAttribute('rel', 'stylesheet');
     el.textContent = `
             * {
                 scrollbar-color: #202324 #454a4d;
@@ -33,17 +33,17 @@ function enableDarkMode() {
 }
 
 if (
-  sessionStorage !== null
-  && sessionStorage.getItem("darkModeIsEnabled") === "yes"
+  sessionStorage !== null &&
+  sessionStorage.getItem('darkModeIsEnabled') === 'yes'
 ) {
   enableDarkMode();
 }
 
 function disableDarkMode() {
   if (sessionStorage !== null) {
-    sessionStorage.setItem("darkModeIsEnabled", "no");
+    sessionStorage.setItem('darkModeIsEnabled', 'no');
   }
-  if ($("#darkModeElement")) {
-    $("#darkModeElement").remove();
+  if ($('#darkModeElement')) {
+    $('#darkModeElement').remove();
   }
 }

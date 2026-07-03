@@ -1,19 +1,19 @@
-"use strict";
+'use strict';
 
 const twpConfig = (function() {
   /** @type {function[]} */
   const observers = [];
-  const defaultTargetLanguages = ["en", "es", "de"];
+  const defaultTargetLanguages = ['en', 'es', 'de'];
   /**
    * all configName available
    * @typedef {"uiLanguage" | "pageTranslatorService" | "textTranslatorService" | "textToSpeechService" | "enabledServices" | "ttsSpeed" | "ttsVolume" | "targetLanguage" | "targetLanguageTextTranslation" | "targetLanguages" | "alwaysTranslateSites" | "neverTranslateSites" | "sitesToTranslateWhenHovering" | "langsToTranslateWhenHovering" | "alwaysTranslateLangs" | "neverTranslateLangs" | "customDictionary" | "showTranslatePageContextMenu" | "showTranslateSelectedContextMenu" | "showButtonInTheAddressBar" | "showOriginalTextWhenHovering" | "showTranslateSelectedButton" | "whenShowMobilePopup" | "useOldPopup" | "darkMode" | "popupBlueWhenSiteIsTranslated" | "popupPanelSection" | "showReleaseNotes" | "dontShowIfIsNotValidText" | "dontShowIfPageLangIsTargetLang" | "dontShowIfPageLangIsUnknown" | "dontShowIfSelectedTextIsTargetLang" | "dontShowIfSelectedTextIsUnknown" | "hotkeys" | "expandPanelTranslateSelectedText" | "translateTag_pre" | "enableIframePageTranslation" | "dontSortResults" | "translateDynamicallyCreatedContent" | "autoTranslateWhenClickingALink" | "translateSelectedWhenPressTwice" | "translateTextOverMouseWhenPressTwice" | "translateClickingOnce" | "enableDiskCache" | "useAlternativeService" | "customServices" | "showMobilePopupOnDesktop" | "popupMobileKeepOnScren" | "popupMobilePosition" | "addPaddingToPage" | "proxyServers"} DefaultConfigNames
    */
   const defaultConfig = {
-    uiLanguage: "default",
-    pageTranslatorService: "google", // google yandex bing
-    textTranslatorService: "google", // google yandex bing deepl
-    textToSpeechService: "google", // google bing
-    enabledServices: ["google", "bing", "yandex", "deepl"],
+    uiLanguage: 'default',
+    pageTranslatorService: 'google', // google yandex bing
+    textTranslatorService: 'google', // google yandex bing deepl
+    textToSpeechService: 'google', // google bing
+    enabledServices: ['google', 'bing', 'yandex', 'deepl'],
     ttsSpeed: 1.0,
     ttsVolume: 1.0,
     targetLanguage: null,
@@ -26,39 +26,39 @@ const twpConfig = (function() {
     alwaysTranslateLangs: [],
     neverTranslateLangs: [],
     customDictionary: new Map(),
-    showTranslatePageContextMenu: "yes",
-    showTranslateSelectedContextMenu: "yes",
-    showButtonInTheAddressBar: "yes",
-    showOriginalTextWhenHovering: "no",
-    showTranslateSelectedButton: "yes",
-    whenShowMobilePopup: "when-necessary", // when-necessary only-when-i-touch always-show
-    useOldPopup: "yes",
-    darkMode: "auto", // auto yes no
-    popupBlueWhenSiteIsTranslated: "yes",
+    showTranslatePageContextMenu: 'yes',
+    showTranslateSelectedContextMenu: 'yes',
+    showButtonInTheAddressBar: 'yes',
+    showOriginalTextWhenHovering: 'no',
+    showTranslateSelectedButton: 'yes',
+    whenShowMobilePopup: 'when-necessary', // when-necessary only-when-i-touch always-show
+    useOldPopup: 'yes',
+    darkMode: 'auto', // auto yes no
+    popupBlueWhenSiteIsTranslated: 'yes',
     popupPanelSection: 1,
-    showReleaseNotes: "yes",
-    dontShowIfIsNotValidText: "yes",
-    dontShowIfPageLangIsTargetLang: "no",
-    dontShowIfPageLangIsUnknown: "no",
-    dontShowIfSelectedTextIsTargetLang: "no",
-    dontShowIfSelectedTextIsUnknown: "no",
+    showReleaseNotes: 'yes',
+    dontShowIfIsNotValidText: 'yes',
+    dontShowIfPageLangIsTargetLang: 'no',
+    dontShowIfPageLangIsUnknown: 'no',
+    dontShowIfSelectedTextIsTargetLang: 'no',
+    dontShowIfSelectedTextIsUnknown: 'no',
     hotkeys: {}, // Hotkeys are obtained from the manifest file
-    expandPanelTranslateSelectedText: "no",
-    translateTag_pre: "yes",
-    enableIframePageTranslation: "yes",
-    dontSortResults: "no",
-    translateDynamicallyCreatedContent: "yes",
-    autoTranslateWhenClickingALink: "no",
-    translateSelectedWhenPressTwice: "no",
-    translateTextOverMouseWhenPressTwice: "no",
-    translateClickingOnce: "no",
-    enableDiskCache: "no",
-    useAlternativeService: "yes",
+    expandPanelTranslateSelectedText: 'no',
+    translateTag_pre: 'yes',
+    enableIframePageTranslation: 'yes',
+    dontSortResults: 'no',
+    translateDynamicallyCreatedContent: 'yes',
+    autoTranslateWhenClickingALink: 'no',
+    translateSelectedWhenPressTwice: 'no',
+    translateTextOverMouseWhenPressTwice: 'no',
+    translateClickingOnce: 'no',
+    enableDiskCache: 'no',
+    useAlternativeService: 'yes',
     customServices: [],
-    showMobilePopupOnDesktop: "no",
-    popupMobileKeepOnScren: "no",
-    popupMobilePosition: "top", // top bottom
-    addPaddingToPage: "no",
+    showMobilePopupOnDesktop: 'no',
+    popupMobileKeepOnScren: 'no',
+    popupMobilePosition: 'top', // top bottom
+    addPaddingToPage: 'no',
     proxyServers: {},
   };
   const config = structuredClone(defaultConfig);
@@ -152,7 +152,7 @@ const twpConfig = (function() {
     const newconfig = JSON.parse(configJSON);
 
     for (const key in defaultConfig) {
-      if (typeof newconfig[key] !== "undefined") {
+      if (typeof newconfig[key] !== 'undefined') {
         let value = newconfig[key];
         value = fixObjectType(key, value);
         // @ts-ignore
@@ -161,8 +161,8 @@ const twpConfig = (function() {
     }
 
     if (
-      typeof browser !== "undefined"
-      && typeof browser.commands !== "undefined"
+      typeof browser !== 'undefined' &&
+      typeof browser.commands !== 'undefined'
     ) {
       for (const name in config.hotkeys) {
         browser.commands.update({
@@ -181,8 +181,8 @@ const twpConfig = (function() {
   twpConfig.restoreToDefault = function() {
     // try to reset the keyboard shortcuts
     if (
-      typeof browser !== "undefined"
-      && typeof browser.commands !== "undefined"
+      typeof browser !== 'undefined' &&
+      typeof browser.commands !== 'undefined'
     ) {
       for (
         const name of Object.keys(
@@ -198,7 +198,7 @@ const twpConfig = (function() {
         } else {
           browser.commands.update({
             name: name,
-            shortcut: "",
+            shortcut: '',
           });
         }
       }
@@ -218,7 +218,7 @@ const twpConfig = (function() {
   // listen to storage changes
   chrome.storage.onChanged.addListener((changes, areaName) => {
     twpConfig.onReady(function() {
-      if (areaName === "local") {
+      if (areaName === 'local') {
         for (const name in changes) {
           const newValue = changes[name].newValue;
           if (config[name] !== newValue) {
@@ -250,7 +250,7 @@ const twpConfig = (function() {
 
       // try to get the 3 target languages through the user defined languages in the browser configuration.
       for (let lang of acceptedLanguages) {
-        if (config.targetLanguages.length >= 3) break;
+        if (config.targetLanguages.length >= 3) { break; }
         lang = twpLang.fixTLanguageCode(lang);
         if (lang && config.targetLanguages.indexOf(lang) === -1) {
           config.targetLanguages.push(lang);
@@ -259,7 +259,7 @@ const twpConfig = (function() {
 
       // then try to use de array defaultTargetLanguages ["en", "es", "de"]
       for (const lang in defaultTargetLanguages) {
-        if (config.targetLanguages.length >= 3) break;
+        if (config.targetLanguages.length >= 3) { break; }
         if (
           config.targetLanguages.indexOf(defaultTargetLanguages[lang]) === -1
         ) {
@@ -268,7 +268,7 @@ const twpConfig = (function() {
       }
 
       // if targetLanguages is bigger than 3 remove the surplus
-      while (config.targetLanguages.length > 3) config.targetLanguages.pop();
+      while (config.targetLanguages.length > 3) { config.targetLanguages.pop(); }
 
       /*
       // remove the duplicates languages
@@ -285,17 +285,17 @@ const twpConfig = (function() {
 
       // if targetLanguage does not exits in targetLanguages, then set it to targetLanguages[0]
       if (
-        !config.targetLanguage
-        || config.targetLanguages.indexOf(config.targetLanguage) === -1
+        !config.targetLanguage ||
+        config.targetLanguages.indexOf(config.targetLanguage) === -1
       ) {
         config.targetLanguage = config.targetLanguages[0];
       }
 
       // if targetLanguageTextTranslation does not exits in targetLanguages, then set it to targetLanguages[0]
       if (
-        !config.targetLanguageTextTranslation
-        || config.targetLanguages.indexOf(config.targetLanguageTextTranslation)
-          === -1
+        !config.targetLanguageTextTranslation ||
+        config.targetLanguages.indexOf(config.targetLanguageTextTranslation) ===
+          -1
       ) {
         config.targetLanguageTextTranslation = config.targetLanguages[0];
       }
@@ -323,20 +323,20 @@ const twpConfig = (function() {
       }
       // if targetLanguageTextTranslation does not exits in targetLanguages, then set it to targetLanguages[0]
       if (
-        config.targetLanguages.indexOf(config.targetLanguageTextTranslation)
-          === -1
+        config.targetLanguages.indexOf(config.targetLanguageTextTranslation) ===
+          -1
       ) {
         config.targetLanguageTextTranslation = config.targetLanguages[0];
       }
 
       // try to save de keyboard shortcuts in the config
-      if (typeof chrome.commands !== "undefined") {
+      if (typeof chrome.commands !== 'undefined') {
         chrome.commands.getAll((results) => {
           try {
             for (const result of results) {
               config.hotkeys[result.name] = result.shortcut;
             }
-            twpConfig.set("hotkeys", config.hotkeys);
+            twpConfig.set('hotkeys', config.hotkeys);
           } catch (e) {
             console.error(e);
           } finally {
@@ -359,7 +359,7 @@ const twpConfig = (function() {
 
   function addInMap(configName, key, value) {
     let map = twpConfig.get(configName);
-    if (typeof map.get(key) === "undefined") {
+    if (typeof map.get(key) === 'undefined') {
       map.set(key, value);
       twpConfig.set(configName, map);
     }
@@ -376,71 +376,71 @@ const twpConfig = (function() {
 
   function removeFromMap(configName, key) {
     const map = twpConfig.get(configName);
-    if (typeof map.get(key) !== "undefined") {
+    if (typeof map.get(key) !== 'undefined') {
       map.delete(key);
       twpConfig.set(configName, map);
     }
   }
 
   twpConfig.addSiteToTranslateWhenHovering = function(hostname) {
-    addInArray("sitesToTranslateWhenHovering", hostname);
+    addInArray('sitesToTranslateWhenHovering', hostname);
   };
 
   twpConfig.removeSiteFromTranslateWhenHovering = function(hostname) {
-    removeFromArray("sitesToTranslateWhenHovering", hostname);
+    removeFromArray('sitesToTranslateWhenHovering', hostname);
   };
 
   twpConfig.addLangToTranslateWhenHovering = function(lang) {
-    addInArray("langsToTranslateWhenHovering", lang);
+    addInArray('langsToTranslateWhenHovering', lang);
   };
 
   twpConfig.removeLangFromTranslateWhenHovering = function(lang) {
-    removeFromArray("langsToTranslateWhenHovering", lang);
+    removeFromArray('langsToTranslateWhenHovering', lang);
   };
 
   twpConfig.addSiteToAlwaysTranslate = function(hostname) {
-    addInArray("alwaysTranslateSites", hostname);
-    removeFromArray("neverTranslateSites", hostname);
+    addInArray('alwaysTranslateSites', hostname);
+    removeFromArray('neverTranslateSites', hostname);
   };
   twpConfig.removeSiteFromAlwaysTranslate = function(hostname) {
-    removeFromArray("alwaysTranslateSites", hostname);
+    removeFromArray('alwaysTranslateSites', hostname);
   };
   twpConfig.addSiteToNeverTranslate = function(hostname) {
-    addInArray("neverTranslateSites", hostname);
-    removeFromArray("alwaysTranslateSites", hostname);
-    removeFromArray("sitesToTranslateWhenHovering", hostname);
+    addInArray('neverTranslateSites', hostname);
+    removeFromArray('alwaysTranslateSites', hostname);
+    removeFromArray('sitesToTranslateWhenHovering', hostname);
   };
   twpConfig.addKeyWordTocustomDictionary = function(key, value) {
-    addInMap("customDictionary", key, value);
+    addInMap('customDictionary', key, value);
   };
   twpConfig.removeSiteFromNeverTranslate = function(hostname) {
-    removeFromArray("neverTranslateSites", hostname);
+    removeFromArray('neverTranslateSites', hostname);
   };
   twpConfig.removeKeyWordFromcustomDictionary = function(keyWord) {
-    removeFromMap("customDictionary", keyWord);
+    removeFromMap('customDictionary', keyWord);
   };
   twpConfig.addLangToAlwaysTranslate = function(lang, hostname) {
-    addInArray("alwaysTranslateLangs", lang);
-    removeFromArray("neverTranslateLangs", lang);
+    addInArray('alwaysTranslateLangs', lang);
+    removeFromArray('neverTranslateLangs', lang);
 
     if (hostname) {
-      removeFromArray("neverTranslateSites", hostname);
+      removeFromArray('neverTranslateSites', hostname);
     }
   };
   twpConfig.removeLangFromAlwaysTranslate = function(lang) {
-    removeFromArray("alwaysTranslateLangs", lang);
+    removeFromArray('alwaysTranslateLangs', lang);
   };
   twpConfig.addLangToNeverTranslate = function(lang, hostname) {
-    addInArray("neverTranslateLangs", lang);
-    removeFromArray("alwaysTranslateLangs", lang);
-    removeFromArray("langsToTranslateWhenHovering", lang);
+    addInArray('neverTranslateLangs', lang);
+    removeFromArray('alwaysTranslateLangs', lang);
+    removeFromArray('langsToTranslateWhenHovering', lang);
 
     if (hostname) {
-      removeFromArray("alwaysTranslateSites", hostname);
+      removeFromArray('alwaysTranslateSites', hostname);
     }
   };
   twpConfig.removeLangFromNeverTranslate = function(lang) {
-    removeFromArray("neverTranslateLangs", lang);
+    removeFromArray('neverTranslateLangs', lang);
   };
 
   /**
@@ -451,9 +451,9 @@ const twpConfig = (function() {
    * @returns
    */
   function addTargetLanguage(lang) {
-    const targetLanguages = twpConfig.get("targetLanguages");
+    const targetLanguages = twpConfig.get('targetLanguages');
     lang = twpLang.fixTLanguageCode(lang);
-    if (!lang) return;
+    if (!lang) { return; }
 
     const index = targetLanguages.indexOf(lang);
     if (index === -1) {
@@ -464,7 +464,7 @@ const twpConfig = (function() {
       targetLanguages.unshift(lang);
     }
 
-    twpConfig.set("targetLanguages", targetLanguages);
+    twpConfig.set('targetLanguages', targetLanguages);
   }
 
   /**
@@ -478,15 +478,15 @@ const twpConfig = (function() {
    * @returns
    */
   twpConfig.setTargetLanguage = function(lang, forTextToo = false) {
-    const targetLanguages = twpConfig.get("targetLanguages");
+    const targetLanguages = twpConfig.get('targetLanguages');
     lang = twpLang.fixTLanguageCode(lang);
-    if (!lang) return;
+    if (!lang) { return; }
 
     if (targetLanguages.indexOf(lang) === -1 || forTextToo) {
       addTargetLanguage(lang);
     }
 
-    twpConfig.set("targetLanguage", lang);
+    twpConfig.set('targetLanguage', lang);
 
     if (forTextToo) {
       twpConfig.setTargetLanguageTextTranslation(lang);
@@ -502,9 +502,9 @@ const twpConfig = (function() {
    */
   twpConfig.setTargetLanguageTextTranslation = function(lang) {
     lang = twpLang.fixTLanguageCode(lang);
-    if (!lang) return;
+    if (!lang) { return; }
 
-    twpConfig.set("targetLanguageTextTranslation", lang);
+    twpConfig.set('targetLanguageTextTranslation', lang);
   };
 
   /**
@@ -553,23 +553,23 @@ const twpConfig = (function() {
    * @returns {string} newServiceName
    */
   twpConfig.swapPageTranslationService = function() {
-    const pageTranslationServices = ["google", "bing", "yandex"];
+    const pageTranslationServices = ['google', 'bing', 'yandex'];
     const pageEnabledServices = twpConfig
-      .get("enabledServices")
+      .get('enabledServices')
       .filter((svName) => pageTranslationServices.includes(svName));
     const index = pageEnabledServices.indexOf(
-      twpConfig.get("pageTranslatorService"),
+      twpConfig.get('pageTranslatorService'),
     );
     if (index !== -1) {
       if (pageEnabledServices[index + 1]) {
-        twpConfig.set("pageTranslatorService", pageEnabledServices[index + 1]);
+        twpConfig.set('pageTranslatorService', pageEnabledServices[index + 1]);
       } else {
-        twpConfig.set("pageTranslatorService", pageEnabledServices[0]);
+        twpConfig.set('pageTranslatorService', pageEnabledServices[0]);
       }
     } else {
-      twpConfig.set("pageTranslatorService", pageEnabledServices[0]);
+      twpConfig.set('pageTranslatorService', pageEnabledServices[0]);
     }
-    return twpConfig.get("pageTranslatorService");
+    return twpConfig.get('pageTranslatorService');
   };
 
   return twpConfig;

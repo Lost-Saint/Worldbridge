@@ -1,24 +1,24 @@
-"use strict";
+'use strict';
 
 let $ = document.querySelector.bind(document);
 
-$("#btnClose").addEventListener("click", () => {
+$('#btnClose').addEventListener('click', () => {
   window.history.back();
 });
 
-$("#btnApply").addEventListener("click", () => {
-  twpConfig.setTargetLanguage($("#selectTargetLanguage").value, true);
+$('#btnApply').addEventListener('click', () => {
+  twpConfig.setTargetLanguage($('#selectTargetLanguage').value, true);
   // twpConfig.set("dontSortResults", $("#dontSortResults").value);
 
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(
       tabs[0].id,
       {
-        action: "improveTranslation",
-        sourceLanguage: $("#selectOriginalLanguage").value,
-        pageTranslatorService: $("#pageTranslatorService").value,
-        dontSortResults: $("#dontSortResults").value,
-        targetLanguage: $("#selectTargetLanguage").value,
+        action: 'improveTranslation',
+        sourceLanguage: $('#selectOriginalLanguage').value,
+        pageTranslatorService: $('#pageTranslatorService').value,
+        dontSortResults: $('#dontSortResults').value,
+        targetLanguage: $('#selectTargetLanguage').value,
       },
       (response) => {
         checkedLastError();
@@ -34,36 +34,36 @@ twpConfig
   .then(() => {
     twpI18n.translateDocument();
 
-    $("#pageTranslatorService").value = twpConfig.get("pageTranslatorService");
-    $("#dontSortResults").value = twpConfig.get("dontSortResults");
+    $('#pageTranslatorService').value = twpConfig.get('pageTranslatorService');
+    $('#dontSortResults').value = twpConfig.get('dontSortResults');
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       chrome.tabs.sendMessage(
         tabs[0].id,
-        { action: "getCurrentSourceLanguage" },
+        { action: 'getCurrentSourceLanguage' },
         (sourceLanguage) => {
           checkedLastError();
-          $("#selectOriginalLanguage").value = sourceLanguage
-            ? sourceLanguage
-            : "auto";
+          $('#selectOriginalLanguage').value = sourceLanguage ?
+            sourceLanguage :
+            'auto';
         },
       );
 
       chrome.tabs.sendMessage(
         tabs[0].id,
-        { action: "getCurrentPageTranslatorService" },
+        { action: 'getCurrentPageTranslatorService' },
         (pageService) => {
           checkedLastError();
           if (pageService) {
-            $("#pageTranslatorService").value = pageService;
+            $('#pageTranslatorService').value = pageService;
           }
         },
       );
       chrome.tabs.sendMessage(
         tabs[0].id,
-        { action: "getDontSortResults" },
+        { action: 'getDontSortResults' },
         (dontSortResults) => {
           checkedLastError();
-          $("#dontSortResults").value = dontSortResults ? "yes" : "no";
+          $('#dontSortResults').value = dontSortResults ? 'yes' : 'no';
         },
       );
     });
@@ -80,9 +80,9 @@ twpConfig
       return a[1].localeCompare(b[1]);
     });
 
-    const eAllLangs = selectTargetLanguage.querySelector("[name=\"all\"]");
+    const eAllLangs = selectTargetLanguage.querySelector('[name="all"]');
     langsSorted.forEach((value) => {
-      const option = document.createElement("option");
+      const option = document.createElement('option');
       option.value = value[0];
       option.textContent = value[1];
       eAllLangs.appendChild(option);
@@ -93,7 +93,7 @@ twpConfig
       chrome.tabs.sendMessage(
         tabs[0].id,
         {
-          action: "getOriginalTabLanguage",
+          action: 'getOriginalTabLanguage',
         },
         {
           frameId: 0,
@@ -105,7 +105,7 @@ twpConfig
           ) {
             langsSorted.forEach((value) => {
               if (value[0] === tabLanguage) {
-                const option = document.createElement("option");
+                const option = document.createElement('option');
                 option.value = value[0];
                 option.textContent = value[1];
                 selectOriginalLanguage_group_1.appendChild(option);
@@ -118,26 +118,26 @@ twpConfig
 
     const selectOriginalLanguage_group_2 = $("#selectOriginalLanguage > [name='group_2']");
     langsSorted.forEach((value) => {
-      const option = document.createElement("option");
+      const option = document.createElement('option');
       option.value = value[0];
       option.textContent = value[1];
       selectOriginalLanguage_group_2.appendChild(option);
     });
 
-    const eRecentsLangs = selectTargetLanguage.querySelector("[name=\"targets\"]");
-    for (const value of twpConfig.get("targetLanguages")) {
-      const option = document.createElement("option");
+    const eRecentsLangs = selectTargetLanguage.querySelector('[name="targets"]');
+    for (const value of twpConfig.get('targetLanguages')) {
+      const option = document.createElement('option');
       option.value = value;
       option.textContent = langs[value];
       eRecentsLangs.appendChild(option);
     }
-    selectTargetLanguage.value = twpConfig.get("targetLanguages")[0];
+    selectTargetLanguage.value = twpConfig.get('targetLanguages')[0];
 
     function disableDarkMode() {
-      if (!$("#lightModeElement")) {
-        const el = document.createElement("style");
-        el.setAttribute("id", "lightModeElement");
-        el.setAttribute("rel", "stylesheet");
+      if (!$('#lightModeElement')) {
+        const el = document.createElement('style');
+        el.setAttribute('id', 'lightModeElement');
+        el.setAttribute('rel', 'stylesheet');
         el.textContent = `
             body {
                 color: rgb(0, 0, 0);
@@ -162,23 +162,23 @@ twpConfig
     }
 
     function enableDarkMode() {
-      if ($("#lightModeElement")) {
-        $("#lightModeElement").remove();
+      if ($('#lightModeElement')) {
+        $('#lightModeElement').remove();
       }
     }
 
-    switch (twpConfig.get("darkMode")) {
-      case "auto":
-        if (matchMedia("(prefers-color-scheme: dark)").matches) {
+    switch (twpConfig.get('darkMode')) {
+      case 'auto':
+        if (matchMedia('(prefers-color-scheme: dark)').matches) {
           enableDarkMode();
         } else {
           disableDarkMode();
         }
         break;
-      case "yes":
+      case 'yes':
         enableDarkMode();
         break;
-      case "no":
+      case 'no':
         disableDarkMode();
         break;
       default:

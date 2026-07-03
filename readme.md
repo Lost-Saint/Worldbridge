@@ -11,7 +11,8 @@ Translate your page in real time using Google, Bing or Yandex.
 
 ### Firefox
 
-- Desktop users, download from [Mozilla Addons](https://addons.mozilla.org/firefox/addon/traduzir-paginas-web/).
+- Desktop users, download from
+  [Mozilla Addons](https://addons.mozilla.org/firefox/addon/traduzir-paginas-web/).
 - Android users
   1. Install the latest version of _Firefox (v120+)_.
   2. Open the extension manager.
@@ -22,8 +23,12 @@ Translate your page in real time using Google, Bing or Yandex.
 ### Chrome, Edge and Brave
 
 - The extension will be officially released for these browsers in the future.
-- If you installed the extension in these browsers previously through a registry modification, please undo those changes.\
-  Note: If you want to undo registry changes, download and run this [twp-registry-uninstall-self.reg](https://raw.githubusercontent.com/FilipePS/Traduzir-paginas-web/master/dist/chromium/twp-registry-uninstall-self.reg). If you want a deeper removal download and run this other file [twp-registry-uninstall-all.reg](https://raw.githubusercontent.com/FilipePS/Traduzir-paginas-web/master/dist/chromium/twp-registry-uninstall-all.reg)
+- If you installed the extension in these browsers previously through a registry modification,
+  please undo those changes.\
+  Note: If you want to undo registry changes, download and run this
+  [twp-registry-uninstall-self.reg](https://raw.githubusercontent.com/FilipePS/Traduzir-paginas-web/master/dist/chromium/twp-registry-uninstall-self.reg).
+  If you want a deeper removal download and run this other file
+  [twp-registry-uninstall-all.reg](https://raw.githubusercontent.com/FilipePS/Traduzir-paginas-web/master/dist/chromium/twp-registry-uninstall-all.reg)
 
 ## Screenshots
 
@@ -33,7 +38,8 @@ Translate your page in real time using Google, Bing or Yandex.
 
 ## Contribute
 
-- To collaborate with the translation of the extension interface use [Crowdin](https://crowdin.com/project/translate-web-pages).
+- To collaborate with the translation of the extension interface use
+  [Crowdin](https://crowdin.com/project/translate-web-pages).
 
 ## Donations
 
@@ -45,14 +51,14 @@ To make a donation use [Patreon](https://www.patreon.com/filipeps).
 
 **What can this extension do?**
 
-Your current page is translated without having to open new tabs.
-It is possible to change the translation language.
-You can select to automatically translate.
-To change the translation engine just touch the Google Translate icon.
+Your current page is translated without having to open new tabs. It is possible to change the
+translation language. You can select to automatically translate. To change the translation engine
+just touch the Google Translate icon.
 
 **Why do you need to access your data on all the websites you visit?**
 
-To translate any website it is necessary to access and modify the text of the web pages. And the extension can only do that, with that permission.
+To translate any website it is necessary to access and modify the text of the web pages. And the
+extension can only do that, with that permission.
 
 **How are the pages translated?**
 
@@ -60,11 +66,15 @@ The pages are translated using the Google or Yandex translation engine (you choo
 
 **And how's my privacy?**
 
-[Privacy policy](https://addons.mozilla.org/addon/traduzir-paginas-web/privacy/): We do not collect any information. However, to translate, the contents of the web pages will be sent to Google or Yandex servers.
+[Privacy policy](https://addons.mozilla.org/addon/traduzir-paginas-web/privacy/): We do not collect
+any information. However, to translate, the contents of the web pages will be sent to Google or
+Yandex servers.
 
 **Limitations**
 
-Some pages like [support.mozilla.org](https://support.mozilla.org/) and [addons.mozilla.org](http://addons.mozilla.org/) will not be translated. For security reasons, the browser blocks extensions from accessing these sites.
+Some pages like [support.mozilla.org](https://support.mozilla.org/) and
+[addons.mozilla.org](http://addons.mozilla.org/) will not be translated. For security reasons, the
+browser blocks extensions from accessing these sites.
 
 ## Build instructions
 

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /*
   When the DeepL tab is not activated, the timers will have a minimum delay of 1 second which delays the translation.
@@ -15,26 +15,26 @@ void (function() {
     return await new Promise((resolve) => {
       /** @type {HTMLTextAreaElement} */
       const source_textarea = document.querySelector(
-        "d-textarea[data-testid=translator-source-input] > div",
+        'd-textarea[data-testid=translator-source-input] > div',
       );
       if (!source_textarea) {
-        throw new Error("source_textarea not found.");
+        throw new Error('source_textarea not found.');
       }
 
       /** @type {HTMLTextAreaElement} */
       const target_textarea = document.querySelector(
-        "d-textarea[data-testid=translator-target-input]",
+        'd-textarea[data-testid=translator-target-input]',
       );
       if (!target_textarea) {
-        throw new Error("target_textarea not found.");
+        throw new Error('target_textarea not found.');
       }
 
       /** @type {HTMLButtonElement} */
       const select_language_el = document.querySelector(
-        "button[data-testid=translator-target-lang-btn]",
+        'button[data-testid=translator-target-lang-btn]',
       );
       if (!select_language_el) {
-        throw new Error("select_language_el not found.");
+        throw new Error('select_language_el not found.');
       }
 
       // select the target language
@@ -54,7 +54,7 @@ void (function() {
       setTimeout(() => {
         source_textarea.focus();
         source_textarea.textContent = text;
-        source_textarea.dispatchEvent(new Event("input", { bubbles: true }));
+        source_textarea.dispatchEvent(new Event('input', { bubbles: true }));
       }, 400);
 
       // set the URL hash, the translation will start immediately
@@ -69,9 +69,9 @@ void (function() {
        */
       function checkresult(oldvalue) {
         if (
-          performance.now() - startTime > 2400
-          || (target_textarea.textContent
-            && target_textarea.textContent !== oldvalue)
+          performance.now() - startTime > 2400 ||
+          (target_textarea.textContent &&
+            target_textarea.textContent !== oldvalue)
         ) {
           return resolve(target_textarea.textContent);
         }
@@ -82,8 +82,8 @@ void (function() {
   }
 
   function injectInformation() {
-    if (document.getElementById("twp-info")) return;
-    const style = document.createElement("style");
+    if (document.getElementById('twp-info')) { return; }
+    const style = document.createElement('style');
     style.textContent = `
     /* TWP - Translate Web Pages */
     #twp-info button {
@@ -106,8 +106,8 @@ void (function() {
     `;
     document.head.appendChild(style);
 
-    const info = document.createElement("div");
-    info.setAttribute("id", "twp-info");
+    const info = document.createElement('div');
+    info.setAttribute('id', 'twp-info');
     info.style.cssText = `
       width: 100%;
       padding: 10px;
@@ -123,8 +123,8 @@ void (function() {
     `;
     document.body.insertBefore(info, document.body.firstChild);
 
-    info.querySelector("button").addEventListener("click", () => {
-      twpConfig.set("textTranslatorService", "google");
+    info.querySelector('button').addEventListener('click', () => {
+      twpConfig.set('textTranslatorService', 'google');
       setTimeout(() => window.close(), 500);
     });
 
@@ -135,22 +135,22 @@ void (function() {
   }
 
   // get the sourceText and targetLanguage from the URL hash
-  if (location.hash.startsWith("#!")) {
+  if (location.hash.startsWith('#!')) {
     injectInformation();
 
-    let [targetLanguage, text] = location.hash.split("!#");
-    location.hash = "";
+    let [targetLanguage, text] = location.hash.split('!#');
+    location.hash = '';
 
     targetLanguage = decodeURIComponent(targetLanguage.substring(2));
     text = decodeURIComponent(text);
 
     setTimeout(() => {
-      translate(text, targetLanguage || "en")
+      translate(text, targetLanguage || 'en')
         .then((result) => {
           console.info(result);
           chrome.runtime.sendMessage(
             {
-              action: "DeepL_firstTranslationResult",
+              action: 'DeepL_firstTranslationResult',
               result,
             },
             checkedLastError,
@@ -160,8 +160,8 @@ void (function() {
           console.error(e);
           chrome.runtime.sendMessage(
             {
-              action: "DeepL_firstTranslationResult",
-              result: "",
+              action: 'DeepL_firstTranslationResult',
+              result: '',
             },
             checkedLastError,
           );
@@ -170,7 +170,7 @@ void (function() {
   }
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "translateTextWithDeepL") {
+    if (request.action === 'translateTextWithDeepL') {
       console.info(request);
       translate(request.text, request.targetLanguage)
         .then((result) => {
@@ -179,7 +179,7 @@ void (function() {
         })
         .catch((e) => {
           console.error(e);
-          sendResponse("");
+          sendResponse('');
         });
     }
 

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const translationService = (function() {
   const translationService = {};
@@ -15,23 +15,23 @@ const translationService = (function() {
      * @returns {string} escapedString
      */
     static escapeHTML(unsafe) {
-      const bingMarkFrontPart = "<mstrans:dictionary translation=\"";
-      const bingMarkSecondPart = "\"></mstrans:dictionary>";
+      const bingMarkFrontPart = '<mstrans:dictionary translation="';
+      const bingMarkSecondPart = '"></mstrans:dictionary>';
 
       unsafe = unsafe
-        .replaceAll(bingMarkFrontPart, "@-/629^*")
-        .replaceAll(bingMarkSecondPart, "^$537+*");
+        .replaceAll(bingMarkFrontPart, '@-/629^*')
+        .replaceAll(bingMarkSecondPart, '^$537+*');
 
       unsafe = unsafe
-        .replace(/\&/g, "&amp;")
-        .replace(/\</g, "&lt;")
-        .replace(/\>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/\'/g, "&#39;");
+        .replace(/\&/g, '&amp;')
+        .replace(/\</g, '&lt;')
+        .replace(/\>/g, '&gt;')
+        .replace(/\"/g, '&quot;')
+        .replace(/\'/g, '&#39;');
 
       unsafe = unsafe
-        .replaceAll("@-/629^*", bingMarkFrontPart)
-        .replaceAll("^$537+*", bingMarkSecondPart);
+        .replaceAll('@-/629^*', bingMarkFrontPart)
+        .replaceAll('^$537+*', bingMarkSecondPart);
 
       return unsafe;
     }
@@ -43,17 +43,17 @@ const translationService = (function() {
      */
     static unescapeHTML(unsafe) {
       return unsafe
-        .replace(/\&amp;/g, "&")
-        .replace(/\&lt;/g, "<")
-        .replace(/\&gt;/g, ">")
-        .replace(/\&quot;/g, "\"")
+        .replace(/\&amp;/g, '&')
+        .replace(/\&lt;/g, '<')
+        .replace(/\&gt;/g, '>')
+        .replace(/\&quot;/g, '"')
         .replace(/\&\#39;/g, "'");
     }
   }
 
   class GoogleHelper {
     static get googleTranslateTKK() {
-      return "448487.932609646";
+      return '448487.932609646';
     }
 
     /**
@@ -65,17 +65,17 @@ const translationService = (function() {
       for (let i = 0; i < optString.length - 2; i += 3) {
         /** @type {string|number} */
         let acc = optString.charAt(i + 2);
-        if ("a" <= acc) {
+        if ('a' <= acc) {
           acc = acc.charCodeAt(0) - 87;
         } else {
           acc = Number(acc);
         }
-        if (optString.charAt(i + 1) == "+") {
+        if (optString.charAt(i + 1) == '+') {
           acc = num >>> acc;
         } else {
           acc = num << acc;
         }
-        if (optString.charAt(i) == "+") {
+        if (optString.charAt(i) == '+') {
           num += acc & 4294967295;
         } else {
           num ^= acc;
@@ -102,13 +102,13 @@ const translationService = (function() {
             bytesArray[idx++] = (charCode >> 6) | 192;
           } else {
             if (
-              55296 == (charCode & 64512)
-              && i + 1 < query.length
-              && 56320 == (query.charCodeAt(i + 1) & 64512)
+              55296 == (charCode & 64512) &&
+              i + 1 < query.length &&
+              56320 == (query.charCodeAt(i + 1) & 64512)
             ) {
-              charCode = 65536
-                + ((charCode & 1023) << 10)
-                + (query.charCodeAt(++i) & 1023);
+              charCode = 65536 +
+                ((charCode & 1023) << 10) +
+                (query.charCodeAt(++i) & 1023);
               bytesArray[idx++] = (charCode >> 18) | 240;
               bytesArray[idx++] = ((charCode >> 12) & 63) | 128;
             } else {
@@ -129,7 +129,7 @@ const translationService = (function() {
      */
     static calcHash(query) {
       const windowTkk = GoogleHelper.googleTranslateTKK;
-      const tkkSplited = windowTkk.split(".");
+      const tkkSplited = windowTkk.split('.');
       const tkkIndex = Number(tkkSplited[0]) || 0;
       const tkkKey = Number(tkkSplited[1]) || 0;
 
@@ -140,12 +140,12 @@ const translationService = (function() {
         encondingRound += item;
         encondingRound = GoogleHelper.shiftLeftOrRightThenSumOrXor(
           encondingRound,
-          "+-a^+6",
+          '+-a^+6',
         );
       }
       encondingRound = GoogleHelper.shiftLeftOrRightThenSumOrXor(
         encondingRound,
-        "+-3^+b+-f",
+        '+-3^+b+-f',
       );
 
       encondingRound ^= tkkKey;
@@ -154,7 +154,7 @@ const translationService = (function() {
       }
 
       const normalizedResult = encondingRound % 1000000;
-      return normalizedResult.toString() + "." + (normalizedResult ^ tkkIndex);
+      return normalizedResult.toString() + '.' + (normalizedResult ^ tkkIndex);
     }
   }
 
@@ -248,8 +248,8 @@ const translationService = (function() {
 
           const http = new XMLHttpRequest();
           http.open(
-            "GET",
-            "https://translate.googleapis.com/_/translate_http/_/js/k=translate_http.tr.en_US.YusFYy3P_ro.O/am=AAg/d=1/exm=el_conf/ed=1/rs=AN8SPfq1Hb8iJRleQqQc8zhdzXmF9E56eQ/m=el_main",
+            'GET',
+            'https://translate.googleapis.com/_/translate_http/_/js/k=translate_http.tr.en_US.YusFYy3P_ro.O/am=AAg/d=1/exm=el_conf/ed=1/rs=AN8SPfq1Hb8iJRleQqQc8zhdzXmF9E56eQ/m=el_main',
           );
           http.send();
           http.onload = (e) => {
@@ -311,7 +311,7 @@ const translationService = (function() {
      * @returns {Promise<void>}
      */
     static async findSID() {
-      if (YandexHelper.#findPromise) return await YandexHelper.#findPromise;
+      if (YandexHelper.#findPromise) { return await YandexHelper.#findPromise; }
       YandexHelper.#findPromise = new Promise((resolve) => {
         let updateYandexSid = false;
         if (YandexHelper.#lastRequestSidTime) {
@@ -335,8 +335,8 @@ const translationService = (function() {
 
           const http = new XMLHttpRequest();
           http.open(
-            "GET",
-            "https://translate.yandex.net/website-widget/v1/widget.js?widgetId=ytWidget&pageLang=es&widgetTheme=light&autoMode=false",
+            'GET',
+            'https://translate.yandex.net/website-widget/v1/widget.js?widgetId=ytWidget&pageLang=es&widgetTheme=light&autoMode=false',
           );
           http.send();
           http.onload = (e) => {
@@ -388,7 +388,7 @@ const translationService = (function() {
      * @returns {Promise<void>}
      */
     static async findAuth() {
-      if (BingHelper.#authPromise) return await BingHelper.#authPromise;
+      if (BingHelper.#authPromise) { return await BingHelper.#authPromise; }
 
       BingHelper.#authPromise = new Promise((resolve) => {
         let updateBingAuth = false;
@@ -412,7 +412,7 @@ const translationService = (function() {
           BingHelper.#lastRequestAuthTime = Date.now();
 
           const http = new XMLHttpRequest();
-          http.open("GET", "https://edge.microsoft.com/translate/auth");
+          http.open('GET', 'https://edge.microsoft.com/translate/auth');
           http.send();
           http.onload = (e) => {
             if (http.responseText && http.responseText.length > 1) {
@@ -515,7 +515,7 @@ const translationService = (function() {
     constructor(
       serviceName,
       baseURL,
-      xhrMethod = "GET",
+      xhrMethod = 'GET',
       cbTransformRequest,
       cbParseResponse,
       cbTransformResponse,
@@ -550,7 +550,7 @@ const translationService = (function() {
      */
     removeTranslationsWithError() {
       this.translationsInProgress.forEach((transInfo, key) => {
-        if (transInfo.status === "error") {
+        if (transInfo.status === 'error') {
           this.translationsInProgress.delete(key);
         }
       });
@@ -587,14 +587,14 @@ const translationService = (function() {
           sourceLanguage,
           targetLanguage,
           requestString,
-        ].join(", ");
+        ].join(', ');
 
         const progressInfo = this.translationsInProgress.get(requestHash);
         if (progressInfo) {
           currentTranslationsInProgress.push(progressInfo);
         } else {
           /** @type {TranslationStatus} */
-          let status = "translating";
+          let status = 'translating';
           /** @type {() => void} */
           let promise_resolve = null;
 
@@ -626,7 +626,7 @@ const translationService = (function() {
           if (cacheEntry) {
             progressInfo.translatedText = cacheEntry.translatedText;
             progressInfo.detectedLanguage = cacheEntry.detectedLanguage;
-            progressInfo.status = "complete";
+            progressInfo.status = 'complete';
             // this.translationsInProgress.delete([sourceLanguage, targetLanguage, requestString])
           } else {
             currentRequest.push(progressInfo);
@@ -661,14 +661,14 @@ const translationService = (function() {
         const xhr = new XMLHttpRequest();
         xhr.open(
           this.xhrMethod,
-          this.baseURL
-            + (this.cbGetExtraParameters
-              ? this.cbGetExtraParameters(
+          this.baseURL +
+            (this.cbGetExtraParameters ?
+              this.cbGetExtraParameters(
                 sourceLanguage,
                 targetLanguage,
                 requests,
-              )
-              : ""),
+              ) :
+              ''),
         );
 
         if (this.cbGetExtraHeaders) {
@@ -678,7 +678,7 @@ const translationService = (function() {
           });
         }
 
-        xhr.responseType = "json";
+        xhr.responseType = 'json';
 
         xhr.onload = (event) => {
           resolve(xhr.response);
@@ -693,9 +693,9 @@ const translationService = (function() {
             };
 
         xhr.send(
-          this.cbGetRequestBody
-            ? this.cbGetRequestBody(sourceLanguage, targetLanguage, requests)
-            : undefined,
+          this.cbGetRequestBody ?
+            this.cbGetRequestBody(sourceLanguage, targetLanguage, requests) :
+            undefined,
         );
       });
     }
@@ -737,13 +737,13 @@ const translationService = (function() {
                 const result = results[idx];
                 this.cbTransformResponse(result.text, dontSortResults); // apenas para gerar error
                 const transInfo = request[idx];
-                transInfo.detectedLanguage = result.detectedLanguage || "und";
+                transInfo.detectedLanguage = result.detectedLanguage || 'und';
                 transInfo.translatedText = result.text;
-                transInfo.status = "complete";
+                transInfo.status = 'complete';
 
                 if (
-                  dontSaveInPersistentCache === false
-                  && transInfo.translatedText
+                  dontSaveInPersistentCache === false &&
+                  transInfo.translatedText
                 ) {
                   translationCache.set(
                     this.serviceName,
@@ -759,7 +759,7 @@ const translationService = (function() {
             .catch((e) => {
               console.error(e);
               for (const transInfo of request) {
-                transInfo.status = "error";
+                transInfo.status = 'error';
                 // this.translationsInProgress.delete([sourceLanguage, targetLanguage, transInfo.originalText])
               }
             }),
@@ -779,16 +779,16 @@ const translationService = (function() {
      * @returns {string} fixedStr
      */
     fixString(str) {
-      return str.replace(/\u200b/g, " ");
+      return str.replace(/\u200b/g, ' ');
     }
   }
 
   const googleService = new (class extends Service {
     constructor() {
       super(
-        "google",
-        "https://translate-pa.googleapis.com/v1/translateHtml",
-        "POST",
+        'google',
+        'https://translate-pa.googleapis.com/v1/translateHtml',
+        'POST',
         function cbTransformRequest(sourceArray) {
           sourceArray = sourceArray.map((text) => Utils.escapeHTML(text));
           if (sourceArray.length > 1) {
@@ -797,7 +797,7 @@ const translationService = (function() {
             );
           }
           // the <pre> tag is to preserve the text formating
-          return `<pre>${sourceArray.join("")}</pre>`;
+          return `<pre>${sourceArray.join('')}</pre>`;
         },
         function cbParseResponse(response) {
           /** @type {[Service_Single_Result_Response]} */
@@ -833,9 +833,9 @@ const translationService = (function() {
         },
         function cbTransformResponse(result, dontSortResults) {
           // remove the <pre> tag from the response
-          if (result.indexOf("<pre") !== -1) {
-            result = result.replace("</pre>", "");
-            const index = result.indexOf(">");
+          if (result.indexOf('<pre') !== -1) {
+            result = result.replace('</pre>', '');
+            const index = result.indexOf('>');
             result = result.slice(index + 1);
           }
 
@@ -847,12 +847,12 @@ const translationService = (function() {
           let idx = 0;
           while (true) {
             // each translated sentence is inside of <b> tag
-            const sentenceStartIndex = result.indexOf("<b>", idx);
-            if (sentenceStartIndex === -1) break;
+            const sentenceStartIndex = result.indexOf('<b>', idx);
+            if (sentenceStartIndex === -1) { break; }
 
             // the <i> tag is the original text in each sentence
             const sentenceFinalIndex = result.indexOf(
-              "<i>",
+              '<i>',
               sentenceStartIndex,
             );
 
@@ -868,9 +868,9 @@ const translationService = (function() {
           }
 
           // maybe the response don't have any sentence (does not have <i> and <b> tags), is this case just use de result
-          result = sentences.length > 0 ? sentences.join(" ") : result;
+          result = sentences.length > 0 ? sentences.join(' ') : result;
           // Remove the remaining </b> tags (usually the last)
-          result = result.replace(/\<\/b\>/g, "");
+          result = result.replace(/\<\/b\>/g, '');
           // Capture each <a i={number}> and put it in an array, the </a> will be ignored
           // maybe the same index appears several times
           // maybe some text will be outside of <a i={number}> (Usually text before the first <a> tag, and some whitespace between the <a> tags),
@@ -892,10 +892,10 @@ const translationService = (function() {
             // if it is bigger then it has text outside the tags
             if (pos > lastEndPos) {
               const aTag = r[1];
-              const insideText = r[2] || "";
+              const insideText = r[2] || '';
               const outsideText = result
                 .slice(lastEndPos, pos)
-                .replace(/\<\/a\>/g, "");
+                .replace(/\<\/a\>/g, '');
               resultArray.push(aTag + outsideText + insideText);
             } else {
               resultArray.push(fullText);
@@ -907,7 +907,7 @@ const translationService = (function() {
           {
             const lastOutsideText = result
               .slice(lastEndPos)
-              .replace(/\<\/a\>/g, "");
+              .replace(/\<\/a\>/g, '');
             if (resultArray.length > 0) {
               resultArray[resultArray.length - 1] += lastOutsideText;
             }
@@ -926,7 +926,7 @@ const translationService = (function() {
               .filter((value) => !isNaN(value));
             // get the text inside of <a i={number}>
             resultArray = resultArray.map((value) => {
-              const resultStartAtIndex = value.indexOf(">");
+              const resultStartAtIndex = value.indexOf('>');
               return value.slice(resultStartAtIndex + 1);
             });
           } else {
@@ -967,7 +967,7 @@ const translationService = (function() {
 
             for (const j in indexes) {
               if (finalResulArray[indexes[j]]) {
-                finalResulArray[indexes[j]] += " " + resultArray[j];
+                finalResulArray[indexes[j]] += ' ' + resultArray[j];
               } else {
                 finalResulArray[indexes[j]] = resultArray[j];
               }
@@ -990,17 +990,17 @@ const translationService = (function() {
               sourceLanguage,
               targetLanguage,
             ],
-            "te",
+            'te',
           ]);
         },
         function cbGetExtraHeaders() {
           return [
             {
-              name: "Content-Type",
-              value: "application/application/json+protobuf",
+              name: 'Content-Type',
+              value: 'application/application/json+protobuf',
             },
             {
-              name: "X-goog-api-key",
+              name: 'X-goog-api-key',
               value: GoogleHelper_v2.translateAuth,
             },
           ];
@@ -1022,8 +1022,8 @@ const translationService = (function() {
       /** @type {{search: string, replace: string}[]} */
       const replacements = [
         {
-          search: "prs",
-          replace: "fa-AF",
+          search: 'prs',
+          replace: 'fa-AF',
         },
       ];
       replacements.forEach((r) => {
@@ -1036,7 +1036,7 @@ const translationService = (function() {
       });
 
       await GoogleHelper_v2.findAuth();
-      if (!GoogleHelper_v2.translateAuth) return;
+      if (!GoogleHelper_v2.translateAuth) { return; }
 
       return await super.translate(
         sourceLanguage,
@@ -1051,17 +1051,17 @@ const translationService = (function() {
   const yandexService = new (class extends Service {
     constructor() {
       super(
-        "yandex",
-        "https://translate.yandex.net/api/v1/tr.json/translate?srv=tr-url-widget",
-        "GET",
+        'yandex',
+        'https://translate.yandex.net/api/v1/tr.json/translate?srv=tr-url-widget',
+        'GET',
         function cbTransformRequest(sourceArray) {
           return sourceArray
             .map((value) => Utils.escapeHTML(value))
-            .join("<wbr>");
+            .join('<wbr>');
         },
         function cbParseResponse(response) {
           const lang = response.lang;
-          const detectedLanguage = lang ? lang.split("-")[0] : null;
+          const detectedLanguage = lang ? lang.split('-')[0] : null;
           return response.text.map(
             /** @return {Service_Single_Result_Response} */ (
               /** @type {string} */ text,
@@ -1070,7 +1070,7 @@ const translationService = (function() {
         },
         function cbTransformResponse(result, dontSortResults) {
           return result
-            .split("<wbr>")
+            .split('<wbr>')
             .map((value) => Utils.unescapeHTML(value));
         },
         function cbGetExtraParameters(
@@ -1079,11 +1079,11 @@ const translationService = (function() {
           requests,
         ) {
           return `&id=${YandexHelper.translateSid}-0-0&format=html&lang=${
-            sourceLanguage === "auto" ? "" : sourceLanguage + "-"
+            sourceLanguage === 'auto' ? '' : sourceLanguage + '-'
           }${targetLanguage}${
             requests
               .map((info) => `&text=${encodeURIComponent(info.originalText)}`)
-              .join("")
+              .join('')
           }`;
         },
         function cbGetRequestBody(sourceLanguage, targetLanguage, requests) {
@@ -1092,8 +1092,8 @@ const translationService = (function() {
         function cbGetExtraHeaders() {
           return [
             {
-              name: "Content-Type",
-              value: "application/x-www-form-urlencoded",
+              name: 'Content-Type',
+              value: 'application/x-www-form-urlencoded',
             },
           ];
         },
@@ -1111,28 +1111,28 @@ const translationService = (function() {
       dontSortResults = false,
     ) {
       await YandexHelper.findSID();
-      if (!YandexHelper.translateSid) return;
+      if (!YandexHelper.translateSid) { return; }
       /** @type {{search: string, replace: string}[]} */
       const replacements = [
         {
-          search: "zh-CN",
-          replace: "zh",
+          search: 'zh-CN',
+          replace: 'zh',
         },
         {
-          search: "zh-TW",
-          replace: "zh",
+          search: 'zh-TW',
+          replace: 'zh',
         },
         {
-          search: "fr-CA",
-          replace: "fr",
+          search: 'fr-CA',
+          replace: 'fr',
         },
         {
-          search: "pt",
-          replace: "pt-BR",
+          search: 'pt',
+          replace: 'pt-BR',
         },
         {
-          search: "pt-PT",
-          replace: "pt",
+          search: 'pt-PT',
+          replace: 'pt',
         },
       ];
       replacements.forEach((r) => {
@@ -1157,9 +1157,9 @@ const translationService = (function() {
   const bingService = new (class extends Service {
     constructor() {
       super(
-        "bing",
-        "https://api-edge.cognitive.microsofttranslator.com/translate?api-version=3.0&includeSentenceLength=true",
-        "POST",
+        'bing',
+        'https://api-edge.cognitive.microsofttranslator.com/translate?api-version=3.0&includeSentenceLength=true',
+        'POST',
         function cbTransformRequest(sourceArray) {
           let id = 10;
           return sourceArray
@@ -1168,7 +1168,7 @@ const translationService = (function() {
               id++;
               return r;
             })
-            .join("");
+            .join('');
         },
         function cbParseResponse(response) {
           return response.map(
@@ -1183,23 +1183,23 @@ const translationService = (function() {
           const resultArray = [];
 
           const parser = new DOMParser();
-          const doc = parser.parseFromString(result, "text/html");
-          let currText = "";
+          const doc = parser.parseFromString(result, 'text/html');
+          let currText = '';
           doc.body.childNodes.forEach((node) => {
             if (dontSortResults) {
-              if (node.nodeName == "#text") {
+              if (node.nodeName == '#text') {
                 currText += node.textContent;
               } else {
                 resultArray.push(currText + node.textContent);
-                currText = "";
+                currText = '';
               }
             } else {
-              if (node.nodeName == "#text") {
+              if (node.nodeName == '#text') {
                 currText += node.textContent;
               } else {
                 const id = parseInt(node.nodeName.slice(1)) - 10;
                 resultArray[id] = currText + node.textContent;
-                currText = "";
+                currText = '';
               }
             }
           });
@@ -1212,7 +1212,7 @@ const translationService = (function() {
           requests,
         ) {
           return `${
-            sourceLanguage !== "auto-detect" ? "&from=" + sourceLanguage : ""
+            sourceLanguage !== 'auto-detect' ? '&from=' + sourceLanguage : ''
           }&to=${targetLanguage}`;
         },
         function cbGetRequestBody(sourceLanguage, targetLanguage, requests) {
@@ -1225,12 +1225,12 @@ const translationService = (function() {
         function cbGetExtraHeaders() {
           return [
             {
-              name: "Content-Type",
-              value: "application/json",
+              name: 'Content-Type',
+              value: 'application/json',
             },
             {
-              name: "authorization",
-              value: "Bearer " + BingHelper.translateAuth,
+              name: 'authorization',
+              value: 'Bearer ' + BingHelper.translateAuth,
             },
           ];
         },
@@ -1251,52 +1251,52 @@ const translationService = (function() {
       /** @type {{search: string, replace: string}[]} */
       const replacements = [
         {
-          search: "auto",
-          replace: "auto-detect",
+          search: 'auto',
+          replace: 'auto-detect',
         },
         {
-          search: "zh-CN",
-          replace: "zh-Hans",
+          search: 'zh-CN',
+          replace: 'zh-Hans',
         },
         {
-          search: "zh-TW",
-          replace: "zh-Hant",
+          search: 'zh-TW',
+          replace: 'zh-Hant',
         },
         {
-          search: "tl",
-          replace: "fil",
+          search: 'tl',
+          replace: 'fil',
         },
         {
-          search: "hmn",
-          replace: "mww",
+          search: 'hmn',
+          replace: 'mww',
         },
         {
-          search: "ku",
-          replace: "kmr",
+          search: 'ku',
+          replace: 'kmr',
         },
         {
-          search: "ckb",
-          replace: "ku",
+          search: 'ckb',
+          replace: 'ku',
         },
         {
-          search: "mn",
-          replace: "mn-Cyrl",
+          search: 'mn',
+          replace: 'mn-Cyrl',
         },
         {
-          search: "no",
-          replace: "nb",
+          search: 'no',
+          replace: 'nb',
         },
         {
-          search: "lg",
-          replace: "lug",
+          search: 'lg',
+          replace: 'lug',
         },
         {
-          search: "sr",
-          replace: "sr-Cyrl",
+          search: 'sr',
+          replace: 'sr-Cyrl',
         },
         {
-          search: "mni-Mtei",
-          replace: "mni",
+          search: 'mni-Mtei',
+          replace: 'mni',
         },
       ];
       replacements.forEach((r) => {
@@ -1309,7 +1309,7 @@ const translationService = (function() {
       });
 
       await BingHelper.findAuth();
-      if (!BingHelper.translateAuth) return;
+      if (!BingHelper.translateAuth) { return; }
 
       return await super.translate(
         sourceLanguage,
@@ -1340,20 +1340,20 @@ const translationService = (function() {
       dontSaveInPersistentCache,
       dontSortResults = false,
     ) {
-      if (targetLanguage === "pt") {
-        targetLanguage = "pt-BR";
-      } else if (targetLanguage === "no") {
-        targetLanguage = "nb";
-      } else if (targetLanguage == "zh-CN") {
-        targetLanguage = "zh-Hans";
-      } else if (targetLanguage == "zh-TW") {
-        targetLanguage = "zh";
+      if (targetLanguage === 'pt') {
+        targetLanguage = 'pt-BR';
+      } else if (targetLanguage === 'no') {
+        targetLanguage = 'nb';
+      } else if (targetLanguage == 'zh-CN') {
+        targetLanguage = 'zh-Hans';
+      } else if (targetLanguage == 'zh-TW') {
+        targetLanguage = 'zh';
       }
 
       return await new Promise((resolve) => {
         const waitFirstTranslationResult = () => {
           const listener = (request, sender, sendResponse) => {
-            if (request.action === "DeepL_firstTranslationResult") {
+            if (request.action === 'DeepL_firstTranslationResult') {
               resolve([[request.result]]);
               chrome.runtime.onMessage.removeListener(listener);
             }
@@ -1362,7 +1362,7 @@ const translationService = (function() {
 
           setTimeout(() => {
             chrome.runtime.onMessage.removeListener(listener);
-            resolve([[""]]);
+            resolve([['']]);
           }, 8000);
         };
 
@@ -1374,7 +1374,7 @@ const translationService = (function() {
               chrome.tabs.sendMessage(
                 tab.id,
                 {
-                  action: "translateTextWithDeepL",
+                  action: 'translateTextWithDeepL',
                   text: sourceArray2d[0][0],
                   targetLanguage,
                 },
@@ -1429,9 +1429,9 @@ const translationService = (function() {
     return new (class extends Service {
       constructor() {
         super(
-          "libre",
+          'libre',
           url,
-          "POST",
+          'POST',
           function cbTransformRequest(sourceArray) {
             return sourceArray[0];
           },
@@ -1449,18 +1449,18 @@ const translationService = (function() {
           null,
           function cbGetRequestBody(sourceLanguage, targetLanguage, requests) {
             const params = new URLSearchParams();
-            params.append("q", requests[0].originalText);
-            params.append("source", sourceLanguage);
-            params.append("target", targetLanguage);
-            params.append("format", "text");
-            params.append("api_key", apiKey);
+            params.append('q', requests[0].originalText);
+            params.append('source', sourceLanguage);
+            params.append('target', targetLanguage);
+            params.append('format', 'text');
+            params.append('api_key', apiKey);
             return params.toString();
           },
           function cbGetExtraHeaders() {
             return [
               {
-                name: "Content-Type",
-                value: "application/x-www-form-urlencoded",
+                name: 'Content-Type',
+                value: 'application/x-www-form-urlencoded',
               },
             ];
           },
@@ -1497,9 +1497,9 @@ const translationService = (function() {
     return new (class extends Service {
       constructor() {
         super(
-          "deepl",
-          "https://api-free.deepl.com/v2/translate",
-          "POST",
+          'deepl',
+          'https://api-free.deepl.com/v2/translate',
+          'POST',
           function cbTransformRequest(sourceArray) {
             return sourceArray[0];
           },
@@ -1517,31 +1517,31 @@ const translationService = (function() {
           null,
           function cbGetRequestBody(sourceLanguage, targetLanguage, requests) {
             const params = new URLSearchParams();
-            params.append("text", requests[0].originalText);
-            if (sourceLanguage !== "auto") {
+            params.append('text', requests[0].originalText);
+            if (sourceLanguage !== 'auto') {
               // params.append("source_lang", sourceLanguage);
             }
-            if (targetLanguage === "pt") {
-              targetLanguage = "pt-BR";
-            } else if (targetLanguage === "no") {
-              targetLanguage = "nb";
-            } else if (targetLanguage.startsWith("zh-")) {
-              targetLanguage = "zh";
-            } else if (targetLanguage.startsWith("fr-")) {
-              targetLanguage = "fr";
+            if (targetLanguage === 'pt') {
+              targetLanguage = 'pt-BR';
+            } else if (targetLanguage === 'no') {
+              targetLanguage = 'nb';
+            } else if (targetLanguage.startsWith('zh-')) {
+              targetLanguage = 'zh';
+            } else if (targetLanguage.startsWith('fr-')) {
+              targetLanguage = 'fr';
             }
-            params.append("target_lang", targetLanguage);
+            params.append('target_lang', targetLanguage);
             return params.toString();
           },
           function cbGetExtraHeaders() {
             return [
               {
-                name: "Content-Type",
-                value: "application/x-www-form-urlencoded",
+                name: 'Content-Type',
+                value: 'application/x-www-form-urlencoded',
               },
               {
-                name: "Authorization",
-                value: "DeepL-Auth-Key " + apiKey,
+                name: 'Authorization',
+                value: 'DeepL-Auth-Key ' + apiKey,
               },
             ];
           },
@@ -1572,11 +1572,11 @@ const translationService = (function() {
   /** @type {Map<string, Service>} */
   const serviceList = new Map();
 
-  serviceList.set("google", googleService);
-  serviceList.set("yandex", yandexService);
-  serviceList.set("bing", bingService);
+  serviceList.set('google', googleService);
+  serviceList.set('yandex', yandexService);
+  serviceList.set('bing', bingService);
   serviceList.set(
-    "deepl",
+    'deepl',
     /** @type {Service} */ /** @type {?} */ (deeplService),
   );
 
@@ -1588,8 +1588,8 @@ const translationService = (function() {
    */
   const getSafeServiceByName = (serviceName) => {
     if (
-      twpConfig.get("enabledServices").includes(serviceName)
-      || twpConfig.get("customServices").find((cs) => cs.name === serviceName)
+      twpConfig.get('enabledServices').includes(serviceName) ||
+      twpConfig.get('customServices').find((cs) => cs.name === serviceName)
     ) {
       return serviceList.get(serviceName);
     } else {
@@ -1669,13 +1669,13 @@ const translationService = (function() {
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // If the translation request came from an incognito window, the translation should not be cached on disk.
     let dontSaveInPersistentCache = true;
-    if (twpConfig.get("enableDiskCache") !== "yes") {
+    if (twpConfig.get('enableDiskCache') !== 'yes') {
       dontSaveInPersistentCache = true;
     } else {
       dontSaveInPersistentCache = sender.tab ? sender.tab.incognito : false;
     }
 
-    if (request.action === "translateHTML") {
+    if (request.action === 'translateHTML') {
       translationService
         .translateHTML(
           request.translationService,
@@ -1692,7 +1692,7 @@ const translationService = (function() {
         });
 
       return true;
-    } else if (request.action === "translateText") {
+    } else if (request.action === 'translateText') {
       translationService
         .translateText(
           request.translationService,
@@ -1708,7 +1708,7 @@ const translationService = (function() {
         });
 
       return true;
-    } else if (request.action === "translateSingleText") {
+    } else if (request.action === 'translateSingleText') {
       translationService
         .translateSingleText(
           request.translationService,
@@ -1724,50 +1724,50 @@ const translationService = (function() {
         });
 
       return true;
-    } else if (request.action === "removeTranslationsWithError") {
+    } else if (request.action === 'removeTranslationsWithError') {
       serviceList.forEach((service) => {
         if (service.removeTranslationsWithError) {
           service.removeTranslationsWithError();
         }
       });
-    } else if (request.action === "createLibreService") {
+    } else if (request.action === 'createLibreService') {
       serviceList.set(
-        "libre",
+        'libre',
         createLibreService(request.libre.url, request.libre.apiKey),
       );
-    } else if (request.action === "removeLibreService") {
-      serviceList.delete("libre");
-    } else if (request.action === "createDeeplFreeApiService") {
+    } else if (request.action === 'removeLibreService') {
+      serviceList.delete('libre');
+    } else if (request.action === 'createDeeplFreeApiService') {
       serviceList.set(
-        "deepl",
+        'deepl',
         createDeeplFreeApiService(request.deepl_freeapi.apiKey),
       );
-    } else if (request.action === "removeDeeplFreeApiService") {
+    } else if (request.action === 'removeDeeplFreeApiService') {
       serviceList.set(
-        "deepl",
+        'deepl',
         /** @type {Service} */ /** @type {?} */ (deeplService),
       );
     }
   });
 
   twpConfig.onReady(function() {
-    if (twpConfig.get("customServices").find((cs) => cs.name === "libre")) {
+    if (twpConfig.get('customServices').find((cs) => cs.name === 'libre')) {
       const libre = twpConfig
-        .get("customServices")
-        .find((cs) => cs.name === "libre");
-      serviceList.set("libre", createLibreService(libre.url, libre.apiKey));
+        .get('customServices')
+        .find((cs) => cs.name === 'libre');
+      serviceList.set('libre', createLibreService(libre.url, libre.apiKey));
     }
 
     if (
-      twpConfig.get("customServices").find((cs) => cs.name === "deepl_freeapi")
+      twpConfig.get('customServices').find((cs) => cs.name === 'deepl_freeapi')
     ) {
       const deepl_freeapi = twpConfig
-        .get("customServices")
-        .find((cs) => cs.name === "deepl_freeapi");
-      serviceList.set("deepl", createDeeplFreeApiService(deepl_freeapi.apiKey));
+        .get('customServices')
+        .find((cs) => cs.name === 'deepl_freeapi');
+      serviceList.set('deepl', createDeeplFreeApiService(deepl_freeapi.apiKey));
     }
 
-    const proxyServers = twpConfig.get("proxyServers");
+    const proxyServers = twpConfig.get('proxyServers');
     if (proxyServers?.google?.translateServer) {
       const url = new URL(googleService.baseURL);
       url.host = proxyServers.google.translateServer;
@@ -1776,14 +1776,14 @@ const translationService = (function() {
   });
 
   twpConfig.onChanged((name, newValue) => {
-    if (name === "proxyServers") {
+    if (name === 'proxyServers') {
       if (newValue?.google?.translateServer) {
         const url = new URL(googleService.baseURL);
         url.host = newValue.google.translateServer;
         googleService.baseURL = url.toString();
       } else {
         const url = new URL(googleService.baseURL);
-        url.host = "translate-pa.googleapis.com";
+        url.host = 'translate-pa.googleapis.com';
         googleService.baseURL = url.toString();
       }
     }
