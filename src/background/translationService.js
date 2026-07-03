@@ -3,6 +3,48 @@
 const translationService = (function() {
   const translationService = {};
 
+  class FetchUtils {
+    /**
+     * @param {string} url
+     * @returns {Promise<string>}
+     */
+    static async fetchText(url) {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+      return await response.text();
+    }
+
+    /**
+     * @param {string} url
+     * @param {{
+     *   method?: string,
+     *   headers?: Record<string, string>,
+     *   body?: string
+     * }} [options]
+     * @returns {Promise<unknown>}
+     */
+    static async fetchJson(url, options = {}) {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        return await response.json();
+      }
+
+      const text = await response.text();
+      try {
+        return JSON.parse(text);
+      } catch {
+        return text;
+      }
+    }
+  }
+
   class Utils {
     /**
      * Replace the characters `& < > " '` with `&amp; &lt; &gt; &quot; &#39;`.
@@ -139,39 +181,33 @@ const translationService = (function() {
             ]),
           );
 
-          const http = new XMLHttpRequest();
-          http.open(
-            'GET',
+          FetchUtils.fetchText(
             'https://translate.googleapis.com/_/translate_http/_/js/k=translate_http.tr.en_US.YusFYy3P_ro.O/am=AAg/d=1/exm=el_conf/ed=1/rs=AN8SPfq1Hb8iJRleQqQc8zhdzXmF9E56eQ/m=el_main',
-          );
-          http.send();
-          http.onload = (e) => {
-            if (http.responseText && http.responseText.length > 1) {
-              const result = http.responseText.match(
-                /['"]x\-goog\-api\-key['"]\s*\:\s*['"](\w{39})['"]/i,
-              );
-              console.log(result);
-              if (result && result.length === 2) {
-                GoogleHelper_v2.#translateAuth = result[1];
-                GoogleHelper_v2.#AuthNotFound = false;
+          )
+            .then((responseText) => {
+              if (responseText && responseText.length > 1) {
+                const result = responseText.match(
+                  /['"]x\-goog\-api\-key['"]\s*\:\s*['"](\w{39})['"]/i,
+                );
+                if (result && result.length === 2) {
+                  GoogleHelper_v2.#translateAuth = result[1];
+                  GoogleHelper_v2.#AuthNotFound = false;
+                } else {
+                  GoogleHelper_v2.#AuthNotFound = true;
+                  GoogleHelper_v2.#translateAuth = alternativeKey;
+                }
               } else {
                 GoogleHelper_v2.#AuthNotFound = true;
                 GoogleHelper_v2.#translateAuth = alternativeKey;
               }
-            } else {
-              GoogleHelper_v2.#AuthNotFound = true;
+            })
+            .catch((e) => {
+              console.error(e);
               GoogleHelper_v2.#translateAuth = alternativeKey;
-            }
-            resolve();
-          };
-          http.onerror =
-            http.onabort =
-            http.ontimeout =
-              (e) => {
-                console.error(e);
-                GoogleHelper_v2.#translateAuth = alternativeKey;
-                resolve();
-              };
+            })
+            .finally(() => {
+              resolve();
+            });
         } else {
           resolve();
         }
@@ -226,29 +262,24 @@ const translationService = (function() {
         if (updateYandexSid) {
           YandexHelper.#lastRequestSidTime = Date.now();
 
-          const http = new XMLHttpRequest();
-          http.open(
-            'GET',
+          FetchUtils.fetchText(
             'https://translate.yandex.net/website-widget/v1/widget.js?widgetId=ytWidget&pageLang=es&widgetTheme=light&autoMode=false',
-          );
-          http.send();
-          http.onload = (e) => {
-            const result = http.responseText.match(/sid\:\s\'[0-9a-f\.]+/);
-            if (result && result[0] && result[0].length > 7) {
-              YandexHelper.#translateSid = result[0].substring(6);
-              YandexHelper.#SIDNotFound = false;
-            } else {
-              YandexHelper.#SIDNotFound = true;
-            }
-            resolve();
-          };
-          http.onerror =
-            http.onabort =
-            http.ontimeout =
-              (e) => {
-                console.error(e);
-                resolve();
-              };
+          )
+            .then((responseText) => {
+              const result = responseText.match(/sid\:\s\'[0-9a-f\.]+/);
+              if (result && result[0] && result[0].length > 7) {
+                YandexHelper.#translateSid = result[0].substring(6);
+                YandexHelper.#SIDNotFound = false;
+              } else {
+                YandexHelper.#SIDNotFound = true;
+              }
+            })
+            .catch((e) => {
+              console.error(e);
+            })
+            .finally(() => {
+              resolve();
+            });
         } else {
           resolve();
         }
@@ -304,25 +335,21 @@ const translationService = (function() {
         if (updateBingAuth) {
           BingHelper.#lastRequestAuthTime = Date.now();
 
-          const http = new XMLHttpRequest();
-          http.open('GET', 'https://edge.microsoft.com/translate/auth');
-          http.send();
-          http.onload = (e) => {
-            if (http.responseText && http.responseText.length > 1) {
-              BingHelper.#translateAuth = http.responseText;
-              BingHelper.#AuthNotFound = false;
-            } else {
-              BingHelper.#AuthNotFound = true;
-            }
-            resolve();
-          };
-          http.onerror =
-            http.onabort =
-            http.ontimeout =
-              (e) => {
-                console.error(e);
-                resolve();
-              };
+          FetchUtils.fetchText('https://edge.microsoft.com/translate/auth')
+            .then((responseText) => {
+              if (responseText && responseText.length > 1) {
+                BingHelper.#translateAuth = responseText;
+                BingHelper.#AuthNotFound = false;
+              } else {
+                BingHelper.#AuthNotFound = true;
+              }
+            })
+            .catch((e) => {
+              console.error(e);
+            })
+            .finally(() => {
+              resolve();
+            });
         } else {
           resolve();
         }
@@ -543,54 +570,38 @@ const translationService = (function() {
     }
 
     /**
-     * Makes a request using the *XMLHttpRequest* API. Returns a promise that will be resolved with the result of the request. If the request fails, the promise will be rejected.
+     * Makes a request using `fetch()`. Returns a promise that will be resolved with the result of the request. If the request fails, the promise will be rejected.
      * @param {string} sourceLanguage
      * @param {string} targetLanguage
      * @param {Array<TranslationInfo>} requests
      * @returns {Promise<*>}
      */
     async makeRequest(sourceLanguage, targetLanguage, requests) {
-      return await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open(
-          this.xhrMethod,
-          this.baseURL +
-            (this.cbGetExtraParameters ?
-              this.cbGetExtraParameters(
-                sourceLanguage,
-                targetLanguage,
-                requests,
-              ) :
-              ''),
-        );
+      /** @type {Record<string, string>} */
+      const headers = {};
+      if (this.cbGetExtraHeaders) {
+        this.cbGetExtraHeaders().forEach((header) => {
+          headers[header.name] = header.value;
+        });
+      }
 
-        if (this.cbGetExtraHeaders) {
-          const headers = this.cbGetExtraHeaders();
-          headers.forEach((header) => {
-            xhr.setRequestHeader(header.name, header.value);
-          });
-        }
-
-        xhr.responseType = 'json';
-
-        xhr.onload = (event) => {
-          resolve(xhr.response);
-        };
-
-        xhr.onerror =
-          xhr.onabort =
-          xhr.ontimeout =
-            (event) => {
-              console.error(event);
-              reject();
-            };
-
-        xhr.send(
-          this.cbGetRequestBody ?
+      return await FetchUtils.fetchJson(
+        this.baseURL +
+          (this.cbGetExtraParameters ?
+            this.cbGetExtraParameters(
+              sourceLanguage,
+              targetLanguage,
+              requests,
+            ) :
+            ''),
+        {
+          method: this.xhrMethod,
+          headers,
+          body: this.cbGetRequestBody ?
             this.cbGetRequestBody(sourceLanguage, targetLanguage, requests) :
             undefined,
-        );
-      });
+        },
+      );
     }
 
     /**
@@ -1075,29 +1086,36 @@ const translationService = (function() {
         function cbTransformResponse(result, dontSortResults) {
           const resultArray = [];
 
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(result, 'text/html');
-          let currText = '';
-          doc.body.childNodes.forEach((node) => {
-            if (dontSortResults) {
-              if (node.nodeName == '#text') {
-                currText += node.textContent;
-              } else {
-                resultArray.push(currText + node.textContent);
-                currText = '';
-              }
-            } else {
-              if (node.nodeName == '#text') {
-                currText += node.textContent;
-              } else {
-                const id = parseInt(node.nodeName.slice(1)) - 10;
-                resultArray[id] = currText + node.textContent;
-                currText = '';
-              }
-            }
-          });
+          let pendingText = '';
+          let lastIndex = 0;
+          let lastResultIndex = -1;
 
-          return resultArray;
+          for (
+            const match of result.matchAll(/<b([0-9]+)>([\s\S]*?)<\/b\1>/g)
+          ) {
+            pendingText += result.slice(lastIndex, match.index);
+
+            const text = pendingText + match[2];
+            if (dontSortResults) {
+              resultArray.push(text);
+              lastResultIndex = resultArray.length - 1;
+            } else {
+              lastResultIndex = parseInt(match[1], 10) - 10;
+              resultArray[lastResultIndex] = text;
+            }
+
+            pendingText = '';
+            lastIndex = match.index + match[0].length;
+          }
+
+          const trailingText = result.slice(lastIndex);
+          if (lastResultIndex !== -1 && trailingText) {
+            resultArray[lastResultIndex] += trailingText;
+          } else if (resultArray.length === 0) {
+            resultArray.push(result);
+          }
+
+          return resultArray.map((value) => Utils.unescapeHTML(value));
         },
         function cbGetExtraParameters(
           sourceLanguage,
@@ -1559,89 +1577,111 @@ const translationService = (function() {
     )[0][0];
   };
 
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    // If the translation request came from an incognito window, the translation should not be cached on disk.
-    let dontSaveInPersistentCache = true;
-    if (twpConfig.get('enableDiskCache') !== 'yes') {
-      dontSaveInPersistentCache = true;
-    } else {
-      dontSaveInPersistentCache = sender.tab ? sender.tab.incognito : false;
-    }
+  translationService.removeTranslationsWithError = () => {
+    serviceList.forEach((service) => {
+      if (service.removeTranslationsWithError) {
+        service.removeTranslationsWithError();
+      }
+    });
+  };
 
-    if (request.action === 'translateHTML') {
-      translationService
-        .translateHTML(
-          request.translationService,
-          request.sourceLanguage,
-          request.targetLanguage,
-          request.sourceArray2d,
-          dontSaveInPersistentCache,
-          request.dontSortResults,
-        )
-        .then((results) => sendResponse(results))
-        .catch((e) => {
-          sendResponse();
-          console.error(e);
-        });
+  translationService.createLibreService = (libre) => {
+    serviceList.set(
+      'libre',
+      createLibreService(libre.url, libre.apiKey),
+    );
+  };
 
-      return true;
-    } else if (request.action === 'translateText') {
-      translationService
-        .translateText(
-          request.translationService,
-          request.sourceLanguage,
-          request.targetLanguage,
-          request.sourceArray,
-          dontSaveInPersistentCache,
-        )
-        .then((results) => sendResponse(results))
-        .catch((e) => {
-          sendResponse();
-          console.error(e);
-        });
+  translationService.removeLibreService = () => {
+    serviceList.delete('libre');
+  };
 
-      return true;
-    } else if (request.action === 'translateSingleText') {
-      translationService
-        .translateSingleText(
-          request.translationService,
-          request.sourceLanguage,
-          request.targetLanguage,
-          request.source,
-          dontSaveInPersistentCache,
-        )
-        .then((results) => sendResponse(results))
-        .catch((e) => {
-          sendResponse();
-          console.error(e);
-        });
+  translationService.createDeeplFreeApiService = (deeplFreeApi) => {
+    serviceList.set(
+      'deepl',
+      createDeeplFreeApiService(deeplFreeApi.apiKey),
+    );
+  };
 
-      return true;
-    } else if (request.action === 'removeTranslationsWithError') {
-      serviceList.forEach((service) => {
-        if (service.removeTranslationsWithError) {
-          service.removeTranslationsWithError();
-        }
-      });
-    } else if (request.action === 'createLibreService') {
-      serviceList.set(
-        'libre',
-        createLibreService(request.libre.url, request.libre.apiKey),
-      );
-    } else if (request.action === 'removeLibreService') {
-      serviceList.delete('libre');
-    } else if (request.action === 'createDeeplFreeApiService') {
-      serviceList.set(
-        'deepl',
-        createDeeplFreeApiService(request.deepl_freeapi.apiKey),
-      );
-    } else if (request.action === 'removeDeeplFreeApiService') {
-      serviceList.set(
-        'deepl',
-        /** @type {Service} */ /** @type {?} */ (deeplService),
-      );
-    }
-  });
+  translationService.removeDeeplFreeApiService = () => {
+    serviceList.set(
+      'deepl',
+      /** @type {Service} */ /** @type {?} */ (deeplService),
+    );
+  };
+
+  if (!globalThis.__TWP_DISABLE_BACKGROUND_MESSAGE_LISTENERS) {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      // If the translation request came from an incognito window, the translation should not be cached on disk.
+      let dontSaveInPersistentCache = true;
+      if (twpConfig.get('enableDiskCache') !== 'yes') {
+        dontSaveInPersistentCache = true;
+      } else {
+        dontSaveInPersistentCache = sender.tab ? sender.tab.incognito : false;
+      }
+
+      if (request.action === 'translateHTML') {
+        translationService
+          .translateHTML(
+            request.translationService,
+            request.sourceLanguage,
+            request.targetLanguage,
+            request.sourceArray2d,
+            dontSaveInPersistentCache,
+            request.dontSortResults,
+          )
+          .then((results) => sendResponse(results))
+          .catch((e) => {
+            sendResponse();
+            console.error(e);
+          });
+
+        return true;
+      } else if (request.action === 'translateText') {
+        translationService
+          .translateText(
+            request.translationService,
+            request.sourceLanguage,
+            request.targetLanguage,
+            request.sourceArray,
+            dontSaveInPersistentCache,
+          )
+          .then((results) => sendResponse(results))
+          .catch((e) => {
+            sendResponse();
+            console.error(e);
+          });
+
+        return true;
+      } else if (request.action === 'translateSingleText') {
+        translationService
+          .translateSingleText(
+            request.translationService,
+            request.sourceLanguage,
+            request.targetLanguage,
+            request.source,
+            dontSaveInPersistentCache,
+          )
+          .then((results) => sendResponse(results))
+          .catch((e) => {
+            sendResponse();
+            console.error(e);
+          });
+
+        return true;
+      } else if (request.action === 'removeTranslationsWithError') {
+        translationService.removeTranslationsWithError();
+      } else if (request.action === 'createLibreService') {
+        translationService.createLibreService(request.libre);
+      } else if (request.action === 'removeLibreService') {
+        translationService.removeLibreService();
+      } else if (request.action === 'createDeeplFreeApiService') {
+        translationService.createDeeplFreeApiService(request.deepl_freeapi);
+      } else if (request.action === 'removeDeeplFreeApiService') {
+        translationService.removeDeeplFreeApiService();
+      }
+    });
+  }
 
   twpConfig.onReady(function() {
     if (twpConfig.get('customServices').find((cs) => cs.name === 'libre')) {

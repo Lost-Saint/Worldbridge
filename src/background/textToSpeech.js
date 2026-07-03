@@ -3,6 +3,85 @@
 const textToSpeech = (function() {
   const textToSpeech = {};
 
+  class FetchUtils {
+    /**
+     * @param {string} text
+     * @returns {string}
+     */
+    static escapeXML(text) {
+      return text
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&apos;');
+    }
+
+    /**
+     * @param {ArrayBuffer} arrayBuffer
+     * @param {string} mimeType
+     * @returns {string}
+     */
+    static arrayBufferToDataUrl(arrayBuffer, mimeType) {
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      const chunkSize = 0x8000;
+      for (let index = 0; index < bytes.length; index += chunkSize) {
+        const chunk = bytes.subarray(index, index + chunkSize);
+        binary += String.fromCharCode(...chunk);
+      }
+      return `data:${mimeType};base64,${btoa(binary)}`;
+    }
+  }
+
+  class AudioAmplifier {
+    constructor() {
+      /** @type {MediaElementAudioSourceNode[]} */
+      this.sources = [];
+      if (
+        typeof window !== 'undefined' &&
+        'AudioContext' in window
+      ) {
+        this.audioCtx = new AudioContext();
+        this.audioCtx.suspend();
+        this.gainNode = this.audioCtx.createGain();
+        this.gainNode.gain.value = 1;
+        this.gainNode.connect(this.audioCtx.destination);
+      }
+    }
+
+    /**
+     * @param {HTMLAudioElement} audio
+     */
+    async amplify(audio) {
+      if (!this.audioCtx) { return; }
+      const existingSource = this.sources.find((source) => source.mediaElement === audio);
+      if (existingSource) {
+        await this.audioCtx.resume();
+        return;
+      }
+
+      const source = this.audioCtx.createMediaElementSource(audio);
+      this.sources.push(source);
+      source.connect(this.gainNode);
+      await this.audioCtx.resume();
+    }
+
+    /**
+     * @param {number} volume
+     */
+    setVolume(volume) {
+      if (!this.gainNode) { return; }
+      this.gainNode.gain.value = volume > 1 ? volume : 1;
+    }
+
+    async suspend() {
+      if (this.audioCtx) {
+        await this.audioCtx.suspend();
+      }
+    }
+  }
+
   class BingHelper {
     /** @type {number} */
     static #lastRequestTime = null;
@@ -60,54 +139,49 @@ const textToSpeech = (function() {
         if (updateBingAuth) {
           BingHelper.#lastRequestTime = Date.now();
 
-          const http = new XMLHttpRequest();
-          http.open('GET', 'https://www.bing.com/translator');
-          http.send();
-          http.onload = (e) => {
-            try {
-              if (!(http.responseText && http.responseText.length > 1)) {
-                throw new Error('Not found');
-              }
+          fetch('https://www.bing.com/translator')
+            .then((response) => response.text())
+            .then((responseText) => {
+              try {
+                if (!(responseText && responseText.length > 1)) {
+                  throw new Error('Not found');
+                }
 
-              const responseText = http.responseText;
-              const IG = responseText.match(/IG:"([^"]+)"/)[1];
-              const IID = responseText.match(/data\-iid\="([^"]+)"/)[1];
+                const IG = responseText.match(/IG:"([^"]+)"/)[1];
+                const IID = responseText.match(/data\-iid\="([^"]+)"/)[1];
 
-              const abhStartText = 'params_AbusePreventionHelper = [';
-              const abhStartIndex = responseText.indexOf(abhStartText);
-              if (abhStartIndex === -1) {
-                throw new Error('Not found 2');
-              }
-              const abhEndIndex = responseText.indexOf(']', abhStartIndex);
-              if (abhEndIndex === -1) {
-                throw new Error('Not found 3');
-              }
-              const abhText = responseText.slice(
-                abhStartIndex + abhStartText.length - 1,
-                abhEndIndex + 1,
-              );
-              const abh = JSON.parse(abhText);
-              const key = abh[0];
-              const token = abh[1];
+                const abhStartText = 'params_AbusePreventionHelper = [';
+                const abhStartIndex = responseText.indexOf(abhStartText);
+                if (abhStartIndex === -1) {
+                  throw new Error('Not found 2');
+                }
+                const abhEndIndex = responseText.indexOf(']', abhStartIndex);
+                if (abhEndIndex === -1) {
+                  throw new Error('Not found 3');
+                }
+                const abhText = responseText.slice(
+                  abhStartIndex + abhStartText.length - 1,
+                  abhEndIndex + 1,
+                );
+                const abh = JSON.parse(abhText);
+                const key = abh[0];
+                const token = abh[1];
 
-              BingHelper.#IG = IG;
-              BingHelper.#IID = IID;
-              BingHelper.#key = key;
-              BingHelper.#token = token;
-              BingHelper.#notFound = false;
-            } catch (e) {
-              BingHelper.#notFound = true;
-            } finally {
-              resolve();
-            }
-          };
-          http.onerror =
-            http.onabort =
-            http.ontimeout =
-              (e) => {
-                console.error(e);
+                BingHelper.#IG = IG;
+                BingHelper.#IID = IID;
+                BingHelper.#key = key;
+                BingHelper.#token = token;
+                BingHelper.#notFound = false;
+              } catch (e) {
+                BingHelper.#notFound = true;
+              } finally {
                 resolve();
-              };
+              }
+            })
+            .catch((e) => {
+              console.error(e);
+              resolve();
+            });
         } else {
           resolve();
         }
@@ -241,66 +315,6 @@ const textToSpeech = (function() {
    * @return {string} requestBody
    */
 
-  class AudioAmplifier {
-    /**
-     * Defines the Amplifier class for the text-to-speech service.
-     */
-    constructor() {
-      /** @type {MediaElementAudioSourceNode[]} */
-      this.sources = [];
-      if ('AudioContext' in window) {
-        this.audioCtx = new AudioContext();
-        this.audioCtx.suspend();
-        this.gainNode = this.audioCtx.createGain();
-        this.gainNode.gain.value = 1;
-        this.gainNode.connect(this.audioCtx.destination);
-      }
-    }
-
-    /**
-     * Amplify the audio.
-     * @param {HTMLAudioElement} audio
-     */
-    async amplify(audio) {
-      if (!this.audioCtx) { return; }
-      if (this.sources.find((source) => source.mediaElement === audio)) {
-        await this.audioCtx.resume();
-        return;
-      }
-
-      const source = this.audioCtx.createMediaElementSource(audio);
-      this.sources.push(source);
-
-      source.connect(this.gainNode);
-
-      await this.audioCtx.resume();
-    }
-
-    /**
-     * Set the volume of the amplifier.
-     * @param {number} volume
-     */
-    setVolume(volume) {
-      if (!this.gainNode) { return; }
-      if (volume > 1) {
-        this.gainNode.gain.value = volume;
-      } else {
-        this.gainNode.gain.value = 1;
-      }
-    }
-
-    /**
-     * Suspend the audio context.
-     * https://github.com/FilipePS/Traduzir-paginas-web/issues/802
-     * @returns {Promise<void>} Promise\<void\>
-     */
-    async suspend() {
-      if (this.audioCtx) {
-        await this.audioCtx.suspend();
-      }
-    }
-  }
-
   class Service {
     /**
      * Defines the Service class for the text-to-speech service.
@@ -323,10 +337,12 @@ const textToSpeech = (function() {
       this.cbGetExtraParameters = cbGetExtraParameters;
       this.cbGetRequestBody = cbGetRequestBody;
 
-      /** @type {Map<string, HTMLAudioElement>} */
+      /** @type {Map<string, string>} */
       this.audios = new Map();
       this.audioSpeed = 1.0;
-
+      this.audioVolume = 1.0;
+      /** @type {HTMLAudioElement[]} */
+      this.currentAudios = [];
       this.audioAmplifier = new AudioAmplifier();
     }
 
@@ -383,36 +399,28 @@ const textToSpeech = (function() {
      * The promise is rejected if there is an error.
      * @param {string} text
      * @param {string} targetLanguage
-     * @returns {Promise<any>} Promise\<blob\>
+     * @returns {Promise<string>} Promise\<dataUrl\>
      */
     async makeRequest(text, targetLanguage) {
-      return await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.onload = (e) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.onerror = () => reject();
-          reader.readAsDataURL(xhr.response);
-        };
-        xhr.onerror = (e) => {
-          console.error(e);
-          reject();
-        };
-        xhr.open(
-          this.xhrMethod,
-          this.baseURL + this.cbGetExtraParameters(text, targetLanguage),
-        );
-        xhr.responseType = 'blob';
-        if (this.cbGetRequestBody) {
-          xhr.setRequestHeader(
-            'Content-Type',
-            'application/x-www-form-urlencoded',
-          );
-          xhr.send(this.cbGetRequestBody(text, targetLanguage));
-        } else {
-          xhr.send();
-        }
-      });
+      const response = await fetch(
+        this.baseURL + this.cbGetExtraParameters(text, targetLanguage),
+        {
+          method: this.xhrMethod,
+          headers: this.cbGetRequestBody ?
+            { 'Content-Type': 'application/x-www-form-urlencoded' } :
+            undefined,
+          body: this.cbGetRequestBody ?
+            this.cbGetRequestBody(text, targetLanguage) :
+            undefined,
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+      return FetchUtils.arrayBufferToDataUrl(
+        await response.arrayBuffer(),
+        response.headers.get('content-type') || 'audio/mpeg',
+      );
     }
 
     /**
@@ -433,13 +441,12 @@ const textToSpeech = (function() {
         const audioKey = [targetLanguage, requestText].join(', ');
         if (!this.audios.get(audioKey)) {
           promises.push(
-            this.makeRequest(requestText, targetLanguage)
-              .then(
-                /** @type {string} */ (response) => {
-                  const audio = new Audio(response);
-                  this.audios.set(audioKey, audio);
-                  return response;
-                },
+                this.makeRequest(requestText, targetLanguage)
+                  .then(
+                    /** @type {string} */ (response) => {
+                      this.audios.set(audioKey, response);
+                      return response;
+                    },
               )
               .catch((e) => {
                 console.error(e);
@@ -457,51 +464,62 @@ const textToSpeech = (function() {
 
     /**
      * Play the audio or all the audio in the array.
-     * @param {HTMLAudioElement | HTMLAudioElement[]} audios
+     * @param {string | (string | undefined)[]} audios
      */
     async play(audios) {
       this.stopAll();
-      const result = await new Promise(async (resolve) => {
-        try {
-          if (audios instanceof Array) {
-            const playAll = async (/** @type {number} */ currentIndex) => {
-              this.stopAll();
-              const audio = audios[currentIndex];
-              if (audio) {
-                audio.playbackRate = this.audioSpeed;
-                await this.audioAmplifier.amplify(audio);
-                audio.play();
-                audio.addEventListener(
-                  'ended',
-                  () => {
-                    playAll(currentIndex + 1);
-                  },
-                  { once: true },
-                );
-              } else {
-                resolve();
-              }
-            };
-            playAll(0);
-          } else if (audios instanceof HTMLAudioElement) {
-            audios.playbackRate = this.audioSpeed;
-            await this.audioAmplifier.amplify(audios);
-            audios.play();
-            audios.addEventListener(
-              'ended',
-              () => {
-                resolve();
-              },
-              { once: true },
-            );
-          }
-        } catch (e) {
-          console.error(e);
-          resolve();
-        }
+      const audioSources = (audios instanceof Array ? audios : [audios]).filter(Boolean);
+      if (audioSources.length === 0) {
+        return;
+      }
+
+      if (typeof globalThis.twpEnsureOffscreenDocument === 'function') {
+        await globalThis.twpEnsureOffscreenDocument();
+        return await chrome.runtime.sendMessage({
+          target: 'offscreen-audio',
+          action: 'playAudioSequence',
+          audioSources,
+          playbackRate: this.audioSpeed,
+          volume: this.audioVolume,
+        });
+      }
+
+      this.currentAudios = audioSources.map((source) => {
+        const audio = new Audio(source);
+        audio.preload = 'auto';
+        audio.playbackRate = this.audioSpeed;
+        audio.volume = this.audioVolume > 1 ? 1 : this.audioVolume;
+        return audio;
       });
-      await this.audioAmplifier.suspend();
-      return result;
+      this.audioAmplifier.setVolume(this.audioVolume);
+
+      return await new Promise((resolve) => {
+        const playNext = async (index) => {
+          if (index >= this.currentAudios.length) {
+            this.currentAudios = [];
+            await this.audioAmplifier.suspend();
+            resolve();
+            return;
+          }
+
+          const audio = this.currentAudios[index];
+          await this.audioAmplifier.amplify(audio);
+          audio.play();
+          audio.addEventListener(
+            'ended',
+            () => {
+              playNext(index + 1);
+            },
+            { once: true },
+          );
+        };
+
+        playNext(0).catch((error) => {
+          console.error(error);
+          this.currentAudios = [];
+          resolve();
+        });
+      });
     }
 
     /**
@@ -510,9 +528,6 @@ const textToSpeech = (function() {
      */
     setAudioSpeed(speed) {
       this.audioSpeed = speed;
-      this.audios.forEach((audio) => {
-        audio.playbackRate = this.audioSpeed;
-      });
     }
 
     /**
@@ -520,24 +535,30 @@ const textToSpeech = (function() {
      * @param {number} volume
      */
     setAudioVolume(volume) {
-      this.audios.forEach((audio) => {
-        audio.volume = volume > 1 ? 1 : volume;
-      });
-      this.audioAmplifier.setVolume(volume < 1 ? 1 : volume);
+      this.audioVolume = volume;
     }
 
     /**
      * Pause all audio and reset audio time to start
      */
     stopAll() {
-      this.audios.forEach((audio) => {
+      if (typeof globalThis.twpEnsureOffscreenDocument === 'function') {
+        chrome.runtime.sendMessage({
+          target: 'offscreen-audio',
+          action: 'stopAudioPlayback',
+        }).catch((error) => {
+          console.debug(error);
+        });
+        return;
+      }
+
+      this.currentAudios.forEach((audio) => {
         audio.pause();
-        // If `currentTime` is not `duration` an audio stream will remain active in Firefox
-        // https://github.com/FilipePS/Traduzir-paginas-web/issues/802
         if (!isNaN(audio.duration) && isFinite(audio.duration)) {
           audio.currentTime = audio.duration;
         }
       });
+      this.currentAudios = [];
       this.audioAmplifier.suspend();
     }
   }
@@ -570,51 +591,43 @@ const textToSpeech = (function() {
     },
     function getRequestBody(text, targetLanguage) {
       const languageData = BingHelper.getLanguageData(targetLanguage);
-
-      const domParser = new DOMParser();
-      const doc = domParser.parseFromString(
-        `<speak version='1.0' xml:lang=''><voice xml:lang='' xml:gender='' name=''><prosody rate='-20.00%'></prosody></voice></speak>`,
-        'text/xml',
-      );
-      doc.querySelector('speak').setAttribute('xml:lang', languageData.locale);
-      doc.querySelector('voice').setAttribute('xml:lang', languageData.locale);
-      doc
-        .querySelector('voice')
-        .setAttribute('xml:gender', languageData.gender);
-      doc.querySelector('voice').setAttribute('xml:name', languageData.voice);
-      doc.querySelector('prosody').textContent = text;
+      const ssml = `<speak version='1.0' xml:lang='${languageData.locale}'><voice xml:lang='${languageData.locale}' xml:gender='${languageData.gender}' name='${languageData.voice}'><prosody rate='-20.00%'>${FetchUtils.escapeXML(text)}</prosody></voice></speak>`;
 
       const params = new URLSearchParams();
-      params.append('ssml', new XMLSerializer().serializeToString(doc));
+      params.append('ssml', ssml);
       params.append('token', BingHelper.token);
       params.append('key', BingHelper.key.toString());
       return params.toString();
     },
   );
 
-  // Listen for messages coming from contentScript or other scripts.
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'textToSpeech') {
-      if (twpConfig.get('textToSpeechService') === 'bing') {
-        bingService
-          .textToSpeech(request.text, request.targetLanguage)
-          .finally(() => {
-            sendResponse();
-          });
-      } else {
-        googleService
-          .textToSpeech(request.text, request.targetLanguage)
-          .finally(() => {
-            sendResponse();
-          });
-      }
-
-      return true;
-    } else if (request.action === 'stopAudio') {
-      googleService.stopAll();
-      bingService.stopAll();
+  textToSpeech.play = async (text, targetLanguage) => {
+    if (twpConfig.get('textToSpeechService') === 'bing') {
+      await bingService.textToSpeech(text, targetLanguage);
+    } else {
+      await googleService.textToSpeech(text, targetLanguage);
     }
-  });
+  };
+
+  textToSpeech.stop = () => {
+    googleService.stopAll();
+    bingService.stopAll();
+  };
+
+  if (!globalThis.__TWP_DISABLE_BACKGROUND_MESSAGE_LISTENERS) {
+    // Listen for messages coming from contentScript or other scripts.
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.action === 'textToSpeech') {
+        textToSpeech.play(request.text, request.targetLanguage).finally(() => {
+          sendResponse();
+        });
+
+        return true;
+      } else if (request.action === 'stopAudio') {
+        textToSpeech.stop();
+      }
+    });
+  }
 
   // Listen for changes to the audio speed setting and apply it immediately.
   twpConfig.onReady(async () => {

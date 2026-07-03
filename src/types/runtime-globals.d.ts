@@ -34,9 +34,40 @@ declare const platformInfo: {
   isOpera: RegExpMatchArray | null;
 };
 
-declare const translationService: unknown;
+declare const translationService: {
+  translateHTML(
+    serviceName: string,
+    sourceLanguage: string,
+    targetLanguage: string,
+    sourceArray2d: string[][],
+    dontSaveInPersistentCache?: boolean,
+    dontSortResults?: boolean,
+  ): Promise<unknown>;
+  translateText(
+    serviceName: string,
+    sourceLanguage: string,
+    targetLanguage: string,
+    sourceArray: string[],
+    dontSaveInPersistentCache?: boolean,
+  ): Promise<unknown>;
+  translateSingleText(
+    serviceName: string,
+    sourceLanguage: string,
+    targetLanguage: string,
+    originalText: string,
+    dontSaveInPersistentCache?: boolean,
+  ): Promise<unknown>;
+  removeTranslationsWithError(): void;
+  createLibreService(libre: { url: string; apiKey: string }): void;
+  removeLibreService(): void;
+  createDeeplFreeApiService(deeplFreeApi: { apiKey: string }): void;
+  removeDeeplFreeApiService(): void;
+};
 declare const translationCache: unknown;
-declare const textToSpeech: unknown;
+declare const textToSpeech: {
+  play(text: string, targetLanguage: string): Promise<void>;
+  stop(): void;
+};
 
 declare function checkedLastError(): void;
 declare function tabsCreate(url: string, callback?: () => void): void;

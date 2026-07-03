@@ -1,5 +1,8 @@
 'use strict';
 
+const extensionAction = chrome.action || chrome.browserAction;
+const primaryActionContext = chrome.action ? 'action' : 'browser_action';
+
 // get mimetype
 /** @type {Record<number, string | null | undefined>} */
 var tabToMimeType = {};
@@ -300,17 +303,18 @@ function resetPageAction(tabId, forceShow = false) {
 }
 
 function resetBrowserAction(forceShow = false) {
+  if (!extensionAction) { return; }
   if (twpConfig.get('translateClickingOnce') === 'yes' && !forceShow) {
-    chrome.browserAction.setPopup({
+    extensionAction.setPopup({
       popup: '',
     });
   } else {
     if (twpConfig.get('useOldPopup') === 'yes') {
-      chrome.browserAction.setPopup({
+      extensionAction.setPopup({
         popup: 'popup/old-popup.html',
       });
     } else {
-      chrome.browserAction.setPopup({
+      extensionAction.setPopup({
         popup: 'popup/popup.html',
       });
     }
@@ -373,33 +377,37 @@ if (typeof chrome.contextMenus !== 'undefined') {
     chrome.contextMenus.create({
       id: 'browserAction-showPopup',
       title: twpI18n.getMessage('btnShowPopup'),
-      contexts: ['browser_action'],
+      contexts: [primaryActionContext],
     });
-    chrome.contextMenus.create({
-      id: 'pageAction-showPopup',
-      title: twpI18n.getMessage('btnShowPopup'),
-      contexts: ['page_action'],
-    });
+    if (chrome.pageAction) {
+      chrome.contextMenus.create({
+        id: 'pageAction-showPopup',
+        title: twpI18n.getMessage('btnShowPopup'),
+        contexts: ['page_action'],
+      });
+    }
     chrome.contextMenus.create({
       id: 'never-translate',
       title: twpI18n.getMessage('btnNeverTranslate'),
-      contexts: ['browser_action', 'page_action'],
+      contexts: chrome.pageAction ? [primaryActionContext, 'page_action'] : [primaryActionContext],
     });
     chrome.contextMenus.create({
       id: 'more-options',
       title: twpI18n.getMessage('btnMoreOptions'),
-      contexts: ['browser_action', 'page_action'],
+      contexts: chrome.pageAction ? [primaryActionContext, 'page_action'] : [primaryActionContext],
     });
     chrome.contextMenus.create({
       id: 'browserAction-translate-pdf',
       title: twpI18n.getMessage('msgTranslatePDF'),
-      contexts: ['browser_action'],
+      contexts: [primaryActionContext],
     });
-    chrome.contextMenus.create({
-      id: 'pageAction-translate-pdf',
-      title: twpI18n.getMessage('msgTranslatePDF'),
-      contexts: ['page_action'],
-    });
+    if (chrome.pageAction) {
+      chrome.contextMenus.create({
+        id: 'pageAction-translate-pdf',
+        title: twpI18n.getMessage('msgTranslatePDF'),
+        contexts: ['page_action'],
+      });
+    }
   };
   updateActionContextMenu();
 
@@ -462,8 +470,8 @@ if (typeof chrome.contextMenus !== 'undefined') {
     } else if (info.menuItemId == 'browserAction-showPopup') {
       resetBrowserAction(true);
 
-      if (chrome.browserAction.openPopup) {
-        chrome.browserAction.openPopup();
+      if (extensionAction?.openPopup) {
+        extensionAction.openPopup();
       }
 
       resetBrowserAction();
@@ -485,9 +493,9 @@ if (typeof chrome.contextMenus !== 'undefined') {
       if (
         mimeType &&
         mimeType.toLowerCase() === 'application/pdf' &&
-        typeof chrome.browserAction.openPopup !== 'undefined'
+        typeof extensionAction?.openPopup !== 'undefined'
       ) {
-        chrome.browserAction.openPopup();
+        extensionAction.openPopup();
       } else {
         tabsCreate('https://pdf.translatewebpages.org/');
       }
@@ -586,7 +594,7 @@ twpConfig.onReady(() => {
       }
     });
 
-    chrome.browserAction.onClicked.addListener((tab) => {
+    extensionAction?.onClicked.addListener((tab) => {
       chrome.tabs.sendMessage(
         tab.id,
         {
@@ -606,7 +614,7 @@ twpConfig.onReady(() => {
         }
       });
     }
-    chrome.browserAction.onClicked.addListener((tab) => {
+    extensionAction?.onClicked.addListener((tab) => {
       if (twpConfig.get('translateClickingOnce') === 'yes') {
         sendToggleTranslationMessage(tab.id);
       }
@@ -703,16 +711,20 @@ twpConfig.onReady(() => {
       }
 
       let darkMode = false;
-      darkMode = matchMedia('(prefers-color-scheme: dark)').matches;
+      if (typeof matchMedia === 'function') {
+        darkMode = matchMedia('(prefers-color-scheme: dark)').matches;
+      }
       updateIconInAllTabs();
 
-      matchMedia('(prefers-color-scheme: dark)').addEventListener(
-        'change',
-        () => {
-          darkMode = matchMedia('(prefers-color-scheme: dark)').matches;
-          updateIconInAllTabs();
-        },
-      );
+      if (typeof matchMedia === 'function') {
+        matchMedia('(prefers-color-scheme: dark)').addEventListener(
+          'change',
+          () => {
+            darkMode = matchMedia('(prefers-color-scheme: dark)').matches;
+            updateIconInAllTabs();
+          },
+        );
+      }
 
       function getSVGIcon(incognito = false) {
         const svgXml = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -876,17 +888,17 @@ twpConfig.onReady(() => {
             }
           }
 
-          if (chrome.browserAction) {
+          if (extensionAction) {
             if (
               pageLanguageState === 'translated' &&
               twpConfig.get('popupBlueWhenSiteIsTranslated') === 'yes'
             ) {
-              chrome.browserAction.setIcon({
+              extensionAction.setIcon({
                 tabId: tabId,
                 path: '/icons/icon-32-translated.png',
               });
             } else {
-              chrome.browserAction.setIcon({
+              extensionAction.setIcon({
                 tabId: tabId,
                 path: '/icons/icon-32.png',
               });
