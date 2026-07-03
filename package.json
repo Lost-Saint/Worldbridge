@@ -12,8 +12,6 @@
     "build:sign": "gulp --sign",
     "format": "dprint fmt",
     "format:check": "dprint check",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "polyfill": "webpack --entry=./polyfill.js --output-path=./src/lib --output-filename=polyfill.js -d inline-source-map",
     "typecheck": "tsc --noEmit -p jsconfig.json"
   },
@@ -26,9 +24,6 @@
     "@types/chrome": "^0.0.203",
     "@types/firefox-webext-browser": "^94.0.1",
     "crx3": "^1.1.3",
-    "eslint": "^10.6.0",
-    "eslint-plugin-jsdoc": "^63.0.10",
-    "globals": "^17.7.0",
     "gulp": "^5.0.1",
     "gulp-babel": "^8.1.0",
     "gulp-sourcemaps": "^3.0.0",
