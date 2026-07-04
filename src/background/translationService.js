@@ -2,6 +2,46 @@
 
 const translationService = (function() {
   const translationService = {};
+  const sessionStorageArea = chrome.storage && chrome.storage.session ?
+    chrome.storage.session :
+    null;
+  const deepLTabStorageKey = 'translationService.DeepLTabId';
+
+  function getSessionValue(key) {
+    return new Promise((resolve) => {
+      if (!sessionStorageArea) {
+        resolve(undefined);
+        return;
+      }
+
+      sessionStorageArea.get([key], (result) => {
+        checkedLastError();
+        resolve(result ? result[key] : undefined);
+      });
+    });
+  }
+
+  function setSessionValue(key, value) {
+    if (!sessionStorageArea) { return; }
+
+    if (typeof value === 'undefined' || value === null) {
+      sessionStorageArea.remove([key], checkedLastError);
+      return;
+    }
+
+    sessionStorageArea.set({ [key]: value }, checkedLastError);
+  }
+
+  function createRequestId() {
+    if (
+      typeof crypto !== 'undefined' &&
+      typeof crypto.randomUUID === 'function'
+    ) {
+      return crypto.randomUUID();
+    }
+
+    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  }
 
   class FetchUtils {
     /**
@@ -1236,6 +1276,100 @@ const translationService = (function() {
     constructor() {
       this.DeepLTab = null;
     }
+
+    /**
+     * @param {chrome.tabs.Tab | {id?: number} | null} tab
+     * @returns {boolean}
+     */
+    isDeepLTab(tab) {
+      if (!tab?.id) { return false; }
+      const tabUrl = tab.pendingUrl || tab.url || '';
+
+      try {
+        const url = new URL(tabUrl);
+        return url.hostname === 'www.deepl.com';
+      } catch {
+        return false;
+      }
+    }
+
+    /**
+     * @param {chrome.tabs.Tab | null} tab
+     */
+    setDeepLTab(tab) {
+      this.DeepLTab = tab;
+      setSessionValue(deepLTabStorageKey, tab?.id ?? null);
+    }
+
+    clearDeepLTab() {
+      this.setDeepLTab(null);
+    }
+
+    async getDeepLTab() {
+      if (this.isDeepLTab(this.DeepLTab)) {
+        return this.DeepLTab;
+      }
+
+      const storedTabId = await getSessionValue(deepLTabStorageKey);
+      if (!storedTabId) {
+        this.clearDeepLTab();
+        return null;
+      }
+
+      return await new Promise((resolve) => {
+        chrome.tabs.get(storedTabId, (tab) => {
+          const hasError = Boolean(chrome.runtime.lastError);
+          checkedLastError();
+
+          if (hasError || !this.isDeepLTab(tab)) {
+            this.clearDeepLTab();
+            resolve(null);
+            return;
+          }
+
+          this.DeepLTab = tab;
+          resolve(tab);
+        });
+      });
+    }
+
+    waitFirstTranslationResult(requestId, tabId, resolve) {
+      const listener = (request, sender) => {
+        if (request.action !== 'DeepL_firstTranslationResult') { return; }
+        if (request.requestId !== requestId) { return; }
+        if (sender.tab?.id !== tabId) { return; }
+
+        clearTimeout(timeoutHandler);
+        chrome.runtime.onMessage.removeListener(listener);
+        resolve([[request.result]]);
+      };
+      chrome.runtime.onMessage.addListener(listener);
+
+      const timeoutHandler = setTimeout(() => {
+        chrome.runtime.onMessage.removeListener(listener);
+        resolve([['']]);
+      }, 8000);
+    }
+
+    openDeepLTab(targetLanguage, text, requestId, resolve) {
+      tabsCreate(
+        `https://www.deepl.com/#!${
+          encodeURIComponent(
+            requestId,
+          )
+        }!${encodeURIComponent(targetLanguage)}!#${encodeURIComponent(text)}`,
+        (tab) => {
+          if (!tab?.id) {
+            resolve([['']]);
+            return;
+          }
+
+          this.setDeepLTab(tab);
+          this.waitFirstTranslationResult(requestId, tab.id, resolve);
+        },
+      );
+    }
+
     /**
      * @param {string} sourceLanguage - This parameter is not used
      * @param {*} targetLanguage
@@ -1262,70 +1396,45 @@ const translationService = (function() {
       }
 
       return await new Promise((resolve) => {
-        const waitFirstTranslationResult = () => {
-          const listener = (request, sender, sendResponse) => {
-            if (request.action === 'DeepL_firstTranslationResult') {
-              resolve([[request.result]]);
-              chrome.runtime.onMessage.removeListener(listener);
-            }
-          };
-          chrome.runtime.onMessage.addListener(listener);
+        const requestId = createRequestId();
+        const sourceText = sourceArray2d[0][0];
 
-          setTimeout(() => {
-            chrome.runtime.onMessage.removeListener(listener);
-            resolve([['']]);
-          }, 8000);
-        };
+        this.getDeepLTab().then((deepLTab) => {
+          if (deepLTab?.id) {
+            // chrome.tabs.update(tab.id, {active: true})
+            chrome.tabs.sendMessage(
+              deepLTab.id,
+              {
+                action: 'translateTextWithDeepL',
+                requestId,
+                text: sourceText,
+                targetLanguage,
+              },
+              {
+                frameId: 0,
+              },
+              (response) => {
+                const hasError = Boolean(chrome.runtime.lastError);
+                checkedLastError();
 
-        if (this.DeepLTab) {
-          chrome.tabs.get(this.DeepLTab.id, (tab) => {
-            checkedLastError();
-            if (tab) {
-              // chrome.tabs.update(tab.id, {active: true})
-              chrome.tabs.sendMessage(
-                tab.id,
-                {
-                  action: 'translateTextWithDeepL',
-                  text: sourceArray2d[0][0],
-                  targetLanguage,
-                },
-                {
-                  frameId: 0,
-                },
-                (response) => {
-                  checkedLastError();
-                  resolve([[response]]);
-                },
-              );
-            } else {
-              tabsCreate(
-                `https://www.deepl.com/#!${targetLanguage}!#${
-                  encodeURIComponent(
-                    sourceArray2d[0][0],
-                  )
-                }`,
-                (tab) => {
-                  this.DeepLTab = tab;
-                  waitFirstTranslationResult();
-                },
-              );
-              // resolve([[""]])
-            }
-          });
-        } else {
-          tabsCreate(
-            `https://www.deepl.com/#!${targetLanguage}!#${
-              encodeURIComponent(
-                sourceArray2d[0][0],
-              )
-            }`,
-            (tab) => {
-              this.DeepLTab = tab;
-              waitFirstTranslationResult();
-            },
-          );
-          // resolve([[""]])
-        }
+                if (hasError || typeof response !== 'string') {
+                  this.clearDeepLTab();
+                  this.openDeepLTab(
+                    targetLanguage,
+                    sourceText,
+                    requestId,
+                    resolve,
+                  );
+                  return;
+                }
+
+                resolve([[response]]);
+              },
+            );
+          } else {
+            this.openDeepLTab(targetLanguage, sourceText, requestId, resolve);
+          }
+        });
       });
     }
   })();

@@ -36,8 +36,8 @@ const textToSpeech = (function() {
 
   class AudioAmplifier {
     constructor() {
-      /** @type {MediaElementAudioSourceNode[]} */
-      this.sources = [];
+      /** @type {Map<HTMLAudioElement, MediaElementAudioSourceNode>} */
+      this.sources = new Map();
       if (
         typeof window !== 'undefined' &&
         'AudioContext' in window
@@ -55,16 +55,27 @@ const textToSpeech = (function() {
      */
     async amplify(audio) {
       if (!this.audioCtx) { return; }
-      const existingSource = this.sources.find((source) => source.mediaElement === audio);
+      const existingSource = this.sources.get(audio);
       if (existingSource) {
         await this.audioCtx.resume();
         return;
       }
 
       const source = this.audioCtx.createMediaElementSource(audio);
-      this.sources.push(source);
+      this.sources.set(audio, source);
       source.connect(this.gainNode);
       await this.audioCtx.resume();
+    }
+
+    /**
+     * @param {HTMLAudioElement} audio
+     */
+    release(audio) {
+      const source = this.sources.get(audio);
+      if (!source) { return; }
+
+      source.disconnect();
+      this.sources.delete(audio);
     }
 
     /**
@@ -508,6 +519,7 @@ const textToSpeech = (function() {
           audio.addEventListener(
             'ended',
             () => {
+              this.audioAmplifier.release(audio);
               playNext(index + 1);
             },
             { once: true },
@@ -557,6 +569,7 @@ const textToSpeech = (function() {
         if (!isNaN(audio.duration) && isFinite(audio.duration)) {
           audio.currentTime = audio.duration;
         }
+        this.audioAmplifier.release(audio);
       });
       this.currentAudios = [];
       this.audioAmplifier.suspend();

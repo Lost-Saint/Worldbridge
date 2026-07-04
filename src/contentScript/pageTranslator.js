@@ -431,6 +431,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   let nodesToRestore = [];
 
   function translateNewNodes() {
+    let hasPendingTranslations = false;
     try {
       newNodes.forEach((nn) => {
         if (removedNodes.indexOf(nn) != -1) { return; }
@@ -449,6 +450,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 
           if (!finded) {
             piecesToTranslate.push(newPiecesToTranslate[i]);
+            hasPendingTranslations = true;
           }
         }
       });
@@ -457,6 +459,10 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     } finally {
       newNodes = [];
       removedNodes = [];
+    }
+
+    if (hasPendingTranslations) {
+      scheduleTranslationRoutine();
     }
   }
 
@@ -535,11 +541,19 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 
     if (pageIsVisible && pageLanguageState === 'translated') {
       enableMutatinObserver();
+      scheduleTranslationRoutine(0);
     } else {
       disableMutatinObserver();
+      cancelScheduledTranslationRoutine();
     }
   };
   document.addEventListener('visibilitychange', handleVisibilityChange, false);
+  window.addEventListener('scroll', () => scheduleTranslationRoutine(), {
+    passive: true,
+  });
+  window.addEventListener('resize', () => scheduleTranslationRoutine(), {
+    passive: true,
+  });
 
   /**
    * @param {HTMLElement} node
@@ -984,11 +998,40 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     }
   }
 
+  var translationRoutine_handler = null;
+
+  function cancelScheduledTranslationRoutine() {
+    clearTimeout(translationRoutine_handler);
+    translationRoutine_handler = null;
+  }
+
+  function scheduleTranslationRoutine(delay = 300) {
+    if (pageLanguageState !== 'translated') {
+      cancelScheduledTranslationRoutine();
+      return;
+    }
+
+    clearTimeout(translationRoutine_handler);
+    translationRoutine_handler = setTimeout(() => {
+      translationRoutine_handler = null;
+      translationRoutine();
+    }, delay);
+  }
+
   function translationRoutine() {
     try {
-      if (piecesToTranslate && pageIsVisible) {
+      if (
+        pageLanguageState === 'translated' &&
+        piecesToTranslate &&
+        pageIsVisible
+      ) {
         (function() {
-          if (piecesToTranslate.length < 1) { return; }
+          if (
+            piecesToTranslate.length < 1 &&
+            attributesToTranslate.length < 1
+          ) {
+            return;
+          }
           const innerHeight = window.innerHeight;
 
           function isInScreen(element) {
@@ -1096,12 +1139,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     } catch (e) {
       console.error(e);
     }
-
-    clearTimeout(translationRoutine_handler);
-    translationRoutine_handler = setTimeout(translationRoutine, 300);
   }
-
-  translationRoutine();
 
   function translatePageTitle() {
     const title = document.querySelector('title');
@@ -1132,8 +1170,6 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
   pageTranslator.onPageLanguageStateChange = function(callback) {
     pageLanguageStateObservers.push(callback);
   };
-
-  var translationRoutine_handler = null;
 
   pageTranslator.translatePage = function(targetLanguage) {
     fooCount++;
@@ -1181,7 +1217,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 
     enableMutatinObserver();
 
-    translationRoutine();
+    scheduleTranslationRoutine(0);
   };
 
   pageTranslator.restorePage = function() {
@@ -1190,6 +1226,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
 
     showOriginal.disable();
     disableMutatinObserver();
+    cancelScheduledTranslationRoutine();
 
     pageLanguageState = 'original';
     chrome.runtime.sendMessage(
@@ -1216,7 +1253,7 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
         ntr.node.replaceWith(ntr.original);
       }
       if (ntr.originalScale) {
-        ntr.parentNode.style.transform = `scaleX(${ntr.originalScale}`;
+        ntr.parentNode.style.transform = `scaleX(${ntr.originalScale})`;
       }
     }
     nodesToRestore = [];
@@ -1318,28 +1355,27 @@ Promise.all([twpConfig.onReady(), getTabHostName()]).then(function(_) {
     } else if (request.action === 'currentTargetLanguage') {
       sendResponse(currentTargetLanguage);
     } else if (request.action === 'detectLanguageUsingTextContent') {
-      if (textContentLanguageDetectionPromise) {
-        textContentLanguageDetectionPromise.then((result) => sendResponse(result));
-      } else {
+      if (!textContentLanguageDetectionPromise) {
         textContentLanguageDetectionPromise = new Promise((resolve) => {
-          chrome.i18n.detectLanguage(
-            document.body.innerText.trim().slice(0, 1000),
-            (result) => {
-              // checkedLastError();
-              if (
-                result &&
-                result.languages &&
-                result.languages.length > 0
-              ) {
-                resolve(result.languages[0].language);
-                sendResponse(result.languages[0].language);
-              } else {
-                sendResponse('und');
-              }
-            },
-          );
+          const textContent = document.body?.innerText?.trim().slice(0, 1000) || '';
+          chrome.i18n.detectLanguage(textContent, (result) => {
+            // checkedLastError();
+            if (
+              result &&
+              result.languages &&
+              result.languages.length > 0
+            ) {
+              resolve(result.languages[0].language);
+            } else {
+              resolve('und');
+            }
+          });
+        }).finally(() => {
+          textContentLanguageDetectionPromise = null;
         });
       }
+
+      textContentLanguageDetectionPromise.then((result) => sendResponse(result));
       return true;
     }
   });

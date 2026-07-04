@@ -2,8 +2,8 @@
 
 class AudioAmplifier {
   constructor() {
-    /** @type {MediaElementAudioSourceNode[]} */
-    this.sources = [];
+    /** @type {Map<HTMLAudioElement, MediaElementAudioSourceNode>} */
+    this.sources = new Map();
     if ('AudioContext' in window) {
       this.audioCtx = new AudioContext();
       this.audioCtx.suspend();
@@ -15,16 +15,24 @@ class AudioAmplifier {
 
   async amplify(audio) {
     if (!this.audioCtx) { return; }
-    const existingSource = this.sources.find((source) => source.mediaElement === audio);
+    const existingSource = this.sources.get(audio);
     if (existingSource) {
       await this.audioCtx.resume();
       return;
     }
 
     const source = this.audioCtx.createMediaElementSource(audio);
-    this.sources.push(source);
+    this.sources.set(audio, source);
     source.connect(this.gainNode);
     await this.audioCtx.resume();
+  }
+
+  release(audio) {
+    const source = this.sources.get(audio);
+    if (!source) { return; }
+
+    source.disconnect();
+    this.sources.delete(audio);
   }
 
   setVolume(volume) {
@@ -56,6 +64,7 @@ function stopPlayback() {
     if (!isNaN(audio.duration) && isFinite(audio.duration)) {
       audio.currentTime = audio.duration;
     }
+    amplifier.release(audio);
   });
   currentAudios = [];
   amplifier.suspend();
@@ -93,6 +102,7 @@ async function playAudioSequence(audioSources, playbackRate, volume) {
       audio.addEventListener(
         'ended',
         () => {
+          amplifier.release(audio);
           if (currentAudios === audios) {
             playNext(index + 1);
           }

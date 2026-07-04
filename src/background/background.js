@@ -2,10 +2,54 @@
 
 const extensionAction = chrome.action || chrome.browserAction;
 const primaryActionContext = chrome.action ? 'action' : 'browser_action';
+const sessionStorageArea = chrome.storage && chrome.storage.session ? chrome.storage.session : null;
+
+function getSessionValues(defaults) {
+  return new Promise((resolve) => {
+    if (!sessionStorageArea) {
+      resolve(defaults);
+      return;
+    }
+
+    sessionStorageArea.get(defaults, (result) => {
+      checkedLastError();
+      resolve(result || defaults);
+    });
+  });
+}
+
+function setSessionValues(values) {
+  if (!sessionStorageArea) { return; }
+  sessionStorageArea.set(values, checkedLastError);
+}
 
 // get mimetype
 /** @type {Record<number, string | null | undefined>} */
 var tabToMimeType = {};
+let tabToMimeTypeLoadPromise = Promise.resolve();
+if (sessionStorageArea) {
+  tabToMimeTypeLoadPromise = getSessionValues({ tabToMimeType: {} }).then(
+    (result) => {
+      tabToMimeType = result.tabToMimeType || {};
+    },
+  );
+}
+
+function persistTabToMimeType() {
+  setSessionValues({ tabToMimeType });
+}
+
+async function getTabMimeTypeForTabId(tabId) {
+  if (typeof tabId !== 'number') { return undefined; }
+
+  if (typeof tabToMimeType[tabId] !== 'undefined') {
+    return tabToMimeType[tabId];
+  }
+
+  await tabToMimeTypeLoadPromise;
+  return tabToMimeType[tabId];
+}
+
 chrome.webRequest.onHeadersReceived.addListener(
   function(details) {
     if (details.tabId !== -1) {
@@ -17,6 +61,7 @@ chrome.webRequest.onHeadersReceived.addListener(
         }
       }
       tabToMimeType[details.tabId] = contentTypeHeader && contentTypeHeader.value.split(';', 1)[0];
+      persistTabToMimeType();
     }
   },
   {
@@ -104,7 +149,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     );
   } else if (request.action === 'getTabMimeType') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      sendResponse(tabToMimeType[tabs[0].id]);
+      getTabMimeTypeForTabId(tabs[0]?.id).then((mimeType) => {
+        sendResponse(mimeType);
+      });
     });
     return true;
   } else if (request.action === 'restorePagesWithServiceNames') {
@@ -413,6 +460,49 @@ if (typeof chrome.contextMenus !== 'undefined') {
 
   const tabHasContentScript = {};
   let currentTabId = null;
+
+  function probeContentScript(tabId, callback) {
+    if (typeof tabId !== 'number') {
+      callback(false);
+      return;
+    }
+
+    chrome.tabs.sendMessage(
+      tabId,
+      {
+        action: 'contentScriptIsInjected',
+      },
+      {
+        frameId: 0,
+      },
+      (response) => {
+        checkedLastError();
+        const hasContentScript = !!response;
+        tabHasContentScript[tabId] = hasContentScript;
+        callback(hasContentScript);
+      },
+    );
+  }
+
+  function openTranslateSelectedPopup(selectionText, tabId) {
+    if (
+      typeof tabId !== 'number' ||
+      !chrome.pageAction ||
+      !chrome.pageAction.openPopup
+    ) {
+      return;
+    }
+
+    chrome.pageAction.setPopup({
+      popup: 'popup/popup-translate-text.html#text=' +
+        encodeURIComponent(selectionText),
+      tabId,
+    });
+    chrome.pageAction.openPopup();
+
+    resetPageAction(tabId);
+  }
+
   chrome.tabs.onActivated.addListener((activeInfo) => {
     currentTabId = activeInfo.tabId;
     updateActionContextMenu();
@@ -420,17 +510,18 @@ if (typeof chrome.contextMenus !== 'undefined') {
 
   chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId == 'translate-web-page') {
-      const mimeType = tabToMimeType[tab.id];
-      if (
-        mimeType &&
-        mimeType.toLowerCase() === 'application/pdf' &&
-        chrome.pageAction &&
-        chrome.pageAction.openPopup
-      ) {
-        chrome.pageAction.openPopup();
-      } else {
-        sendToggleTranslationMessage(tab.id);
-      }
+      void getTabMimeTypeForTabId(tab?.id).then((mimeType) => {
+        if (
+          mimeType &&
+          mimeType.toLowerCase() === 'application/pdf' &&
+          chrome.pageAction &&
+          chrome.pageAction.openPopup
+        ) {
+          chrome.pageAction.openPopup();
+        } else if (tab?.id) {
+          sendToggleTranslationMessage(tab.id);
+        }
+      });
     } else if (info.menuItemId == 'translate-restore-this-frame') {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.tabs.sendMessage(
@@ -443,29 +534,33 @@ if (typeof chrome.contextMenus !== 'undefined') {
         );
       });
     } else if (info.menuItemId == 'translate-selected-text') {
-      if (
-        chrome.pageAction &&
-        chrome.pageAction.openPopup &&
-        (!tab || !tabHasContentScript[tab.id] || tab.isInReaderMode)
-      ) {
-        chrome.pageAction.setPopup({
-          popup: 'popup/popup-translate-text.html#text=' +
-            encodeURIComponent(info.selectionText),
-          tabId: tab?.id || currentTabId,
-        });
-        chrome.pageAction.openPopup();
+      const targetTabId = tab?.id || currentTabId;
+      if (!targetTabId) { return; }
 
-        resetPageAction(tab?.id || currentTabId);
-      } else {
-        // a merda do chrome não suporte openPopup
+      const sendTranslateSelectedTextMessage = () => {
         chrome.tabs.sendMessage(
-          tab.id,
+          targetTabId,
           {
             action: 'TranslateSelectedText',
             selectionText: info.selectionText,
           },
           checkedLastError,
         );
+      };
+
+      if (tab?.isInReaderMode) {
+        openTranslateSelectedPopup(info.selectionText, targetTabId);
+      } else if (chrome.pageAction && chrome.pageAction.openPopup) {
+        probeContentScript(targetTabId, (hasContentScript) => {
+          if (hasContentScript) {
+            sendTranslateSelectedTextMessage();
+          } else {
+            openTranslateSelectedPopup(info.selectionText, targetTabId);
+          }
+        });
+      } else {
+        // a merda do chrome não suporte openPopup
+        sendTranslateSelectedTextMessage();
       }
     } else if (info.menuItemId == 'browserAction-showPopup') {
       resetBrowserAction(true);
@@ -489,27 +584,29 @@ if (typeof chrome.contextMenus !== 'undefined') {
     } else if (info.menuItemId == 'more-options') {
       tabsCreate(chrome.runtime.getURL('/options/options.html'));
     } else if (info.menuItemId == 'browserAction-translate-pdf') {
-      const mimeType = tabToMimeType[tab.id];
-      if (
-        mimeType &&
-        mimeType.toLowerCase() === 'application/pdf' &&
-        typeof extensionAction?.openPopup !== 'undefined'
-      ) {
-        extensionAction.openPopup();
-      } else {
-        tabsCreate('https://pdf.translatewebpages.org/');
-      }
+      void getTabMimeTypeForTabId(tab?.id).then((mimeType) => {
+        if (
+          mimeType &&
+          mimeType.toLowerCase() === 'application/pdf' &&
+          typeof extensionAction?.openPopup !== 'undefined'
+        ) {
+          extensionAction.openPopup();
+        } else {
+          tabsCreate('https://pdf.translatewebpages.org/');
+        }
+      });
     } else if (info.menuItemId == 'pageAction-translate-pdf') {
-      const mimeType = tabToMimeType[tab.id];
-      if (
-        mimeType &&
-        mimeType.toLowerCase() === 'application/pdf' &&
-        typeof chrome.pageAction.openPopup !== 'undefined'
-      ) {
-        chrome.pageAction.openPopup();
-      } else {
-        tabsCreate('https://pdf.translatewebpages.org/');
-      }
+      void getTabMimeTypeForTabId(tab?.id).then((mimeType) => {
+        if (
+          mimeType &&
+          mimeType.toLowerCase() === 'application/pdf' &&
+          typeof chrome.pageAction.openPopup !== 'undefined'
+        ) {
+          chrome.pageAction.openPopup();
+        } else {
+          tabsCreate('https://pdf.translatewebpages.org/');
+        }
+      });
     }
   });
 
@@ -539,44 +636,17 @@ if (typeof chrome.contextMenus !== 'undefined') {
     if (tab.active && changeInfo.status == 'loading') {
       twpConfig.onReady(() => updateContextMenu());
     } else if (changeInfo.status == 'complete') {
-      chrome.tabs.sendMessage(
-        tabId,
-        {
-          action: 'contentScriptIsInjected',
-        },
-        {
-          frameId: 0,
-        },
-        (response) => {
-          checkedLastError();
-          tabHasContentScript[tabId] = !!response;
-        },
-      );
+      probeContentScript(tabId, () => {});
     }
   });
 
   chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
     delete tabHasContentScript[tabId];
+    delete tabToMimeType[tabId];
+    persistTabToMimeType();
   });
 
-  chrome.tabs.query({}, (tabs) =>
-    tabs.forEach((tab) =>
-      chrome.tabs.sendMessage(
-        tab.id,
-        {
-          action: 'contentScriptIsInjected',
-        },
-        {
-          frameId: 0,
-        },
-        (response) => {
-          checkedLastError();
-          if (response) {
-            tabHasContentScript[tab.id] = true;
-          }
-        },
-      )
-    ));
+  chrome.tabs.query({}, (tabs) => tabs.forEach((tab) => probeContentScript(tab.id, () => {})));
 }
 
 twpConfig.onReady(() => {

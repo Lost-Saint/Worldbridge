@@ -138,10 +138,19 @@ void (function() {
   if (location.hash.startsWith('#!')) {
     injectInformation();
 
-    let [targetLanguage, text] = location.hash.split('!#');
+    let [metadata, text] = location.hash.split('!#');
     location.hash = '';
 
-    targetLanguage = decodeURIComponent(targetLanguage.substring(2));
+    metadata = metadata.substring(2);
+    const metadataParts = metadata.split('!');
+    let requestId = null;
+    let targetLanguage = metadataParts[0];
+    if (metadataParts.length > 1) {
+      requestId = decodeURIComponent(metadataParts[0]);
+      targetLanguage = metadataParts[1];
+    }
+
+    targetLanguage = decodeURIComponent(targetLanguage);
     text = decodeURIComponent(text);
 
     setTimeout(() => {
@@ -151,6 +160,7 @@ void (function() {
           chrome.runtime.sendMessage(
             {
               action: 'DeepL_firstTranslationResult',
+              requestId,
               result,
             },
             checkedLastError,
@@ -161,6 +171,7 @@ void (function() {
           chrome.runtime.sendMessage(
             {
               action: 'DeepL_firstTranslationResult',
+              requestId,
               result: '',
             },
             checkedLastError,

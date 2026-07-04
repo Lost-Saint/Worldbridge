@@ -47,15 +47,31 @@ void (async function() {
   const shadowRoot = rootElement.attachShadow({ mode: 'closed' });
   shadowRoot.innerHTML = htmlText;
 
-  // update css property --popup-height
-  setInterval(() => {
+  let popupHeightInterval = null;
+
+  function updatePopupHeight() {
     const popupElement = shadowRoot.getElementById('popup');
     const menuOptions = shadowRoot.getElementById('menu-options');
+
+    if (!popupElement || !menuOptions) { return; }
+
     menuOptions.style.setProperty(
       '--popup-height',
       `${popupElement.clientHeight}px`,
     );
-  }, 1000);
+  }
+
+  function startPopupHeightUpdates() {
+    if (popupHeightInterval) { return; }
+
+    updatePopupHeight();
+    popupHeightInterval = setInterval(updatePopupHeight, 1000);
+  }
+
+  function stopPopupHeightUpdates() {
+    clearInterval(popupHeightInterval);
+    popupHeightInterval = null;
+  }
 
   // remove popup after 8 seconds of inactivity
   let lastInteraction = Date.now();
@@ -92,6 +108,7 @@ void (async function() {
 
     if (!rootElement.isConnected) {
       document.documentElement.appendChild(rootElement);
+      startPopupHeightUpdates();
       updatePadding();
 
       lastInteractionInterval = setInterval(() => {
@@ -114,6 +131,7 @@ void (async function() {
 
   function hidePopup(withoutAnimation = false) {
     clearInterval(lastInteractionInterval);
+    stopPopupHeightUpdates();
     if (rootElement.isConnected && !withoutAnimation) {
       const mainElement = shadowRoot.querySelector('main');
       const animation = mainElement.animate(
